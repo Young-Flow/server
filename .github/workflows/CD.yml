@@ -51,20 +51,23 @@ jobs:
     - name: 5. Grant execute permission for gradlew
       run: chmod +x gradlew
 
-    - name: 6. Build with Gradle, without test
+    - name: 6. Redis Server in GitHub Actions
+      uses: supercharge/redis-github-action@1.8.0
+
+    - name: 7. Build with Gradle, without test
       run: ./gradlew clean build -x test
       
-    - name: 7. Configure AWS credentials
+    - name: 8. Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
         role-to-assume: arn:aws:iam::491085415955:role/pitchain-gitactions-role
         aws-region: ap-northeast-2
 
-    - name: 8. Login to Amazon ECR
+    - name: 9. Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: 9. Build, tag, and push image to Amazon ECR
+    - name: 10. Build, tag, and push image to Amazon ECR
       id: build-image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -74,11 +77,11 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
-    - name: 10. Copy Task Definition JSON
+    - name: 11. Copy Task Definition JSON
       run: |
         echo '${{ secrets.TASK_DEFINITION_JSON }}' > ${{ env.ECS_TASK_DEFINITION }}
 
-    - name: 11. Fill in the new image ID in the Amazon ECS task definition
+    - name: 12. Fill in the new image ID in the Amazon ECS task definition
       id: task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
@@ -86,7 +89,7 @@ jobs:
         container-name: ${{ env.CONTAINER_NAME }}
         image: ${{ steps.build-image.outputs.image }}
 
-    - name: 12. Deploy Amazon ECS task definition
+    - name: 13. Deploy Amazon ECS task definition
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
         task-definition: ${{ steps.task-def.outputs.task-definition }}
