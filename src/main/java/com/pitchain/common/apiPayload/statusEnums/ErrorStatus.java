@@ -20,12 +20,17 @@ public enum ErrorStatus implements ResponseStatus {
 
     // member
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER4041", "존재하지 않는 사용자입니다."),
+    MEMBER_FORBIDDEN(HttpStatus.FORBIDDEN, "MEMBER4031", "사용자에게 권한이 없습니다."),
 
     // bm
     BM_NOT_FOUND(HttpStatus.NOT_FOUND, "BM4041", "존재하지 않는 BM입니다."),
 
     // sp
-    SP_NOT_FOUND(HttpStatus.NOT_FOUND, "SP4041", "존재하지 않는 SP입니다.");
+    SP_NOT_FOUND(HttpStatus.NOT_FOUND, "SP4041", "존재하지 않는 SP입니다."),
+
+    // comment
+    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENT4041", "존재하지 않는 댓글입니다.");
+
 
     private final HttpStatus httpStatus;
     private final String code;
