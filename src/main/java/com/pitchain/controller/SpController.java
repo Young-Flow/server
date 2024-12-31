@@ -30,4 +30,5 @@ public class SpController {
         SpRes spRes = spService.getSp(spId);
         return CustomApiResponse.onSuccess(spRes);
     }
+
 }
