@@ -18,13 +18,13 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class CommentService {
 
     private final CommentRepository commentRepository;
     private final BmRepository bmRepository;
     private final MemberRepository memberRepository;
 
+    @Transactional
     public void addComment(Long bmId, Long memberId, CommentDto.addCommentDto dto) {
         Member member = memberRepository.findById(memberId).orElseThrow(() ->
                 new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
@@ -65,6 +65,7 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
+    @Transactional(readOnly = true)
     public List<CommentRes> getComments(Long bmId) {
         Bm bm = bmRepository.findById(bmId).orElseThrow(() ->
                 new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
@@ -73,6 +74,7 @@ public class CommentService {
         return comments.stream().map(CommentRes::createRes).toList();
     }
 
+    @Transactional
     public void modifyComment(Long commentId, Long memberId, CommentDto.modifyCommentDto dto) {
         Member member = memberRepository.findById(memberId).orElseThrow(() ->
                 new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
@@ -86,6 +88,7 @@ public class CommentService {
         comment.changeComment(content);
     }
 
+    @Transactional
     public void removeComment(Long commentId, Long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(() ->
                 new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
