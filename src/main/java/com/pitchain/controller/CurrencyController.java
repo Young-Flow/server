@@ -17,8 +17,8 @@ public class CurrencyController {
     private final CurrencyService currencyService;
 
     @GetMapping("/currency")
-    public CustomApiResponse getCurrency(@AuthenticationPrincipal Long memberId,
-                                         @Valid @RequestBody CurrencyDto.RequestDto dto) {
+    public CustomApiResponse calculateExchangeRate(@AuthenticationPrincipal Long memberId,
+                                                   @Valid @RequestBody CurrencyDto.RequestDto dto) {
         String calculatedAmount = currencyService.calculateExchangeRate(memberId, dto);
 
         CurrencyDto.ResponseDto result = new CurrencyDto.ResponseDto();
