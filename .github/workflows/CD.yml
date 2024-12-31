@@ -3,7 +3,7 @@ name: CD
 on:
   push:
     branches: [ "dev" ]
-    
+
 env:
   AWS_REGION: ap-northeast-2                   # set this to your preferred AWS region, e.g. us-west-1
   ECR_REPOSITORY: pitchain                   # set this to your Amazon ECR repository name
@@ -11,7 +11,7 @@ env:
   ECS_CLUSTER: pitchain-cluster                 # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION: pitchain-task-definition.json  # Task Definition의 파일 이름
   CONTAINER_NAME: pitchain-cont           # set this to the name of the container in the
-  
+
 permissions:
   id-token: write
   contents: read
@@ -28,7 +28,7 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-        
+
     - name: 3. Gradle Caching
       uses: actions/cache@v3
       with:
@@ -51,23 +51,20 @@ jobs:
     - name: 5. Grant execute permission for gradlew
       run: chmod +x gradlew
 
-    - name: 6. Redis Server in GitHub Actions
-      uses: supercharge/redis-github-action@1.8.0
-
-    - name: 7. Build with Gradle, without test
+    - name: 6. Build with Gradle, without test
       run: ./gradlew clean build -x test
-      
-    - name: 8. Configure AWS credentials
+
+    - name: 7. Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
         role-to-assume: arn:aws:iam::491085415955:role/pitchain-gitactions-role
         aws-region: ap-northeast-2
 
-    - name: 9. Login to Amazon ECR
+    - name: 8. Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: 10. Build, tag, and push image to Amazon ECR
+    - name: 9. Build, tag, and push image to Amazon ECR
       id: build-image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -77,11 +74,11 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
-    - name: 11. Copy Task Definition JSON
+    - name: 10. Copy Task Definition JSON
       run: |
         echo '${{ secrets.TASK_DEFINITION_JSON }}' > ${{ env.ECS_TASK_DEFINITION }}
 
-    - name: 12. Fill in the new image ID in the Amazon ECS task definition
+    - name: 11. Fill in the new image ID in the Amazon ECS task definition
       id: task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
@@ -89,7 +86,7 @@ jobs:
         container-name: ${{ env.CONTAINER_NAME }}
         image: ${{ steps.build-image.outputs.image }}
 
-    - name: 13. Deploy Amazon ECS task definition
+    - name: 12. Deploy Amazon ECS task definition
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
         task-definition: ${{ steps.task-def.outputs.task-definition }}
