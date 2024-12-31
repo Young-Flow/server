@@ -41,8 +41,8 @@ public class CommentService {
         }
     }
 
-    private void addReplyComment(Member member, Bm bm, String content, Long topCommentId) {
-        Comment parentComment = commentRepository.findById(topCommentId).orElseThrow(() ->
+    private void addReplyComment(Member member, Bm bm, String content, Long parentCommentId) {
+        Comment parentComment = commentRepository.findById(parentCommentId).orElseThrow(() ->
                 new GeneralHandler(ErrorStatus.COMMENT_NOT_FOUND));
 
         Comment comment = Comment.builder()

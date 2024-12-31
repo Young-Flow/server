@@ -14,13 +14,13 @@ public record ParentCommentRes(
         boolean deleted,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
-        List<ChildCommentRes> childCommentRes
+        List<ChildCommentRes> childComment
 ) {
     public static ParentCommentRes createRes(Comment comment) {
         return ParentCommentRes.builder()
                 .commentId(comment.getId())
                 .writerName(comment.getMember().getName())
-                .childCommentRes(comment.getChildComments().stream().map(ChildCommentRes::createRes).toList())
+                .childComment(comment.getChildComments().stream().map(ChildCommentRes::createRes).toList())
                 .content(comment.getContent())
                 .deleted(comment.isDelYN())
                 .createdAt(comment.getCreatedAt())
