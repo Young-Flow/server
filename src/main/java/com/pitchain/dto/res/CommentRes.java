@@ -7,20 +7,22 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
-public record ParentCommentRes(
+public record CommentRes(
         Long commentId,
+        Long writerId,
         String writerName,
         String content,
         boolean deleted,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
-        List<ChildCommentRes> childComment
+        List<ReplyCommentRes> replyComments
 ) {
-    public static ParentCommentRes createRes(Comment comment) {
-        return ParentCommentRes.builder()
+    public static CommentRes createRes(Comment comment) {
+        return CommentRes.builder()
                 .commentId(comment.getId())
+                .writerId(comment.getMember().getId())
                 .writerName(comment.getMember().getName())
-                .childComment(comment.getChildComments().stream().map(ChildCommentRes::createRes).toList())
+                .replyComments(comment.getChildComments().stream().map(ReplyCommentRes::createRes).toList())
                 .content(comment.getContent())
                 .deleted(comment.isDelYN())
                 .createdAt(comment.getCreatedAt())

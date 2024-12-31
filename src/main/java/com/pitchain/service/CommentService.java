@@ -3,7 +3,7 @@ package com.pitchain.service;
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.dto.CommentDto;
-import com.pitchain.dto.res.ParentCommentRes;
+import com.pitchain.dto.res.CommentRes;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.Comment;
 import com.pitchain.entity.Member;
@@ -37,7 +37,7 @@ public class CommentService {
         if (isOwnedBy(parentCommentId)) {
             addReplyComment(member, bm, content, parentCommentId);
         } else {
-            addParentComment(member, bm, content);
+            addComment(member, bm, content);
         }
     }
 
@@ -55,7 +55,7 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
-    private void addParentComment(Member member, Bm bm, String content) {
+    private void addComment(Member member, Bm bm, String content) {
         Comment comment = Comment.builder()
                 .member(member)
                 .bm(bm)
@@ -65,12 +65,12 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
-    public List<ParentCommentRes> getComments(Long bmId) {
+    public List<CommentRes> getComments(Long bmId) {
         Bm bm = bmRepository.findById(bmId).orElseThrow(() ->
                 new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
 
         List<Comment> comments = commentRepository.findByBm(bm);
-        return comments.stream().map(ParentCommentRes::createRes).toList();
+        return comments.stream().map(CommentRes::createRes).toList();
     }
 
     public void modifyComment(Long commentId, Long memberId, CommentDto.modifyCommentDto dto) {
