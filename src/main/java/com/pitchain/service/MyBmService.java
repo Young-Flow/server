@@ -14,13 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class MyBmService {
 
     private final MyBmRepository myBmRepository;
     private final MemberRepository memberRepository;
     private final BmRepository bmRepository;
 
+    @Transactional
     public void toggleLikeBm(Long bmId, Long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
         Bm bm = bmRepository.findById(bmId).orElseThrow(() -> new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
@@ -30,7 +30,6 @@ public class MyBmService {
         } else addLike(member, bm);
     }
 
-    @Transactional(readOnly = true)
     private boolean isLiked(Member member, Bm bm) {
         return myBmRepository.existsByMemberAndBm(member, bm);
     }
