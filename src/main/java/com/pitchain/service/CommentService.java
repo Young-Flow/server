@@ -25,7 +25,7 @@ public class CommentService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public void addComment(Long bmId, Long memberId, CommentDto.addCommentDto dto) {
+    public void addComment(Long bmId, Long memberId, CommentDto.AddCommentDto dto) {
         Member member = memberRepository.findById(memberId).orElseThrow(() ->
                 new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
         Bm bm = bmRepository.findById(bmId).orElseThrow(() ->
@@ -75,7 +75,7 @@ public class CommentService {
     }
 
     @Transactional
-    public void modifyComment(Long commentId, Long memberId, CommentDto.modifyCommentDto dto) {
+    public void modifyComment(Long commentId, Long memberId, CommentDto.ModifyCommentDto dto) {
         Member member = memberRepository.findById(memberId).orElseThrow(() ->
                 new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
         Comment comment = commentRepository.findById(commentId).orElseThrow(() ->

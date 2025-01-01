@@ -9,7 +9,7 @@ public class CommentDto {
 
     @Getter
     @Setter
-    public static class addCommentDto {
+    public static class AddCommentDto {
         @Nullable
         private Long parentCommentId;
         private String content;
@@ -17,7 +17,7 @@ public class CommentDto {
 
     @Getter
     @Setter
-    public static class modifyCommentDto {
+    public static class ModifyCommentDto {
         private String content;
     }
 }

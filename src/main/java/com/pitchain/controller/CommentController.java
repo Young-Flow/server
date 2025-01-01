@@ -20,7 +20,7 @@ public class CommentController {
     @PostMapping("/{bmId}/comments")
     public CustomApiResponse addComment(@PathVariable("bmId") Long bmId,
                                         @AuthenticationPrincipal Long memberId,
-                                        @RequestBody CommentDto.addCommentDto dto) {
+                                        @RequestBody CommentDto.AddCommentDto dto) {
         commentService.addComment(bmId, memberId, dto);
         return CustomApiResponse.onSuccess();
     }
@@ -35,7 +35,7 @@ public class CommentController {
     public CustomApiResponse modifyComment(@PathVariable("bmId") Long bmId,
                                            @PathVariable("commentId") Long commentId,
                                            @AuthenticationPrincipal Long memberId,
-                                           @RequestBody CommentDto.modifyCommentDto dto) {
+                                           @RequestBody CommentDto.ModifyCommentDto dto) {
         commentService.modifyComment(commentId, memberId, dto);
         return CustomApiResponse.onSuccess();
     }
