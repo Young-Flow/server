@@ -3,7 +3,7 @@ name: CD
 on:
   push:
     branches: [ "dev" ]
-
+    
 env:
   AWS_REGION: ap-northeast-2                   # set this to your preferred AWS region, e.g. us-west-1
   ECR_REPOSITORY: pitchain                   # set this to your Amazon ECR repository name
@@ -11,7 +11,7 @@ env:
   ECS_CLUSTER: pitchain-cluster                 # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION: pitchain-task-definition.json  # Task Definition의 파일 이름
   CONTAINER_NAME: pitchain-cont           # set this to the name of the container in the
-
+  
 permissions:
   id-token: write
   contents: read
@@ -28,7 +28,7 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-
+        
     - name: 3. Gradle Caching
       uses: actions/cache@v3
       with:
@@ -53,7 +53,7 @@ jobs:
 
     - name: 6. Build with Gradle, without test
       run: ./gradlew clean build -x test
-
+      
     - name: 7. Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
