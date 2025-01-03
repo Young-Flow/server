@@ -2,7 +2,6 @@ package com.pitchain.service;
 
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.exception.GeneralHandler;
-import com.pitchain.dto.CurrencyDto;
 import com.pitchain.entity.Member;
 import com.pitchain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,16 +18,15 @@ public class CurrencyService {
     private final MemberRepository memberRepository;
     private final ExchangeRateService ExchangeRateService;
 
-    public String calculateExchangeRate(Long memberId, CurrencyDto.RequestDto dto) {
+    public String calculateExchangeRate(Long memberId, Integer amount) {
         Member member = memberRepository.findById(memberId).orElseThrow(() ->
                 new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
         String countryUnit = member.getCountry().getCountryUnit();  //사용자의 통화코드 조회
 
         Map<String, String> exchangeRateMap = ExchangeRateService.getExchangeRateMap(getTodayDate());  //오늘 통화코드 목록 조회
         double exchangeRate = getExchangeRate(countryUnit, exchangeRateMap);
-        long inputAmount = dto.getInputAmount();
 
-        double calculatedAmount = inputAmount / exchangeRate;
+        double calculatedAmount = amount / exchangeRate;
         return String.format("%.3f", calculatedAmount);
     }
 
