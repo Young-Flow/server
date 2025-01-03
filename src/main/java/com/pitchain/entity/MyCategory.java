@@ -1,5 +1,6 @@
 package com.pitchain.entity;
 
+import com.pitchain.common.constant.BmCategory;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
