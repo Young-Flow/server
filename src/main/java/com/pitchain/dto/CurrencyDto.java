@@ -19,5 +19,6 @@ public class CurrencyDto {
     public static class ResponseDto {
 
         private String calculatedAmount;  //사용자의 통화 기준
+        private String exchangeRateUpdateDateTime;
     }
 }
