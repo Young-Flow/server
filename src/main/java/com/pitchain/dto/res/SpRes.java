@@ -9,7 +9,7 @@ public record SpRes(
         String shortPitchURL,
         String thumbnailImg,
         int views,
-        String description
+        String name
 ) {
     public static SpRes createRes(Sp sp) {
         return SpRes.builder()
@@ -17,7 +17,7 @@ public record SpRes(
                 .shortPitchURL(sp.getShortPitchURL())
                 .thumbnailImg(sp.getThumbnailImg())
                 .views(sp.getViews())
-                .description(sp.getDescription())
+                .name(sp.getName())
                 .build();
     }
 }
