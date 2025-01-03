@@ -16,7 +16,7 @@ public class CurrencyService {
     private final MemberRepository memberRepository;
     private final ExchangeRateService exchangeRateService;
 
-    public String calculateExchangeRate(Long memberId, long inputAmount) {
+    public String calculateExchangeRate(Long memberId, long amount) {
         Member member = memberRepository.findById(memberId).orElseThrow(() ->
                 new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
         String countryUnit = member.getCountry().getCountryUnit();  //사용자의 통화코드 조회
@@ -24,7 +24,7 @@ public class CurrencyService {
         Map<String, String> todayExchangeRateMap = exchangeRateService.getLatestExchangeRateMap();
         double exchangeRate = getExchangeRate(countryUnit, todayExchangeRateMap);
 
-        double calculatedAmount = inputAmount / exchangeRate;
+        double calculatedAmount = amount / exchangeRate;
         return String.format("%.3f", calculatedAmount);
     }
 
