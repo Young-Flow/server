@@ -1,6 +1,6 @@
 package com.pitchain.entity;
 
-import com.pitchain.common.constant.BmCategory;
+import com.pitchain.common.constant.MainCategory;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -21,5 +21,5 @@ public class MyCategory {
     private Member member;
 
     @Enumerated(EnumType.STRING)
-    private BmCategory category;
+    private MainCategory category;
 }

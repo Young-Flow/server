@@ -12,7 +12,8 @@ public record BmDetailRes(
         String name,
         String company,
         String intro,
-        String category,
+        String mainCategory,
+        String subCategory,
         String logoImg,
         String description,
         String descriptionImg,
@@ -31,7 +32,8 @@ public record BmDetailRes(
                 .name(bm.getName())
                 .company(bm.getCompany())
                 .intro(bm.getIntro())
-                .category(bm.getCategory().name())
+                .mainCategory(bm.getMainCategory().getKoreanName())
+                .subCategory(bm.getSubCategory().getKoreanName())
                 .logoImg(bm.getLogoImg())
                 .description(bm.getDescription())
                 .descriptionImg(bm.getDescriptionImg())

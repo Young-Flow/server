@@ -1,6 +1,5 @@
 package com.pitchain.dto.res;
 
-import com.pitchain.common.constant.BmCategory;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.Sp;
 import lombok.Builder;
@@ -12,7 +11,8 @@ public record SpRes(
         String thumbnailImg,
         int views,
         String name,
-        BmCategory category,
+        String mainCategory,
+        String subCategory,
         String company
 ) {
     public static SpRes createRes(Sp sp) {
@@ -23,7 +23,8 @@ public record SpRes(
                 .thumbnailImg(sp.getThumbnailImg())
                 .views(sp.getViews())
                 .name(sp.getName())
-                .category(bm.getCategory())
+                .mainCategory(bm.getMainCategory().getKoreanName())
+                .subCategory(bm.getSubCategory().getKoreanName())
                 .company(bm.getCompany())
                 .build();
     }
