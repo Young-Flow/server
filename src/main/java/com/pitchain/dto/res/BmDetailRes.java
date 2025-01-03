@@ -10,6 +10,8 @@ import java.time.LocalDateTime;
 public record BmDetailRes(
         Long id,
         String name,
+        String company,
+        String intro,
         String category,
         String logoImg,
         String description,
@@ -27,6 +29,8 @@ public record BmDetailRes(
         return BmDetailRes.builder()
                 .id(bm.getId())
                 .name(bm.getName())
+                .company(bm.getCompany())
+                .intro(bm.getIntro())
                 .category(bm.getCategory().name())
                 .logoImg(bm.getLogoImg())
                 .description(bm.getDescription())
