@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class CurrencyController {
 
     private final CurrencyService currencyService;
-    private final ExchangeRateService exchangeRateService;
 
     @GetMapping("/currency")
     public CustomApiResponse calculateExchangeRate(@AuthenticationPrincipal Long memberId,
