@@ -108,7 +108,7 @@ public class ExchangeRateService {
     }
 
     private boolean isNonBusinessDay(ExchangeRateRes[] exchangeRateList) {
-        return exchangeRateList == null;
+        return exchangeRateList.length == 0;
     }
 
     private boolean isBeforeUpdateTime() {
