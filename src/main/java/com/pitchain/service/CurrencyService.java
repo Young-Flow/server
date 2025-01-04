@@ -30,7 +30,7 @@ public class CurrencyService {
 
     public String getExchangeRateUpdateDateTime() {
         Map<String, String> todayExchangeRateMap = exchangeRateService.getLatestExchangeRateMap();
-        return todayExchangeRateMap.get("updateDate") + " 11:00";
+        return todayExchangeRateMap.get("updateDateTime");
     }
 
     private double getExchangeRate(String countryUnit, Map<String, String> currencyExchangeMap) {
