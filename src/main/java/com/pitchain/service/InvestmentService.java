@@ -68,10 +68,16 @@ public class InvestmentService {
     }
 
     private long getMinimumAmount(List<Investment> investments) {
+        if (investments.isEmpty()) {
+            return 0;
+        }
         return investments.get(0).getAmount();
     }
 
     private long getMaximumAmount(List<Investment> investments) {
+        if (investments.isEmpty()) {
+            return 0;
+        }
         return investments.get(investments.size() - 1).getAmount();
     }
 }
