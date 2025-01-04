@@ -1,4 +1,4 @@
-package com.pitchain.entity;
+package com.pitchain.common.constant;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

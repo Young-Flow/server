@@ -10,7 +10,10 @@ import java.time.LocalDateTime;
 public record BmDetailRes(
         Long id,
         String name,
-        String category,
+        String company,
+        String intro,
+        String mainCategory,
+        String subCategory,
         String logoImg,
         String description,
         String descriptionImg,
@@ -27,7 +30,10 @@ public record BmDetailRes(
         return BmDetailRes.builder()
                 .id(bm.getId())
                 .name(bm.getName())
-                .category(bm.getCategory().name())
+                .company(bm.getCompany())
+                .intro(bm.getIntro())
+                .mainCategory(bm.getMainCategory().getKoreanName())
+                .subCategory(bm.getSubCategory().getKoreanName())
                 .logoImg(bm.getLogoImg())
                 .description(bm.getDescription())
                 .descriptionImg(bm.getDescriptionImg())

@@ -29,6 +29,6 @@ public class Sp extends BaseEntity {
     private int views;
 
     @Column(nullable = false)
-    private String description;
+    private String name;
 
 }
