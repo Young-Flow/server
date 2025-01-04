@@ -49,7 +49,7 @@ public class Comment extends BaseEntity {
         this.content = content;
     }
 
-    public void deleteComment() {
+    public void deleteParentComment() {
         this.delYN = true;
     }
 

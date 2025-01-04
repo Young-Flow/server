@@ -4,6 +4,7 @@ import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.dto.CommentDto;
 import com.pitchain.dto.res.CommentRes;
+import com.pitchain.dto.res.DeletedCommentRes;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.Comment;
 import com.pitchain.entity.Member;
@@ -66,12 +67,18 @@ public class CommentService {
     }
 
     @Transactional(readOnly = true)
-    public List<CommentRes> getComments(Long bmId) {
+    public List getComments(Long bmId) {
         Bm bm = bmRepository.findById(bmId).orElseThrow(() ->
                 new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
 
         List<Comment> comments = commentRepository.findByBm(bm);
-        return comments.stream().map(CommentRes::createRes).toList();
+
+        return comments.stream().map(comment -> {
+                    if (comment.isDelYN()) {
+                        return DeletedCommentRes.createRes(comment);
+                    }
+                    return CommentRes.createRes(comment);
+                }).toList();
     }
 
     @Transactional
@@ -98,7 +105,16 @@ public class CommentService {
         Member commentWriter = comment.getMember();
         checkAuthority(member, commentWriter);
 
-        comment.deleteComment();
+        if (isReplyComment(comment)) {
+            commentRepository.deleteById(commentId);
+        } else {
+            comment.deleteParentComment();
+        }
+    }
+
+    private boolean isReplyComment(Comment comment) {
+        List<Comment> childComments = comment.getChildComments();
+        return childComments.isEmpty();
     }
 
     private static void checkAuthority(Member member, Member commentWriter) {

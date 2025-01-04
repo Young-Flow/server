@@ -30,6 +30,8 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Country country;
 
+    private String profileImg;
+
     @OneToMany(mappedBy = "member")
     private List<Investment> investments = new ArrayList<>();
 

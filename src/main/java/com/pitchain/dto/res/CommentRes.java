@@ -11,8 +11,9 @@ public record CommentRes(
         Long commentId,
         Long writerId,
         String writerName,
+        String writerProfileImg,
         String content,
-        boolean deleted,
+        boolean delYN,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
         List<ReplyCommentRes> replyComments
@@ -22,9 +23,10 @@ public record CommentRes(
                 .commentId(comment.getId())
                 .writerId(comment.getMember().getId())
                 .writerName(comment.getMember().getName())
+                .writerProfileImg(comment.getMember().getProfileImg())
                 .replyComments(comment.getChildComments().stream().map(ReplyCommentRes::createRes).toList())
                 .content(comment.getContent())
-                .deleted(comment.isDelYN())
+                .delYN(comment.isDelYN())
                 .createdAt(comment.getCreatedAt())
                 .updatedAt(comment.getUpdatedAt())
                 .build();
