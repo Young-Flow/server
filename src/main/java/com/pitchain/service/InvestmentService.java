@@ -38,6 +38,7 @@ public class InvestmentService {
         return investment.getId();
     }
 
+    @Transactional(readOnly = true)
     public FundraisingRes getFundraisingStatus(Long bmId) {
         Bm bm = bmRepository.findById(bmId).orElseThrow(() -> new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
 
