@@ -2,7 +2,6 @@ package com.pitchain.controller;
 
 import com.pitchain.common.apiPayload.dto.CustomApiResponse;
 import com.pitchain.dto.InvestmentDto;
-import com.pitchain.dto.res.FundraisingStatusRes;
 import com.pitchain.service.InvestmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,9 +29,8 @@ public class InvestmentController {
         return CustomApiResponse.onSuccess(result);
     }
 
-    @GetMapping("/{bmId}/fundraising-status")
-    public CustomApiResponse getFundraisingStatus(@PathVariable("bmId") Long bmId) {
-        FundraisingStatusRes fundraisingStatus = investmentService.getFundraisingStatus(bmId);
-        return CustomApiResponse.onSuccess(fundraisingStatus);
+    @GetMapping("/{bmId}/investment")
+    public CustomApiResponse getInvestmentStatus(@PathVariable("bmId") Long bmId) {
+        return CustomApiResponse.onSuccess(investmentService.getInvestmentStatus(bmId));
     }
 }

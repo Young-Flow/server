@@ -2,8 +2,8 @@ package com.pitchain.service;
 
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.exception.GeneralHandler;
-import com.pitchain.dto.FundraisingStatusDto;
-import com.pitchain.dto.res.FundraisingStatusRes;
+import com.pitchain.dto.InvestmentStatusDto;
+import com.pitchain.dto.res.InvestmentStatusRes;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.Investment;
 import com.pitchain.entity.Member;
@@ -38,16 +38,16 @@ public class InvestmentService {
     }
 
     @Transactional(readOnly = true)
-    public FundraisingStatusRes getFundraisingStatus(Long bmId) {
+    public InvestmentStatusRes getInvestmentStatus(Long bmId) {
         Bm bm = bmRepository.findById(bmId).orElseThrow(() -> new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
 
-        FundraisingStatusDto fundraisingStatusDto = investmentRepository.findFundraisingStatusByBm(bm);
-        int achievementRate = getAchievementRate(bm.getInvestmentGoal(), fundraisingStatusDto.getRaisedAmount());
+        InvestmentStatusDto investmentStatusDto = investmentRepository.findInvestmentStatusByBm(bm);
+        int achievementRate = getAchievementRate(bm.getInvestmentGoal(), investmentStatusDto.getRaisedAmount());
 
-        return FundraisingStatusRes.createFundraisingRes(fundraisingStatusDto, achievementRate);
+        return InvestmentStatusRes.createRes(investmentStatusDto, achievementRate);
     }
 
-    private int getAchievementRate(int investmentGoal, double raisedAmount) {
+    private int getAchievementRate(int investmentGoal, long raisedAmount) {
         int rate = (int) ((raisedAmount / (double) investmentGoal) * 100);
         return Math.min(rate, 100);
     }
