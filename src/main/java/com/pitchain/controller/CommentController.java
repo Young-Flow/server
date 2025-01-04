@@ -2,7 +2,7 @@ package com.pitchain.controller;
 
 import com.pitchain.common.apiPayload.dto.CustomApiResponse;
 import com.pitchain.dto.CommentDto;
-import com.pitchain.dto.res.CommentRes;
+import com.pitchain.dto.res.BaseCommentRes;
 import com.pitchain.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,8 +26,8 @@ public class CommentController {
     }
 
     @GetMapping("/{bmId}/comments")
-    public CustomApiResponse<List<CommentRes>> getComments(@PathVariable("bmId") Long bmId) {
-        List<CommentRes> comments = commentService.getComments(bmId);
+    public CustomApiResponse<List<? extends BaseCommentRes>> getComments(@PathVariable("bmId") Long bmId) {
+        List<? extends BaseCommentRes> comments = commentService.getComments(bmId);
         return CustomApiResponse.onSuccess(comments);
     }
 

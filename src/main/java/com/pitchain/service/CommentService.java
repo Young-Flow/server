@@ -3,8 +3,10 @@ package com.pitchain.service;
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.dto.CommentDto;
+import com.pitchain.dto.res.BaseCommentRes;
 import com.pitchain.dto.res.CommentRes;
 import com.pitchain.dto.res.DeletedCommentRes;
+import com.pitchain.dto.res.ReplyCommentRes;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.Comment;
 import com.pitchain.entity.Member;
@@ -67,18 +69,21 @@ public class CommentService {
     }
 
     @Transactional(readOnly = true)
-    public List getComments(Long bmId) {
+    public List<? extends BaseCommentRes> getComments(Long bmId) {
         Bm bm = bmRepository.findById(bmId).orElseThrow(() ->
                 new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
 
         List<Comment> comments = commentRepository.findByBm(bm);
 
-        return comments.stream().map(comment -> {
+        return comments.stream()
+                .map(comment -> {
+                    List<ReplyCommentRes> replyCommentResList = comment.getChildComments().stream().map(ReplyCommentRes::createRes).toList();
                     if (comment.isDelYN()) {
-                        return DeletedCommentRes.createRes(comment);
+                        return DeletedCommentRes.createRes(comment, replyCommentResList);
                     }
-                    return CommentRes.createRes(comment);
-                }).toList();
+                    return CommentRes.createRes(comment, replyCommentResList);
+                })
+                .toList();
     }
 
     @Transactional

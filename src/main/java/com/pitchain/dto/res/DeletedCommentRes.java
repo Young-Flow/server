@@ -5,17 +5,18 @@ import lombok.Builder;
 
 import java.util.List;
 
-@Builder
-public record DeletedCommentRes(
-        Long commentId,
-        boolean delYN,
-        List<ReplyCommentRes> replyComments
-) {
-    public static DeletedCommentRes createRes(Comment comment) {
+public class DeletedCommentRes extends BaseCommentRes {
+
+    @Builder
+    public DeletedCommentRes(Long commentId, boolean delYN, List<ReplyCommentRes> replyComments) {
+        super(commentId, delYN, replyComments);
+    }
+
+    public static DeletedCommentRes createRes(Comment comment, List<ReplyCommentRes> replyComments) {
         return DeletedCommentRes.builder()
                 .commentId(comment.getId())
                 .delYN(comment.isDelYN())
-                .replyComments(comment.getChildComments().stream().map(ReplyCommentRes::createRes).toList())
+                .replyComments(replyComments)
                 .build();
     }
 }
