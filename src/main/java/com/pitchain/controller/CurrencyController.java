@@ -1,6 +1,7 @@
 package com.pitchain.controller;
 
 import com.pitchain.common.apiPayload.dto.CustomApiResponse;
+import com.pitchain.dto.CurrencyDto;
 import com.pitchain.service.CurrencyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,6 +18,13 @@ public class CurrencyController {
     @GetMapping("/currency")
     public CustomApiResponse calculateExchangeRate(@AuthenticationPrincipal Long memberId,
                                                    @RequestParam Integer amount) {
-        return CustomApiResponse.onSuccess(currencyService.calculateExchangeRate(memberId, amount));
+        String calculatedAmount = currencyService.calculateExchangeRate(memberId, amount);
+        String exchangeRateUpdateDateTime = currencyService.getExchangeRateUpdateDateTime();
+
+        CurrencyDto.ResponseDto result = new CurrencyDto.ResponseDto();
+        result.setCalculatedAmount(calculatedAmount);
+        result.setExchangeRateUpdateDateTime(exchangeRateUpdateDateTime);
+
+        return CustomApiResponse.onSuccess(result);
     }
 }

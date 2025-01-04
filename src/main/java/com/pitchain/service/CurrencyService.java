@@ -7,8 +7,6 @@ import com.pitchain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 @Service
@@ -16,29 +14,28 @@ import java.util.Map;
 public class CurrencyService {
 
     private final MemberRepository memberRepository;
-    private final ExchangeRateService ExchangeRateService;
+    private final ExchangeRateService exchangeRateService;
 
-    public String calculateExchangeRate(Long memberId, Integer amount) {
+    public String calculateExchangeRate(Long memberId, long amount) {
         Member member = memberRepository.findById(memberId).orElseThrow(() ->
                 new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
         String countryUnit = member.getCountry().getCountryUnit();  //사용자의 통화코드 조회
 
-        Map<String, String> exchangeRateMap = ExchangeRateService.getExchangeRateMap(getTodayDate());  //오늘 통화코드 목록 조회
-        double exchangeRate = getExchangeRate(countryUnit, exchangeRateMap);
+        Map<String, String> todayExchangeRateMap = exchangeRateService.getLatestExchangeRateMap();
+        double exchangeRate = getExchangeRate(countryUnit, todayExchangeRateMap);
 
         double calculatedAmount = amount / exchangeRate;
         return String.format("%.3f", calculatedAmount);
     }
 
-    private double getExchangeRate(String countryUnit, Map<String, String> currencyExchangeMap) {
-        String exchangeRate = currencyExchangeMap.get(countryUnit).replace(",", "");
-        return Double.parseDouble(exchangeRate);
+    public String getExchangeRateUpdateDateTime() {
+        Map<String, String> todayExchangeRateMap = exchangeRateService.getLatestExchangeRateMap();
+        return todayExchangeRateMap.get("updateDate") + " 11:00";
     }
 
-    private String getTodayDate() {
-        LocalDate today = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        return today.format(formatter);
+    private double getExchangeRate(String countryUnit, Map<String, String> currencyExchangeMap) {
+        String exchangeRate = currencyExchangeMap.get(countryUnit);
+        return Double.parseDouble(exchangeRate);
     }
 
 }
