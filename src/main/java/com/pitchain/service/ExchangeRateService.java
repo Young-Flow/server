@@ -1,9 +1,9 @@
 package com.pitchain.service;
 
 import com.pitchain.dto.res.ExchangeRateRes;
+import com.pitchain.redis.RedisExchangeRateUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -31,8 +31,7 @@ public class ExchangeRateService {
     @Value("${koreaexim.updateHour}")
     private int updateHour;
 
-    private static final String REDIS_KEY_PREFIX = "ExchangeRateMap";
-    private final RedisTemplate<String, Map<String,String>> redisTemplate;
+    private final RedisExchangeRateUtil redisExchangeRateUtil;
 
     /**
      * 가장 최근의 통화별 일환율 조회
@@ -42,9 +41,9 @@ public class ExchangeRateService {
      */
     public Map<String, String> getLatestExchangeRateMap() {
         if (isBeforeUpdateTime()) {
-            redisTemplate.opsForValue().get(REDIS_KEY_PREFIX + getYesterdayDate());
+            return redisExchangeRateUtil.getExchangeRateMap(getYesterdayDate());
         }
-        return redisTemplate.opsForValue().get(REDIS_KEY_PREFIX + getTodayDate());
+        return redisExchangeRateUtil.getExchangeRateMap(getTodayDate());
     }
 
     /**
@@ -53,7 +52,7 @@ public class ExchangeRateService {
      * 매일 11시 업데이트
      * @return Map<String, String>
      */
-    @Scheduled(cron = "0 0 11 * * *")
+    @Scheduled(cron = "0 30 11 * * *")
     public void updateExchangeRateMap() {
         RestTemplate restTemplate = new RestTemplate();
         String uri = generateRequestURI();
@@ -62,12 +61,12 @@ public class ExchangeRateService {
         String todayDate = getTodayDate();
         Map<String, String> exchangeRateMap = getExchangeRateMap(exchangeRateList, todayDate);
 
-        redisTemplate.opsForValue().set(REDIS_KEY_PREFIX + todayDate, exchangeRateMap);
+        redisExchangeRateUtil.setExchangeRateMap(todayDate, exchangeRateMap);
     }
 
     private Map<String, String> getExchangeRateMap(ExchangeRateRes[] exchangeRateList, String todayDate) {
         if (isNonBusinessDay(exchangeRateList)) {
-            return redisTemplate.opsForValue().get(REDIS_KEY_PREFIX + getYesterdayDate());
+            return redisExchangeRateUtil.getExchangeRateMap(getYesterdayDate());
         }
 
         return convertListToMap(exchangeRateList, todayDate);
