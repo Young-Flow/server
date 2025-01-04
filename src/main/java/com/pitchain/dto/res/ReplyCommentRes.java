@@ -1,6 +1,7 @@
 package com.pitchain.dto.res;
 
 import com.pitchain.entity.Comment;
+import com.pitchain.entity.Member;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -17,16 +18,17 @@ public record ReplyCommentRes(
         LocalDateTime updatedAt
 ) {
     public static ReplyCommentRes createRes(Comment comment) {
+        Member member = comment.getMember();
         return ReplyCommentRes.builder()
                 .commentId(comment.getId())
-                .writerId(comment.getMember().getId())
-                .writerName(comment.getMember().getName())
-                .writerProfileImg(comment.getMember().getProfileImg())
+                .writerId(member.getId())
+                .writerProfileImg(member.getProfileImg())
+                .writerName(member.getName())
+                .writerProfileImg(member.getProfileImg())
                 .content(comment.getContent())
                 .delYN(comment.isDelYN())
                 .createdAt(comment.getCreatedAt())
                 .updatedAt(comment.getUpdatedAt())
                 .build();
     }
-
 }
