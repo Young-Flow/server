@@ -2,6 +2,7 @@ package com.pitchain.service;
 
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.dto.res.FundraisingRes;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.Investment;
 import com.pitchain.entity.Member;
@@ -11,6 +12,8 @@ import com.pitchain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -35,4 +38,39 @@ public class InvestmentService {
         return investment.getId();
     }
 
+    public FundraisingRes getFundraisingStatus(Long bmId) {
+        Bm bm = bmRepository.findById(bmId).orElseThrow(() -> new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
+
+        List<Investment> investments = investmentRepository.findByBm(bm);
+        long raisedAmount = getRaisedAmount(investments);
+        long minimumAmount = getMinimumAmount(investments);
+        long maximumAmount = getMaximumAmount(investments);
+        int achievementRate = getAchievementRate(bm.getInvestmentGoal(), raisedAmount);
+
+        FundraisingRes fundraisingRes = FundraisingRes.builder()
+                .raisedAmount(raisedAmount)
+                .achievementRate(achievementRate)
+                .investorNum(investments.size())
+                .minimumAmount(minimumAmount)
+                .maximumAmount(maximumAmount)
+                .build();
+
+        return fundraisingRes;
+    }
+
+    private int getAchievementRate(int investmentGoal, long raisedAmount) {
+        return (int) ((raisedAmount / (double) investmentGoal) * 100);
+    }
+
+    private long getRaisedAmount(List<Investment> investments) {
+        return investments.stream().mapToLong(Investment::getAmount).sum();
+    }
+
+    private long getMinimumAmount(List<Investment> investments) {
+        return investments.get(0).getAmount();
+    }
+
+    private long getMaximumAmount(List<Investment> investments) {
+        return investments.get(investments.size() - 1).getAmount();
+    }
 }
