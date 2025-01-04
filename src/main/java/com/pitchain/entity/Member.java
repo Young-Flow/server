@@ -1,5 +1,6 @@
 package com.pitchain.entity;
 
+import com.pitchain.common.constant.Country;
 import com.pitchain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

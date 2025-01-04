@@ -1,5 +1,7 @@
 package com.pitchain.entity;
 
+import com.pitchain.common.constant.MainCategory;
+import com.pitchain.common.constant.SubCategory;
 import com.pitchain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -24,10 +26,13 @@ public class Bm extends BaseEntity {
     private String name;
 
     @Enumerated(EnumType.STRING)
-    private BmCategory category;
-
+    private MainCategory mainCategory;
+    @Enumerated(EnumType.STRING)
+    private SubCategory subCategory;
+    private String company;
     private String logoImg;
-
+    @Column(length = 100)
+    private String intro;
     @Column(length = 10000)
     private String description;
 
