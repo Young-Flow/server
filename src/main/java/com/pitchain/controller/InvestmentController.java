@@ -2,7 +2,7 @@ package com.pitchain.controller;
 
 import com.pitchain.common.apiPayload.dto.CustomApiResponse;
 import com.pitchain.dto.InvestmentDto;
-import com.pitchain.dto.res.FundraisingRes;
+import com.pitchain.dto.res.FundraisingStatusRes;
 import com.pitchain.service.InvestmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ public class InvestmentController {
 
     @GetMapping("/{bmId}/fundraising-status")
     public CustomApiResponse getFundraisingStatus(@PathVariable("bmId") Long bmId) {
-        FundraisingRes fundraisingStatus = investmentService.getFundraisingStatus(bmId);
+        FundraisingStatusRes fundraisingStatus = investmentService.getFundraisingStatus(bmId);
         return CustomApiResponse.onSuccess(fundraisingStatus);
     }
 }
