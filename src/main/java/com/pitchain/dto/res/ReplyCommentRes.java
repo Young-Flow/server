@@ -12,7 +12,7 @@ public record ReplyCommentRes(
         String writerName,
         String writerProfileImg,
         String content,
-        boolean deleted,
+        boolean delYN,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
@@ -23,7 +23,7 @@ public record ReplyCommentRes(
                 .writerName(comment.getMember().getName())
                 .writerProfileImg(comment.getMember().getProfileImg())
                 .content(comment.getContent())
-                .deleted(comment.isDelYN())
+                .delYN(comment.isDelYN())
                 .createdAt(comment.getCreatedAt())
                 .updatedAt(comment.getUpdatedAt())
                 .build();
