@@ -10,6 +10,7 @@ public record ReplyCommentRes(
         Long commentId,
         Long writerId,
         String writerName,
+        String writerProfileImg,
         String content,
         boolean deleted,
         LocalDateTime createdAt,
@@ -20,6 +21,7 @@ public record ReplyCommentRes(
                 .commentId(comment.getId())
                 .writerId(comment.getMember().getId())
                 .writerName(comment.getMember().getName())
+                .writerProfileImg(comment.getMember().getProfileImg())
                 .content(comment.getContent())
                 .deleted(comment.isDelYN())
                 .createdAt(comment.getCreatedAt())
