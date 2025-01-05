@@ -84,7 +84,7 @@ public class ExchangeRateService {
 
             exchangeRateMap.put(curUnit, dealBasR);
         }
-        exchangeRateMap.put("updateDateTime", String.format("%s %02d:%02d", date, updateHour, updateMin));
+        exchangeRateMap.put("updateDateTime", String.format("%s %02d:%02d", date, updateHour, updateMin));  //일환율 업데이트 일시
 
         return exchangeRateMap;
     }
