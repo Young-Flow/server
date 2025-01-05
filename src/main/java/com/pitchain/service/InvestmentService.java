@@ -2,6 +2,8 @@ package com.pitchain.service;
 
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.dto.InvestmentStatusDto;
+import com.pitchain.dto.res.InvestmentStatusRes;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.Investment;
 import com.pitchain.entity.Member;
@@ -33,6 +35,21 @@ public class InvestmentService {
 
         investmentRepository.save(investment);
         return investment.getId();
+    }
+
+    @Transactional(readOnly = true)
+    public InvestmentStatusRes getInvestmentStatus(Long bmId) {
+        Bm bm = bmRepository.findById(bmId).orElseThrow(() -> new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
+
+        InvestmentStatusDto investmentStatusDto = investmentRepository.findInvestmentStatusByBm(bm);
+        int achievementRate = getAchievementRate(bm.getInvestmentGoal(), investmentStatusDto.getRaisedAmount());
+
+        return InvestmentStatusRes.createRes(investmentStatusDto, achievementRate);
+    }
+
+    private int getAchievementRate(int investmentGoal, long raisedAmount) {
+        int rate = (int) ((raisedAmount / (double) investmentGoal) * 100);
+        return Math.min(rate, 100);
     }
 
 }

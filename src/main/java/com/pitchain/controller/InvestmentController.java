@@ -28,4 +28,9 @@ public class InvestmentController {
 
         return CustomApiResponse.onSuccess(result);
     }
+
+    @GetMapping("/{bmId}/investment")
+    public CustomApiResponse getInvestmentStatus(@PathVariable("bmId") Long bmId) {
+        return CustomApiResponse.onSuccess(investmentService.getInvestmentStatus(bmId));
+    }
 }
