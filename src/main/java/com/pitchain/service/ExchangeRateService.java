@@ -10,7 +10,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
@@ -114,8 +114,9 @@ public class ExchangeRateService {
     }
 
     private boolean isBeforeUpdateTime() {
-        int currentHour = LocalDateTime.now().getHour();
-        return currentHour < updateHour;
+        LocalTime currentTime = LocalTime.now();
+        LocalTime updateTime = LocalTime.of(updateHour, updateMin);
+        return currentTime.isBefore(updateTime);
     }
 
 }
