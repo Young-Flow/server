@@ -21,16 +21,16 @@ public class CurrencyService {
                 new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
         String countryUnit = member.getCountry().getCountryUnit();  //사용자의 통화코드 조회
 
-        Map<String, String> todayExchangeRateMap = exchangeRateService.getLatestExchangeRateMap();
-        double exchangeRate = getExchangeRate(countryUnit, todayExchangeRateMap);
+        Map<String, String> latestExchangeRateMap = exchangeRateService.getLatestExchangeRateMap();
+        double exchangeRate = getExchangeRate(countryUnit, latestExchangeRateMap);
 
         double calculatedAmount = amount / exchangeRate;
         return String.format("%.3f", calculatedAmount);
     }
 
     public String getExchangeRateUpdateDateTime() {
-        Map<String, String> todayExchangeRateMap = exchangeRateService.getLatestExchangeRateMap();
-        return todayExchangeRateMap.get("updateDate") + " 11:00";
+        Map<String, String> latestExchangeRateMap = exchangeRateService.getLatestExchangeRateMap();
+        return latestExchangeRateMap.get("updateDateTime");
     }
 
     private double getExchangeRate(String countryUnit, Map<String, String> currencyExchangeMap) {

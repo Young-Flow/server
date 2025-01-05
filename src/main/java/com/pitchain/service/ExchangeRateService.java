@@ -10,7 +10,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,8 +28,11 @@ public class ExchangeRateService {
     @Value("${koreaexim.data}")
     private String data;
 
-    @Value("${koreaexim.updateHour}")
+    @Value("${koreaexim.updateTime.hour}")
     private int updateHour;
+
+    @Value("${koreaexim.updateTime.min}")
+    private int updateMin;
 
     private final RedisExchangeRateUtil redisExchangeRateUtil;
 
@@ -49,10 +52,10 @@ public class ExchangeRateService {
     /**
      * 한국수출입은행 현재환율 API 호출을 통한 통화별 일환율 조회 및 DB에 저장
      * 비영업일이면 어제 일환율을 저장
-     * 매일 11시 업데이트
+     * 매일 11시 30분 업데이트
      * @return Map<String, String>
      */
-    @Scheduled(cron = "0 30 11 * * *")
+    @Scheduled(cron = "${koreaexim.updateTime.cron}")
     public void updateExchangeRateMap() {
         RestTemplate restTemplate = new RestTemplate();
         String uri = generateRequestURI();
@@ -77,11 +80,11 @@ public class ExchangeRateService {
         Map<String, String> exchangeRateMap = new HashMap<>();
         for (ExchangeRateRes exchangeRate : exchangeRateList) {
             String curUnit = exchangeRate.getCur_unit();  //통화코드
-            String dealBasR = exchangeRate.getDeal_bas_r().replace(",", "");;  //매매 기준율
+            String dealBasR = exchangeRate.getDeal_bas_r().replace(",", "");  //매매 기준율
 
             exchangeRateMap.put(curUnit, dealBasR);
         }
-        exchangeRateMap.put("updateDate", date);
+        exchangeRateMap.put("updateDateTime", String.format("%s %02d:%02d", date, updateHour, updateMin));  //일환율 업데이트 일시
 
         return exchangeRateMap;
     }
@@ -111,8 +114,9 @@ public class ExchangeRateService {
     }
 
     private boolean isBeforeUpdateTime() {
-        int currentHour = LocalDateTime.now().getHour();
-        return currentHour < updateHour;
+        LocalTime currentTime = LocalTime.now();
+        LocalTime updateTime = LocalTime.of(updateHour, updateMin);
+        return currentTime.isBefore(updateTime);
     }
 
 }
