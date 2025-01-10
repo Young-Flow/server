@@ -5,7 +5,7 @@ import com.pitchain.entity.Sp;
 import lombok.Builder;
 
 @Builder
-public record SpRes(
+public record SpDetailRes(
         Long bmId,
         String shortPitchURL,
         String thumbnailImg,
@@ -15,9 +15,9 @@ public record SpRes(
         String subCategory,
         String company
 ) {
-    public static SpRes createRes(Sp sp) {
+    public static SpDetailRes createRes(Sp sp) {
         Bm bm = sp.getBm();
-        return SpRes.builder()
+        return SpDetailRes.builder()
                 .bmId(sp.getBm().getId())
                 .shortPitchURL(sp.getShortPitchURL())
                 .thumbnailImg(sp.getThumbnailImg())
