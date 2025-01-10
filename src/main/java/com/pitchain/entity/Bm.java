@@ -4,6 +4,7 @@ import com.pitchain.common.constant.MainCategory;
 import com.pitchain.common.constant.SubCategory;
 import com.pitchain.common.entity.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Positive;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,8 +39,12 @@ public class Bm extends BaseEntity {
 
     private String descriptionImg;
     private String address;
+    @Positive
     private Long valuationCap;
+    @Positive
     private Integer goalInvestment;
+    @Positive
+    private Integer maxIssuedShare;
     private LocalDate deadline;
     private String longPitchUrl;
 
@@ -54,4 +59,8 @@ public class Bm extends BaseEntity {
 
     @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
+
+    public int getPricePerShare() {
+        return goalInvestment / maxIssuedShare;
+    }
 }

@@ -18,10 +18,7 @@ public record BmDetailRes(
         String description,
         String descriptionImg,
         String address,
-        Long valuationCap,
-        LocalDate deadline,
         LocalDateTime createdAt,
-        Integer goalInvestment,
         String longPitchUrl,
         String spURL,
         boolean isLiked // todo MyBm 개발 완료 후 추가 예정
