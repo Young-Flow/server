@@ -1,10 +1,11 @@
 package com.pitchain.dto.res;
 
+import com.pitchain.dto.BmWithLikeDto;
 import com.pitchain.entity.Bm;
 import lombok.Builder;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Builder
 public record BmDetailRes(
@@ -21,9 +22,12 @@ public record BmDetailRes(
         LocalDateTime createdAt,
         String longPitchUrl,
         String spURL,
-        boolean isLiked // todo MyBm 개발 완료 후 추가 예정
+        boolean isLiked,
+        Long likeCnt,
+        List<PtImgRes> ptImgResList
 ) {
-    public static BmDetailRes createRes(Bm bm) {
+    public static BmDetailRes createRes(BmWithLikeDto bmWithLikeDto, List<PtImgRes> ptImgResList) {
+        Bm bm = bmWithLikeDto.getBm();
         return BmDetailRes.builder()
                 .id(bm.getId())
                 .name(bm.getName())
@@ -35,12 +39,12 @@ public record BmDetailRes(
                 .description(bm.getDescription())
                 .descriptionImg(bm.getDescriptionImg())
                 .address(bm.getAddress())
-                .valuationCap(bm.getValuationCap())
-                .deadline(bm.getDeadline())
                 .createdAt(bm.getCreatedAt())
-                .goalInvestment(bm.getGoalInvestment())
                 .longPitchUrl(bm.getLongPitchUrl())
                 .spURL(bm.getSp().getShortPitchURL())
+                .isLiked(bmWithLikeDto.isLiked())
+                .likeCnt(bmWithLikeDto.getLikeCnt())
+                .ptImgResList(ptImgResList)
                 .build();
     }
 }
