@@ -20,14 +20,14 @@ public class SpController {
 
     @GetMapping
     public CustomApiResponse<List<SpDetailRes>> getSpDetails(@AuthenticationPrincipal Long memberId) {
-        List<SpDetailRes> spDetailResList = spService.getSpDetails();
+        List<SpDetailRes> spDetailResList = spService.getSpDetails(memberId);
         return CustomApiResponse.onSuccess(spDetailResList);
     }
 
     @GetMapping("/{spId}")
     public CustomApiResponse<SpDetailRes> getSpDetail(@AuthenticationPrincipal Long memberId,
-                                                @PathVariable Long spId) {
-        SpDetailRes spDetailRes = spService.getSpDetail(spId);
+                                                      @PathVariable Long spId) {
+        SpDetailRes spDetailRes = spService.getSpDetail(memberId, spId);
         return CustomApiResponse.onSuccess(spDetailRes);
     }
 
