@@ -21,7 +21,7 @@ public record BmDetailRes(
         Long valuationCap,
         LocalDate deadline,
         LocalDateTime createdAt,
-        Integer investmentGoal,
+        Integer goalInvestment,
         String longPitchUrl,
         String spURL,
         boolean isLiked // todo MyBm 개발 완료 후 추가 예정
@@ -41,7 +41,7 @@ public record BmDetailRes(
                 .valuationCap(bm.getValuationCap())
                 .deadline(bm.getDeadline())
                 .createdAt(bm.getCreatedAt())
-                .investmentGoal(bm.getInvestmentGoal())
+                .goalInvestment(bm.getGoalInvestment())
                 .longPitchUrl(bm.getLongPitchUrl())
                 .spURL(bm.getSp().getShortPitchURL())
                 .build();

@@ -39,7 +39,7 @@ public class Bm extends BaseEntity {
     private String descriptionImg;
     private String address;
     private Long valuationCap;
-    private Integer investmentGoal;
+    private Integer goalInvestment;
     private LocalDate deadline;
     private String longPitchUrl;
 

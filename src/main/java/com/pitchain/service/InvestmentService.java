@@ -42,7 +42,7 @@ public class InvestmentService {
         Bm bm = bmRepository.findById(bmId).orElseThrow(() -> new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
 
         InvestmentStatusDto investmentStatusDto = investmentRepository.findInvestmentStatusByBm(bm);
-        int achievementRate = getAchievementRate(bm.getInvestmentGoal(), investmentStatusDto.getRaisedAmount());
+        int achievementRate = getAchievementRate(bm.getGoalInvestment(), investmentStatusDto.getRaisedAmount());
 
         return InvestmentStatusRes.createRes(investmentStatusDto, achievementRate);
     }
