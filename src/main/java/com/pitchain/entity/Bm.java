@@ -60,7 +60,7 @@ public class Bm extends BaseEntity {
     @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
 
-    public int getPricePerShare() {
-        return goalInvestment / maxIssuedShare;
+    public double getPricePerShare() {
+        return (double) valuationCap / maxIssuedShare;
     }
 }
