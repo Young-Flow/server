@@ -2,8 +2,8 @@ package com.pitchain.service;
 
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.exception.GeneralHandler;
-import com.pitchain.dto.res.SpRes;
-import com.pitchain.entity.Sp;
+import com.pitchain.dto.SpWithLikeDto;
+import com.pitchain.dto.res.SpDetailRes;
 import com.pitchain.repository.SpRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,17 +18,16 @@ public class SpService {
     private final SpRepository spRepository;
 
     @Transactional(readOnly = true)
-    public List<SpRes> getSps() {
-        List<Sp> sps = spRepository.findAll();
-        return sps.stream().map(SpRes::createRes).toList();
+    public List<SpDetailRes> getSpDetails(Long memberId) {
+        List<SpWithLikeDto> spWithLikeDtos = spRepository.findAllWithLike(memberId);
+        return spWithLikeDtos.stream().map(SpDetailRes::createRes).toList();
     }
 
     @Transactional(readOnly = true)
-    public SpRes getSp(Long spId) {
-        Sp sp = spRepository.findById(spId).orElseThrow(
-                () -> new GeneralHandler(ErrorStatus.SP_NOT_FOUND)
-        );
+    public SpDetailRes getSpDetail(Long memberId, Long spId) {
+        SpWithLikeDto spWithLikeDto = spRepository.findSpWithLike(memberId, spId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.SP_NOT_FOUND));
 
-        return SpRes.createRes(sp);
+        return SpDetailRes.createRes(spWithLikeDto);
     }
 }

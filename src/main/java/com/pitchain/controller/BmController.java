@@ -19,7 +19,7 @@ public class BmController {
     @GetMapping("{bmId}")
     public CustomApiResponse<BmDetailRes> getBmDetail(@AuthenticationPrincipal Long memberId,
                                                       @PathVariable("bmId") Long bmId) {
-        BmDetailRes bmDetailRes = bmService.getBmDetail(bmId);
+        BmDetailRes bmDetailRes = bmService.getBmDetail(memberId, bmId);
         return CustomApiResponse.onSuccess(bmDetailRes);
     }
 

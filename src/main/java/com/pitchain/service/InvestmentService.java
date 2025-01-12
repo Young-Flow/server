@@ -39,12 +39,13 @@ public class InvestmentService {
 
     @Transactional(readOnly = true)
     public InvestmentStatusRes getInvestmentStatus(Long bmId) {
-        Bm bm = bmRepository.findById(bmId).orElseThrow(() -> new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
+        Bm bm = bmRepository.findById(bmId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
 
         InvestmentStatusDto investmentStatusDto = investmentRepository.findInvestmentStatusByBm(bm);
-        int achievementRate = getAchievementRate(bm.getInvestmentGoal(), investmentStatusDto.getRaisedAmount());
+        int achievementRate = getAchievementRate(bm.getGoalInvestment(), investmentStatusDto.getRaisedAmount());
 
-        return InvestmentStatusRes.createRes(investmentStatusDto, achievementRate);
+        return InvestmentStatusRes.createRes(bm, investmentStatusDto, achievementRate);
     }
 
     private int getAchievementRate(int investmentGoal, long raisedAmount) {

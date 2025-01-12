@@ -1,7 +1,7 @@
 package com.pitchain.controller;
 
 import com.pitchain.common.apiPayload.dto.CustomApiResponse;
-import com.pitchain.dto.res.SpRes;
+import com.pitchain.dto.res.SpDetailRes;
 import com.pitchain.service.SpService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,16 +19,16 @@ public class SpController {
     private final SpService spService;
 
     @GetMapping
-    public CustomApiResponse<List<SpRes>> getSps(@AuthenticationPrincipal Long memberId) {
-        List<SpRes> spResList = spService.getSps();
-        return CustomApiResponse.onSuccess(spResList);
+    public CustomApiResponse<List<SpDetailRes>> getSpDetails(@AuthenticationPrincipal Long memberId) {
+        List<SpDetailRes> spDetailResList = spService.getSpDetails(memberId);
+        return CustomApiResponse.onSuccess(spDetailResList);
     }
 
     @GetMapping("/{spId}")
-    public CustomApiResponse<SpRes> getSp(@AuthenticationPrincipal Long memberId,
-                                          @PathVariable Long spId) {
-        SpRes spRes = spService.getSp(spId);
-        return CustomApiResponse.onSuccess(spRes);
+    public CustomApiResponse<SpDetailRes> getSpDetail(@AuthenticationPrincipal Long memberId,
+                                                      @PathVariable Long spId) {
+        SpDetailRes spDetailRes = spService.getSpDetail(memberId, spId);
+        return CustomApiResponse.onSuccess(spDetailRes);
     }
 
 }
