@@ -32,12 +32,8 @@ public enum ErrorStatus implements ResponseStatus {
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENT4041", "존재하지 않는 댓글입니다."),
 
     // S3
-    BAD_REQUEST_FILE(HttpStatus.BAD_REQUEST, "S3_40001", "잘못된 파일 데이터입니다."),
+    FAIL_S3_UPLOAD(HttpStatus.BAD_REQUEST, "S3_4001", "S3 업로드에 실패했습니다."),
     INVALID_BUCKET_URL(HttpStatus.BAD_REQUEST, "S3_4002", "유효하지 않은 버킷 URL입니다."),
-    UNAUTHORIZED_S3(HttpStatus.UNAUTHORIZED, "S3_4011", "S3 접근 인증에 실패했습니다."),
-    FORBIDDEN_S3(HttpStatus.FORBIDDEN, "S3_4031", "S3 권한을 가지고 있지 않습니다."),
-    FAIL_FILE_UPLOAD(HttpStatus.INTERNAL_SERVER_ERROR, "S3_5001", "S3에 파일 업로드를 실패했습니다."),
-    UNAVAILABLE_S3(HttpStatus.SERVICE_UNAVAILABLE, "S3_5031", "S3 서버가 일시적으로 데이터를 처리할 수 없습니다."),
 
     // FILE
     INVALID_MIME_TYPE(HttpStatus.BAD_REQUEST, "FILE4001", "유효하지 않은 파일 형식입니다."),
@@ -66,4 +62,4 @@ public enum ErrorStatus implements ResponseStatus {
                 .httpStatus(httpStatus)
                 .build();
     }
-}
+    }
