@@ -1,160 +1,109 @@
 package com.pitchain.service;
 
 
-import com.amazonaws.AmazonServiceException;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.constant.S3UploadTarget;
 import com.pitchain.common.exception.GeneralHandler;
+import io.awspring.cloud.s3.ObjectMetadata;
+import io.awspring.cloud.s3.S3Operations;
+import io.awspring.cloud.s3.S3Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Objects;
-import java.util.Optional;
+import java.net.URI;
 import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class S3Uploader {
-    private final AmazonS3 amazonS3;
+    private final S3Operations s3Operations;
 
-    @Value("${cloud.aws.s3.bucket.img.company.desc}")
-    private String companyDescBucket;
-    @Value("${cloud.aws.s3.bucket.img.company.logo}")
-    private String companyLogoBucket;
-    @Value("${cloud.aws.s3.bucket.img.company.pt}")
-    private String companyPtBucket;
-    @Value("${cloud.aws.s3.bucket.img.company.thumbnail}")
-    private String companyThumbnailBucket;
+    @Value("${spring.cloud.aws.s3.bucket.image}")
+    private String imageBucket;
+    @Value("${spring.cloud.aws.s3.bucket.video}")
+    private String videoBucket;
 
-    @Value("${cloud.aws.s3.bucket.img.member.profile}")
-    private String memberProfileBucket;
-
-    @Value("${cloud.aws.s3.bucket.mp4}")
-    private String mp4Bucket;
-
-    /* MultipartFile을 전달받아 File로 전환 후 S3에 업로드 */
     public String uploadFile(MultipartFile file, S3UploadTarget target) {
-        File uploadFile = null;
-        String fileURL = null;
+        String fileURL = Strings.EMPTY;
 
         try {
-            validateFileType(file, target);
-
-            Optional<File> optionalFile = convert(file);
-            uploadFile = optionalFile.get();
-            fileURL = upload(uploadFile, target);
-        } catch (AmazonServiceException e) {
-            switch (e.getStatusCode()) {
-                case 400:
-                    throw new GeneralHandler(ErrorStatus.BAD_REQUEST_FILE);
-                case 401:
-                    throw new GeneralHandler(ErrorStatus.UNAUTHORIZED_S3);
-                case 403:
-                    throw new GeneralHandler(ErrorStatus.FORBIDDEN_S3);
-                case 500:
-                    throw new GeneralHandler(ErrorStatus.FAIL_FILE_UPLOAD);
-                case 503:
-                    throw new GeneralHandler(ErrorStatus.UNAVAILABLE_S3);
+            validateMimeType(file, target);
+            fileURL = upload(file, target);
+        } catch (S3Exception e) {
+            switch (e.statusCode()) {
+                case 400 -> throw new GeneralHandler(ErrorStatus.BAD_REQUEST_FILE);
+                case 401 -> throw new GeneralHandler(ErrorStatus.UNAUTHORIZED_S3);
+                case 403 -> throw new GeneralHandler(ErrorStatus.FORBIDDEN_S3);
+                case 500 -> throw new GeneralHandler(ErrorStatus.FAIL_FILE_UPLOAD);
+                case 503 -> throw new GeneralHandler(ErrorStatus.UNAVAILABLE_S3);
             }
-        } finally {
-            if (uploadFile != null && uploadFile.exists())
-                removeNewFile(uploadFile);
+        } catch (IOException e) {
+            throw new GeneralHandler(ErrorStatus.FAIL_STREAM_CONVERT);
         }
         return fileURL;
     }
 
-    private void validateFileType(MultipartFile file, S3UploadTarget target) {
-        String contentType = file.getContentType();
-
-        if (!target.isValidMimeType(contentType)) {
-            throw new GeneralHandler(ErrorStatus.BAD_REQUEST_FILE);
+    private static void validateMimeType(MultipartFile file, S3UploadTarget target) {
+        if (!target.isValidMimeType(file.getContentType())) {
+            throw new GeneralHandler(ErrorStatus.INVALID_MIME_TYPE);
         }
     }
 
-    private String upload(File uploadFile, S3UploadTarget target) {
+    private String upload(MultipartFile file, S3UploadTarget target) throws IOException {
         String fileName = UUID.randomUUID().toString();
-        String uploadFileUrl = putS3(uploadFile, fileName, target);
+        String uploadFileUrl = putS3(file, fileName, target);
 
         return uploadFileUrl;
     }
 
-    private String putS3(File uploadFile, String fileName, S3UploadTarget target) {
-        String bucket = getBucket(target);
+    private String putS3(MultipartFile file, String fileName, S3UploadTarget target) throws IOException {
+        String targetBucket = getTargetBucket(target);
 
-        amazonS3.putObject(
-                new PutObjectRequest(bucket, fileName, uploadFile)
-                        .withCannedAcl(CannedAccessControlList.PublicRead)
+        S3Resource uploadFile = s3Operations.upload(
+                targetBucket,
+                target.getPrefix() + fileName,
+                file.getInputStream(),
+                ObjectMetadata.builder()
+                        .contentType(file.getContentType())
+                        .acl(ObjectCannedACL.PUBLIC_READ)
+                        .build()
         );
-        return amazonS3.getUrl(bucket, fileName).toString();
+
+        return uploadFile.getURL().toString();
     }
 
-    private String getBucket(S3UploadTarget target) {
-        return switch (target) {
-            case COMPANY_DESC -> companyDescBucket;
-            case COMPANY_LOGO -> companyLogoBucket;
-            case COMPANY_PT -> companyPtBucket;
-            case COMPANY_THUMBNAIL -> companyThumbnailBucket;
-            case MEMBER_PROFILE -> memberProfileBucket;
-            case COMPANY_VIDEO -> mp4Bucket;
+    private String getTargetBucket(S3UploadTarget target) {
+        return switch (target.getMime()) {
+            case IMAGE -> imageBucket;
+            case VIDEO -> videoBucket;
         };
     }
 
-    private void removeNewFile(File file) {
-        if (file.delete()) {
-            log.debug("파일이 삭제되었습니다.");
-        } else {
-            log.debug("파일 삭제에 실패했습니다.");
-        }
-    }
-
-    private Optional<File> convert(MultipartFile file) {
-        File convertFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
+    public void deleteFile(String fileURL) {
         try {
-            if (convertFile.createNewFile()) {
-                try (FileOutputStream fileOutputStream = new FileOutputStream(convertFile)) {
-                    fileOutputStream.write(file.getBytes());
-                }
-                return Optional.of(convertFile);
-            }
-        } catch (IOException e) {
-            throw new GeneralHandler(ErrorStatus.FAIL_FILE_CONVERT);
-        }
-        return Optional.empty();
-    }
-
-    public void deleteFile(String fileURL, S3UploadTarget target) {
-        try {
-            String key = getBucketKey(fileURL);
-            String bucket = getBucket(target);
-            amazonS3.deleteObject(bucket, key);
-            log.debug("S3에서 파일이 삭제되었습니다. 파일명: " + key);
-        } catch (AmazonServiceException e) {
-            switch (e.getStatusCode()) {
-                case 400:
-                    throw new GeneralHandler(ErrorStatus.BAD_REQUEST_FILE);
-                case 401:
-                    throw new GeneralHandler(ErrorStatus.UNAUTHORIZED_S3);
-                case 403:
-                    throw new GeneralHandler(ErrorStatus.FORBIDDEN_S3);
-                case 500:
-                    throw new GeneralHandler(ErrorStatus.FAIL_FILE_DELETE);
-                case 503:
-                    throw new GeneralHandler(ErrorStatus.UNAVAILABLE_S3);
-            }
+            URI uri = URI.create(fileURL);
+            String bucketName = extractBucketName(uri);
+            String bucketKey = extractBucketKey(uri);
+            s3Operations.deleteObject(bucketName, bucketKey);
+        } catch (Exception e) {
+            throw new GeneralHandler(ErrorStatus.INVALID_BUCKET_URL);
         }
     }
 
-    private String getBucketKey(String fileURL) {
-        return fileURL.substring(fileURL.lastIndexOf("/") + 1);
+    public String extractBucketName(URI uri) {
+        String host = uri.getHost();
+        return host.split("\\.")[0];
+    }
+
+    public String extractBucketKey(URI uri) {
+        return uri.getPath().substring(1);
     }
 }

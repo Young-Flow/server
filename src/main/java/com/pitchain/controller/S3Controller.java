@@ -25,15 +25,8 @@ public class S3Controller {
 
     @Operation(summary = "파일(이미지, 동영상) 삭제 / 개발용")
     @DeleteMapping("/s3")
-    public CustomApiResponse deleteFile(@RequestBody DeleteFileReq req) {
-        s3Uploader.deleteFile(req.fileURL, req.s3UploadTarget);
+    public CustomApiResponse deleteFile(@RequestParam String fileURL) {
+        s3Uploader.deleteFile(fileURL);
         return CustomApiResponse.onSuccess();
-    }
-
-    record DeleteFileReq(
-            String fileURL,
-            S3UploadTarget s3UploadTarget
-    ) {
-
     }
 }
