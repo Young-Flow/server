@@ -1,0 +1,32 @@
+package com.pitchain.repository;
+
+import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
+import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.entity.Bm;
+import com.pitchain.entity.Member;
+import com.pitchain.entity.Sp;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+
+@RequiredArgsConstructor
+@Repository
+public class EntityFacade {
+    private final MemberRepository memberRepository;
+    private final BmRepository bmRepository;
+    private final SpRepository spRepository;
+
+    public Member getMember(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+    }
+
+    public Bm getBm(Long bmId) {
+        return bmRepository.findById(bmId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
+    }
+
+    public Sp getSp(Long spId) {
+        return spRepository.findById(spId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.SP_NOT_FOUND));
+    }
+}
