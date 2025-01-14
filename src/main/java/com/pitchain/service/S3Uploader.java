@@ -33,6 +33,8 @@ public class S3Uploader {
 
     public String uploadFile(MultipartFile file, S3UploadTarget target) {
         String fileURL = Strings.EMPTY;
+        if (file == null || file.isEmpty())
+            return fileURL;
 
         try {
             validateMimeType(file, target);
