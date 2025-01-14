@@ -6,6 +6,7 @@ import com.pitchain.entity.MyBm;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MyBmRepository extends JpaRepository<MyBm, Long> {
+    long countByBm(Bm bm);
 
     boolean existsByMemberAndBm(Member member, Bm bm);
 

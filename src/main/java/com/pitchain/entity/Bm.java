@@ -6,8 +6,10 @@ import com.pitchain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.apache.logging.log4j.util.Strings;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -48,13 +50,17 @@ public class Bm extends BaseEntity {
     private LocalDate deadline;
     private String longPitchUrl;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
     @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY)
     private List<Investment> investments = new ArrayList<>();
 
     @OneToOne(mappedBy = "bm", fetch = FetchType.LAZY)
     private Sp sp;
 
-    @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PtImg> ptImgs = new ArrayList<>();
 
     @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY)
