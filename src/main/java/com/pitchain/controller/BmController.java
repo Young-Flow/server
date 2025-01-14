@@ -1,20 +1,32 @@
 package com.pitchain.controller;
 
 import com.pitchain.common.apiPayload.dto.CustomApiResponse;
+import com.pitchain.dto.req.CreateBmReq;
+import com.pitchain.dto.req.UpdateBmReq;
 import com.pitchain.dto.res.BmDetailRes;
 import com.pitchain.service.BmService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RequestMapping("/bms")
 @RestController
 public class BmController {
     private final BmService bmService;
+
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public CustomApiResponse createBm(@AuthenticationPrincipal Long memberId,
+                                      @RequestPart CreateBmReq createBmReq,
+                                      @RequestPart(required = false) MultipartFile logoImg,
+                                      @RequestPart(required = false) MultipartFile descriptionImg) {
+        bmService.createBm(memberId, createBmReq, logoImg, descriptionImg);
+        return CustomApiResponse.onSuccess();
+    }
 
     @GetMapping("{bmId}")
     public CustomApiResponse<BmDetailRes> getBmDetail(@AuthenticationPrincipal Long memberId,
@@ -23,4 +35,28 @@ public class BmController {
         return CustomApiResponse.onSuccess(bmDetailRes);
     }
 
+    @PutMapping(value = "{bmId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public CustomApiResponse<BmDetailRes> updateBm(@AuthenticationPrincipal Long memberId,
+                                                   @PathVariable("bmId") Long bmId,
+                                                   @RequestBody UpdateBmReq updateBmReq,
+                                                   @RequestPart(required = false) MultipartFile logoImg,
+                                                   @RequestPart(required = false) MultipartFile descriptionImg) {
+        bmService.updateBm(memberId, bmId, updateBmReq, logoImg, descriptionImg);
+        return CustomApiResponse.onSuccess();
+    }
+
+    @PostMapping(value = "{bmId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public CustomApiResponse updatePtImgs(@AuthenticationPrincipal Long memberId,
+                                          @PathVariable Long bmId,
+                                          @RequestPart(required = false) List<MultipartFile> ptImgs) {
+        bmService.updatePtImgs(memberId, bmId, ptImgs);
+        return CustomApiResponse.onSuccess();
+    }
+
+    @DeleteMapping("{bmId}")
+    public CustomApiResponse deleteBm(@AuthenticationPrincipal Long memberId,
+                                      @PathVariable("bmId") Long bmId) {
+        bmService.deleteBm(memberId, bmId);
+        return CustomApiResponse.onSuccess();
+    }
 }

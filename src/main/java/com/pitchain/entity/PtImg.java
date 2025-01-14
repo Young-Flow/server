@@ -24,4 +24,9 @@ public class PtImg {
     @Column(nullable = false)
     private String img;
 
+    public PtImg(Bm bm, int serialNum, String img) {
+        this.bm = bm;
+        this.serialNum = serialNum;
+        this.img = img;
+    }
 }
