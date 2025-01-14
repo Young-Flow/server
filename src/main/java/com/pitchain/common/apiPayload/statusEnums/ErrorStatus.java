@@ -29,8 +29,16 @@ public enum ErrorStatus implements ResponseStatus {
     SP_NOT_FOUND(HttpStatus.NOT_FOUND, "SP4041", "존재하지 않는 SP입니다."),
 
     // comment
-    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENT4041", "존재하지 않는 댓글입니다.");
+    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENT4041", "존재하지 않는 댓글입니다."),
 
+    // S3
+    FAIL_S3_UPLOAD(HttpStatus.BAD_REQUEST, "S3_4001", "S3 업로드에 실패했습니다."),
+    INVALID_BUCKET_URL(HttpStatus.BAD_REQUEST, "S3_4002", "유효하지 않은 버킷 URL입니다."),
+
+    // FILE
+    INVALID_MIME_TYPE(HttpStatus.BAD_REQUEST, "FILE4001", "유효하지 않은 파일 형식입니다."),
+    FAIL_STREAM_CONVERT(HttpStatus.BAD_REQUEST, "FILE4002", "스트림 변환에 실패했습니다."),
+    ;
 
     private final HttpStatus httpStatus;
     private final String code;
@@ -54,4 +62,4 @@ public enum ErrorStatus implements ResponseStatus {
                 .httpStatus(httpStatus)
                 .build();
     }
-}
+    }
