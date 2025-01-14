@@ -35,6 +35,7 @@ public class ExchangeRateService {
     private int updateMin;
 
     private final RedisExchangeRateUtil redisExchangeRateUtil;
+    private final RestTemplate restTemplate;
 
     /**
      * 가장 최근의 통화별 일환율 조회
@@ -57,7 +58,6 @@ public class ExchangeRateService {
      */
     @Scheduled(cron = "${koreaexim.updateTime.cron}")
     public void updateExchangeRateMap() {
-        RestTemplate restTemplate = new RestTemplate();
         String uri = generateRequestURI();
         ExchangeRateRes[] exchangeRateList = restTemplate.getForObject(uri, ExchangeRateRes[].class);
 
