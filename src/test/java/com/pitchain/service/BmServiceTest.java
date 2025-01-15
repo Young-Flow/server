@@ -294,18 +294,15 @@ class BmServiceTest {
     }
 
     @Test
-    void BM_PT_IMG_수정_성공() {
+    void BM_PT_IMG_추가_성공() {
         //given
         Member member = saveMember();
         Bm bm = saveBm(member);
 
         List<MultipartFile> ptImgs = List.of(
-                new MockMultipartFile(
-                        "img_1", "img_1.png", "image/png", "img1".getBytes()),
-                new MockMultipartFile(
-                        "img_2", "img_2.png", "image/png", "img2".getBytes()),
-                new MockMultipartFile(
-                        "img_3", "img_3.png", "image/png", "img3".getBytes())
+                new MockMultipartFile("img_1", "img_1.png", "image/png", "img1".getBytes()),
+                new MockMultipartFile("img_2", "img_2.png", "image/png", "img2".getBytes()),
+                new MockMultipartFile("img_3", "img_3.png", "image/png", "img3".getBytes())
         );
 
         for (int i = 0; i < ptImgs.size(); i++) {
@@ -323,6 +320,42 @@ class BmServiceTest {
 
         assertThat(updatedPtImgs).hasSize(ptImgs.size());
         for (int i = 0; i < ptImgs.size(); i++) {
+            assertThat(updatedPtImgs.get(i).getSerialNum()).isEqualTo(i);
+            assertThat(updatedPtImgs.get(i).getBm().getId()).isEqualTo(updatedBm.getId());
+            assertThat(updatedPtImgs.get(i).getImg()).isEqualTo("fake_" + (i + 1));
+        }
+    }
+
+    @Test
+    void BM_PT_IMG_수정_성공() {
+        //given
+        Member member = saveMember();
+        Bm bm = saveBm(member);
+        bm.updatePtImgs(List.of(
+                new PtImg(bm, 0, "origin_img_0.png"),
+                new PtImg(bm, 1, "origin_img_1.png")
+        ));
+
+        List<MultipartFile> updatePtImgs = List.of(
+                new MockMultipartFile("img_1", "img_1.png", "image/png", "img1".getBytes()),
+                new MockMultipartFile("img_2", "img_2.png", "image/png", "img2".getBytes()),
+                new MockMultipartFile("img_3", "img_3.png", "image/png", "img3".getBytes())
+        );
+        for (int i = 0; i < updatePtImgs.size(); i++) {
+            String fakeUrl = "fake_" + (i + 1);
+            when(s3Service.uploadFile(updatePtImgs.get(i), S3UploadTarget.COMPANY_PT))
+                    .thenReturn(fakeUrl);
+        }
+
+        //when
+        bmService.updatePtImgs(member.getId(), bm.getId(), updatePtImgs);
+
+        //then
+        Bm updatedBm = bmRepository.findById(bm.getId()).orElseThrow();
+        List<PtImg> updatedPtImgs = updatedBm.getPtImgs();
+
+        assertThat(updatedPtImgs).hasSize(updatePtImgs.size());
+        for (int i = 0; i < updatePtImgs.size(); i++) {
             assertThat(updatedPtImgs.get(i).getSerialNum()).isEqualTo(i);
             assertThat(updatedPtImgs.get(i).getBm().getId()).isEqualTo(updatedBm.getId());
             assertThat(updatedPtImgs.get(i).getImg()).isEqualTo("fake_" + (i + 1));
