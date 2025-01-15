@@ -23,7 +23,7 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class S3Uploader {
+public class S3Service {
     private final S3Operations s3Operations;
 
     @Value("${spring.cloud.aws.s3.bucket.image}")

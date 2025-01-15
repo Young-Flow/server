@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 class BmServiceTest {
     @MockBean
-    private S3Uploader s3Uploader;
+    private S3Service s3Service;
     @Autowired
     private BmService bmService;
     @Autowired
@@ -91,9 +91,9 @@ class BmServiceTest {
         CreateBmReq createBmReq = new CreateBmReq(NAME, MAIN_CATEGORY, SUB_CATEGORY, COMPANY,
                 INTRO, DESCRIPTION, ADDRESS, VALUATION_CAP, GOAL_INVESTMENT, MAX_ISSUED_SHARE, DEADLINE, LONG_PITCH_URL);
 
-        when(s3Uploader.uploadFile(LOGO_IMG, S3UploadTarget.COMPANY_LOGO))
+        when(s3Service.uploadFile(LOGO_IMG, S3UploadTarget.COMPANY_LOGO))
                 .thenReturn(LOGO_IMG_URL);
-        when(s3Uploader.uploadFile(DESCRIPTION_IMG, S3UploadTarget.COMPANY_DESC))
+        when(s3Service.uploadFile(DESCRIPTION_IMG, S3UploadTarget.COMPANY_DESC))
                 .thenReturn(DESCRIPTION_IMG_URL);
 
         //when
@@ -228,9 +228,9 @@ class BmServiceTest {
                 updatedMaxIssuedShare, updatedDeadline, updatedLongPitchUrl
         );
 
-        when(s3Uploader.uploadFile(LOGO_IMG, S3UploadTarget.COMPANY_LOGO))
+        when(s3Service.uploadFile(LOGO_IMG, S3UploadTarget.COMPANY_LOGO))
                 .thenReturn(updatedLogoImgUrl);
-        when(s3Uploader.uploadFile(DESCRIPTION_IMG, S3UploadTarget.COMPANY_DESC))
+        when(s3Service.uploadFile(DESCRIPTION_IMG, S3UploadTarget.COMPANY_DESC))
                 .thenReturn(updatedDescriptionImgUrl);
 
         //when
@@ -310,7 +310,7 @@ class BmServiceTest {
 
         for (int i = 0; i < ptImgs.size(); i++) {
             String fakeUrl = "fake_" + (i + 1);
-            when(s3Uploader.uploadFile(ptImgs.get(i), S3UploadTarget.COMPANY_PT))
+            when(s3Service.uploadFile(ptImgs.get(i), S3UploadTarget.COMPANY_PT))
                     .thenReturn(fakeUrl);
         }
 

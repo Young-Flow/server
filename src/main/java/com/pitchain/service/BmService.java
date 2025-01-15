@@ -29,12 +29,12 @@ public class BmService {
     private final EntityFacade entityFacade;
     private final BmRepository bmRepository;
     private final MyBmRepository myBmRepository;
-    private final S3Uploader s3Uploader;
+    private final S3Service s3Service;
 
     public void createBm(Long memberId, CreateBmReq createBmReq, MultipartFile logoImg, MultipartFile descriptionImg) {
         Member member = entityFacade.getMember(memberId);
-        String logoImgURL = s3Uploader.uploadFile(logoImg, S3UploadTarget.COMPANY_LOGO);
-        String descriptionImgURL = s3Uploader.uploadFile(descriptionImg, S3UploadTarget.COMPANY_DESC);
+        String logoImgURL = s3Service.uploadFile(logoImg, S3UploadTarget.COMPANY_LOGO);
+        String descriptionImgURL = s3Service.uploadFile(descriptionImg, S3UploadTarget.COMPANY_DESC);
 
         Bm newBm = createBmReq.createBm(member, logoImgURL, descriptionImgURL);
         bmRepository.save(newBm);
@@ -63,8 +63,8 @@ public class BmService {
 
         validateBmOwner(bm, member);
 
-        String logoImgURL = s3Uploader.uploadFile(logoImg, S3UploadTarget.COMPANY_LOGO);
-        String descriptionImgURL = s3Uploader.uploadFile(descriptionImg, S3UploadTarget.COMPANY_DESC);
+        String logoImgURL = s3Service.uploadFile(logoImg, S3UploadTarget.COMPANY_LOGO);
+        String descriptionImgURL = s3Service.uploadFile(descriptionImg, S3UploadTarget.COMPANY_DESC);
 
         Bm updateBm = updateBmReq.createBm(logoImgURL, descriptionImgURL);
 
@@ -79,7 +79,7 @@ public class BmService {
 
         List<PtImg> uploadPtImgs = new ArrayList<>();
         for (int serialNum = 0; ptImgs != null && serialNum < ptImgs.size(); serialNum++) {
-            String uploadFileURL = s3Uploader.uploadFile(ptImgs.get(serialNum), S3UploadTarget.COMPANY_PT);
+            String uploadFileURL = s3Service.uploadFile(ptImgs.get(serialNum), S3UploadTarget.COMPANY_PT);
             PtImg ptImg = new PtImg(bm, serialNum, uploadFileURL);
             uploadPtImgs.add(ptImg);
         }
