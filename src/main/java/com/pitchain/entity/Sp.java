@@ -31,4 +31,21 @@ public class Sp extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
+    public Sp(Bm bm, String shortPitchURL, String thumbnailImg, String name) {
+        this.bm = bm;
+        this.shortPitchURL = shortPitchURL;
+        this.thumbnailImg = thumbnailImg;
+        this.name = name;
+        this.views = 0;
+    }
+
+    public boolean isOwner(Long memberId) {
+        return bm.getMember().getId().equals(memberId);
+    }
+
+    public void update(Sp updateSp) {
+        this.shortPitchURL = updateSp.shortPitchURL;
+        this.thumbnailImg = updateSp.thumbnailImg;
+        this.name = updateSp.name;
+    }
 }

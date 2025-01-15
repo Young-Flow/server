@@ -1,14 +1,14 @@
 package com.pitchain.controller;
 
 import com.pitchain.common.apiPayload.dto.CustomApiResponse;
+import com.pitchain.dto.req.CreateSpReq;
 import com.pitchain.dto.res.SpDetailRes;
 import com.pitchain.service.SpService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -17,6 +17,15 @@ import java.util.List;
 @RestController
 public class SpController {
     private final SpService spService;
+
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public CustomApiResponse createSp(@AuthenticationPrincipal Long memberId,
+                                      @RequestPart CreateSpReq createSpReq,
+                                      @RequestPart(required = false) MultipartFile spVideo,
+                                      @RequestPart(required = false) MultipartFile thumbnailImg) {
+        spService.createSp(memberId, createSpReq, spVideo, thumbnailImg);
+        return CustomApiResponse.onSuccess();
+    }
 
     @GetMapping
     public CustomApiResponse<List<SpDetailRes>> getSpDetails(@AuthenticationPrincipal Long memberId) {
@@ -31,4 +40,20 @@ public class SpController {
         return CustomApiResponse.onSuccess(spDetailRes);
     }
 
+    @PutMapping(value = "/{spId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public CustomApiResponse updateSp(@AuthenticationPrincipal Long memberId,
+                                      @PathVariable Long spId,
+                                      @RequestPart String name,
+                                      @RequestPart(required = false) MultipartFile spVideo,
+                                      @RequestPart(required = false) MultipartFile thumbnailImg) {
+        spService.updateSp(memberId, spId, name, spVideo, thumbnailImg);
+        return CustomApiResponse.onSuccess();
+    }
+
+    @DeleteMapping("/{spId}")
+    public CustomApiResponse deleteSp(@AuthenticationPrincipal Long memberId,
+                                      @PathVariable Long spId) {
+        spService.deleteSp(memberId, spId);
+        return CustomApiResponse.onSuccess();
+    }
 }
