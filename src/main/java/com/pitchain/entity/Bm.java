@@ -103,7 +103,11 @@ public class Bm extends BaseEntity {
     }
 
     public void updatePtImgs(List<PtImg> ptImgs) {
-        this.ptImgs = ptImgs;
+        if (ptImgs == null)
+            ptImgs = new ArrayList<>();
+
+        this.ptImgs.clear();
+        this.ptImgs.addAll(ptImgs);
     }
 
     public void update(Bm updateBm) {

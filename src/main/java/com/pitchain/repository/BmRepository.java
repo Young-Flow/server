@@ -3,6 +3,7 @@ package com.pitchain.repository;
 import com.pitchain.dto.BmWithLikeDto;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.PtImg;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -23,9 +24,17 @@ public interface BmRepository extends JpaRepository<Bm, Long> {
     Optional<BmWithLikeDto> getBmWithLikeDto(Long memberId, Long bmId);
 
     @Query("""
-        SELECT pi
-        FROM PtImg pi
-        WHERE pi.bm.id = :bmId
-    """)
+                SELECT pi
+                FROM PtImg pi
+                WHERE pi.bm.id = :bmId
+            """)
     List<PtImg> getPtImgsByBmId(Long bmId);
+
+    @Query("""
+                SELECT b 
+                FROM Bm b
+                LEFT JOIN FETCH b.ptImgs
+                WHERE b.id = :bmId
+            """)
+    Optional<Bm> getByIdWithPtImgs(Long bmId);
 }

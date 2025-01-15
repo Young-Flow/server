@@ -71,20 +71,33 @@ public class BmService {
         bm.update(updateBm);
     }
 
-    public void updatePtImgs(Long memberId, Long bmId, List<MultipartFile> ptImgs) {
+    public void updatePtImgs(Long memberId, Long bmId, List<MultipartFile> uploadPtImgs) {
         Member member = entityFacade.getMember(memberId);
-        Bm bm = entityFacade.getBm(bmId);
+        Bm bm = bmRepository.getByIdWithPtImgs(bmId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
 
         validateBmOwner(bm, member);
 
+        deletePtImgs(bm);
+        List<PtImg> uploadedPtImgs = uploadPtImgs(uploadPtImgs, bm);
+
+        bm.updatePtImgs(uploadedPtImgs);
+    }
+
+    private void deletePtImgs(Bm bm) {
+        List<PtImg> ptImgs = bm.getPtImgs();
+        System.out.println("ptImgs = " + ptImgs);
+        ptImgs.forEach(pi -> s3Service.deleteFile(pi.getImg()));
+    }
+
+    private List<PtImg> uploadPtImgs(List<MultipartFile> ptImgs, Bm bm) {
         List<PtImg> uploadPtImgs = new ArrayList<>();
         for (int serialNum = 0; ptImgs != null && serialNum < ptImgs.size(); serialNum++) {
             String uploadFileURL = s3Service.uploadFile(ptImgs.get(serialNum), S3UploadTarget.COMPANY_PT);
             PtImg ptImg = new PtImg(bm, serialNum, uploadFileURL);
             uploadPtImgs.add(ptImg);
         }
-
-        bm.updatePtImgs(uploadPtImgs);
+        return uploadPtImgs;
     }
 
     public void deleteBm(Long memberId, Long bmId) {
