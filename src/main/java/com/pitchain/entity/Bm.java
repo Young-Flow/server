@@ -6,8 +6,10 @@ import com.pitchain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.apache.logging.log4j.util.Strings;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -48,13 +50,17 @@ public class Bm extends BaseEntity {
     private LocalDate deadline;
     private String longPitchUrl;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
     @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY)
     private List<Investment> investments = new ArrayList<>();
 
     @OneToOne(mappedBy = "bm", fetch = FetchType.LAZY)
     private Sp sp;
 
-    @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PtImg> ptImgs = new ArrayList<>();
 
     @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY)
@@ -62,5 +68,62 @@ public class Bm extends BaseEntity {
 
     public double getPricePerShare() {
         return (double) valuationCap / maxIssuedShare;
+    }
+
+    @Builder
+    public Bm(Member member, String name, MainCategory mainCategory, SubCategory subCategory,
+              String company, String logoImg, String intro, String description, String descriptionImg,
+              String address, Long valuationCap, Integer goalInvestment, Integer maxIssuedShare,
+              LocalDate deadline, String longPitchUrl) {
+        this.member = member;
+        this.name = name;
+        this.mainCategory = mainCategory;
+        this.subCategory = subCategory;
+        this.company = company;
+        this.logoImg = logoImg;
+        this.intro = intro;
+        this.description = description;
+        this.descriptionImg = descriptionImg;
+        this.address = address;
+        this.valuationCap = valuationCap;
+        this.goalInvestment = goalInvestment;
+        this.maxIssuedShare = maxIssuedShare;
+        this.deadline = deadline;
+        this.longPitchUrl = longPitchUrl;
+    }
+
+    public String getShortPitchURL() {
+        if (sp == null)
+            return Strings.EMPTY;
+        return sp.getShortPitchURL();
+    }
+
+    public boolean isOwner(Long memberId) {
+        return memberId.equals(member.getId());
+    }
+
+    public void updatePtImgs(List<PtImg> ptImgs) {
+        if (ptImgs == null)
+            ptImgs = new ArrayList<>();
+
+        this.ptImgs.clear();
+        this.ptImgs.addAll(ptImgs);
+    }
+
+    public void update(Bm updateBm) {
+        this.name = updateBm.getName();
+        this.mainCategory = updateBm.getMainCategory();
+        this.subCategory = updateBm.getSubCategory();
+        this.company = updateBm.getCompany();
+        this.logoImg = updateBm.getLogoImg();
+        this.intro = updateBm.getIntro();
+        this.description = updateBm.getDescription();
+        this.descriptionImg = updateBm.getDescriptionImg();
+        this.address = updateBm.getAddress();
+        this.valuationCap = updateBm.getValuationCap();
+        this.goalInvestment = updateBm.getGoalInvestment();
+        this.maxIssuedShare = updateBm.getMaxIssuedShare();
+        this.deadline = updateBm.getDeadline();
+        this.longPitchUrl = updateBm.getLongPitchUrl();
     }
 }

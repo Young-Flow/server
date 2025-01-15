@@ -9,5 +9,4 @@ import lombok.Getter;
 public class BmWithLikeDto {
     Bm bm;
     boolean isLiked;
-    Long likeCnt;
 }

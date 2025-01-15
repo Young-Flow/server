@@ -43,4 +43,11 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member")
     private List<Comment> comments = new ArrayList<>();
+
+    public Member(String name, String email, Country country, String profileImg) {
+        this.name = name;
+        this.email = email;
+        this.country = country;
+        this.profileImg = profileImg;
+    }
 }

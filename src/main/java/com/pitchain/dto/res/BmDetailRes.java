@@ -23,10 +23,10 @@ public record BmDetailRes(
         String longPitchUrl,
         String spURL,
         boolean isLiked,
-        Long likeCnt,
+        long likeCnt,
         List<PtImgRes> ptImgResList
 ) {
-    public static BmDetailRes createRes(BmWithLikeDto bmWithLikeDto, List<PtImgRes> ptImgResList) {
+    public static BmDetailRes createRes(BmWithLikeDto bmWithLikeDto, long likeCnt, List<PtImgRes> ptImgResList) {
         Bm bm = bmWithLikeDto.getBm();
         return BmDetailRes.builder()
                 .id(bm.getId())
@@ -41,9 +41,9 @@ public record BmDetailRes(
                 .address(bm.getAddress())
                 .createdAt(bm.getCreatedAt())
                 .longPitchUrl(bm.getLongPitchUrl())
-                .spURL(bm.getSp().getShortPitchURL())
+                .spURL(bm.getShortPitchURL())
                 .isLiked(bmWithLikeDto.isLiked())
-                .likeCnt(bmWithLikeDto.getLikeCnt())
+                .likeCnt(likeCnt)
                 .ptImgResList(ptImgResList)
                 .build();
     }
