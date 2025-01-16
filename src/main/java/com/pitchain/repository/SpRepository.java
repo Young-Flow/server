@@ -13,8 +13,7 @@ public interface SpRepository extends JpaRepository<Sp, Long> {
     @Query("""
                 SELECT DISTINCT new com.pitchain.dto.SpWithLikeDto(
                     s,
-                    CASE WHEN mb.member.id IS NOT NULL THEN true ELSE false END,
-                    COUNT(mb.id)
+                    CASE WHEN mb.member.id IS NOT NULL THEN true ELSE false END
                 )
                 FROM Sp s
                 LEFT JOIN FETCH s.bm b
@@ -25,8 +24,7 @@ public interface SpRepository extends JpaRepository<Sp, Long> {
     @Query("""
                 SELECT DISTINCT new com.pitchain.dto.SpWithLikeDto(
                     s,
-                    CASE WHEN mb.member.id IS NOT NULL THEN true ELSE false END,
-                    COUNT(mb.id)
+                    CASE WHEN mb.member.id IS NOT NULL THEN true ELSE false END
                 )
                 FROM Sp s
                 LEFT JOIN FETCH s.bm b

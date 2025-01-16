@@ -17,9 +17,9 @@ public record SpDetailRes(
         String subCategory,
         String company,
         boolean isLiked,
-        Long likeCnt
+        long likeCnt
 ) {
-    public static SpDetailRes createRes(SpWithLikeDto spWithLikeDto) {
+    public static SpDetailRes createRes(SpWithLikeDto spWithLikeDto, long likeCnt) {
         Sp sp = spWithLikeDto.getSp();
         Bm bm = sp.getBm();
         return SpDetailRes.builder()
@@ -33,7 +33,7 @@ public record SpDetailRes(
                 .subCategory(bm.getSubCategory().getKoreanName())
                 .company(bm.getCompany())
                 .isLiked(spWithLikeDto.isLiked())
-                .likeCnt(spWithLikeDto.getLikeCnt())
+                .likeCnt(likeCnt)
                 .build();
     }
 }

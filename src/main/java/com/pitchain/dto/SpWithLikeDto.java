@@ -9,5 +9,4 @@ import lombok.Getter;
 public class SpWithLikeDto {
     Sp sp;
     boolean isLiked;
-    Long likeCnt;
 }
