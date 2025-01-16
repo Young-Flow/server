@@ -1,5 +1,6 @@
 package com.pitchain.common.config;
 
+import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.config.TlsConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
@@ -30,8 +31,13 @@ public class RestTemplateConfig {
      */
     @Bean
     public CloseableHttpClient closeableHttpClient() {
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setCircularRedirectsAllowed(true)
+                .build();
+
         CloseableHttpClient httpClient = HttpClients.custom()
                 .setConnectionManager(connectionManager())
+                .setDefaultRequestConfig(requestConfig)
                 .build();
 
         return httpClient;
