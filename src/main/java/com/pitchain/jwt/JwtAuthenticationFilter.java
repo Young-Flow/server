@@ -1,5 +1,6 @@
 package com.pitchain.jwt;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.constant.TokenType;
 import com.pitchain.common.exception.GeneralHandler;
@@ -27,7 +28,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public static final String[] whitelist = {
             "/oauth**",
             "/resources/**", "/favicon.ico", // resource
-            "/swagger-ui/**", "/api-docs/**", "/v3/api-docs**", "/v3/api-docs/**" , // swagger
+            "/swagger-ui/**", "/api-docs/**", "/v3/api-docs**", "/v3/api-docs/**", // swagger
+            "/token" // todo 배포 시 삭제
     };
 
     @Override
@@ -39,17 +41,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = tokenUtil.extractToken(request, TokenType.ACCESS_TOKEN);
 
-        // jwt 검증 로직
-//        if (token == null) {
-//            log.error("Access token is missing");
-//            throw new GeneralHandler(ErrorStatus.MISSING_ACCESS_TOKEN);
-//        }
-//
-//        DecodedJWT decodedJWT = tokenUtil.decodedJWT(token);
-//        Long id = decodedJWT.getClaim("id").asLong();
-//        Authentication authentication = new UsernamePasswordAuthenticationToken(id,null);
+        if (token == null)
+            throw new GeneralHandler(ErrorStatus.MISSING_ACCESS_TOKEN);
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(1L,null);
+        DecodedJWT decodedJWT = tokenUtil.decodedJWT(token);
+        Long id = decodedJWT.getClaim("id").asLong();
+        Authentication authentication = new UsernamePasswordAuthenticationToken(id, null);
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         doFilter(request, response, filterChain);
