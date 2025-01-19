@@ -17,7 +17,7 @@ public record InvestmentStatusRes(
         Long valuationCap,
         double pricePerShare,
         Integer maxIssuedShare,
-        Long goalInvestment,
+        Integer goalInvestment,
         LocalDate deadline
 ) {
     public static InvestmentStatusRes createRes(Bm bm, InvestmentStatusDto investmentStatusDto, int achievementRate) {
@@ -30,7 +30,7 @@ public record InvestmentStatusRes(
                 .valuationCap(bm.getValuationCap())
                 .pricePerShare(bm.getPricePerShare())
                 .maxIssuedShare(bm.getMaxIssuedShare())
-                .goalInvestment(bm.getGoalInvestment().longValue())
+                .goalInvestment(bm.getGoalInvestment())
                 .deadline(bm.getDeadline())
                 .build();
     }

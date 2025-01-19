@@ -23,7 +23,7 @@ public class InvestmentService {
     private final BmRepository bmRepository;
     private final MemberRepository memberRepository;
 
-    public Long addInvestment(Long bmId, Long memberId, long amount) {
+    public void addInvestment(Long bmId, Long memberId, long amount) {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
         Bm bm = bmRepository.findById(bmId).orElseThrow(() -> new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
@@ -34,7 +34,6 @@ public class InvestmentService {
                 .build();
 
         investmentRepository.save(investment);
-        return investment.getId();
     }
 
     @Transactional(readOnly = true)
@@ -48,8 +47,8 @@ public class InvestmentService {
         return InvestmentStatusRes.createRes(bm, investmentStatusDto, achievementRate);
     }
 
-    private int getAchievementRate(int investmentGoal, long raisedAmount) {
-        int rate = (int) ((raisedAmount / (double) investmentGoal) * 100);
+    private int getAchievementRate(int goalInvestment, long raisedAmount) {
+        int rate = (int) ((raisedAmount / (double) goalInvestment) * 100);
         return Math.min(rate, 100);
     }
 
