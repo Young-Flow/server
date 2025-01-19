@@ -1,9 +1,10 @@
 package com.pitchain.controller;
 
 import com.pitchain.common.apiPayload.dto.CustomApiResponse;
-import com.pitchain.dto.CurrencyDto;
+import com.pitchain.dto.res.CurrencyRes;
 import com.pitchain.service.CurrencyService;
 import com.pitchain.service.ExchangeRateService;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,15 +20,12 @@ public class CurrencyController {
 
     @GetMapping("/currency")
     public CustomApiResponse calculateExchangeRate(@AuthenticationPrincipal Long memberId,
-                                                   @RequestParam Integer amount) {
+                                                   @RequestParam @Positive long amount) {
         String calculatedAmount = currencyService.calculateExchangeRate(memberId, amount);
         String exchangeRateUpdateDateTime = currencyService.getExchangeRateUpdateDateTime();
 
-        CurrencyDto result = new CurrencyDto();
-        result.setCalculatedAmount(calculatedAmount);
-        result.setExchangeRateUpdateDateTime(exchangeRateUpdateDateTime);
-
-        return CustomApiResponse.onSuccess(result);
+        CurrencyRes currencyRes = CurrencyRes.createRes(calculatedAmount, exchangeRateUpdateDateTime);
+        return CustomApiResponse.onSuccess(currencyRes);
     }
 
     @GetMapping("/currency-test")

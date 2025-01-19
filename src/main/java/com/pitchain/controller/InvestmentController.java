@@ -17,8 +17,8 @@ public class InvestmentController {
 
     @PostMapping("/{bmId}/investments")
     public CustomApiResponse<InvestmentDto> addInvestment(@PathVariable("bmId") Long bmId,
-                                                                      @AuthenticationPrincipal Long memberId,
-                                                                      @Valid @RequestBody InvestmentDto dto) {
+                                                          @AuthenticationPrincipal Long memberId,
+                                                          @Valid @RequestBody InvestmentDto dto) {
         long amount = dto.getAmount();
         investmentService.addInvestment(bmId, memberId, amount);
         return CustomApiResponse.onSuccess();
