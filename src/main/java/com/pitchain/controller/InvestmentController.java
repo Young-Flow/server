@@ -16,17 +16,12 @@ public class InvestmentController {
     private final InvestmentService investmentService;
 
     @PostMapping("/{bmId}/investments")
-    public CustomApiResponse<InvestmentDto.ResponseDto> addInvestment(@PathVariable("bmId") Long bmId,
+    public CustomApiResponse<InvestmentDto> addInvestment(@PathVariable("bmId") Long bmId,
                                                                       @AuthenticationPrincipal Long memberId,
-                                                                      @Valid @RequestBody InvestmentDto.RequestDto dto) {
-
+                                                                      @Valid @RequestBody InvestmentDto dto) {
         long amount = dto.getAmount();
-        Long investmentId = investmentService.addInvestment(bmId, memberId, amount);
-
-        InvestmentDto.ResponseDto result = new InvestmentDto.ResponseDto();
-        result.setInvestmentId(investmentId);
-
-        return CustomApiResponse.onSuccess(result);
+        investmentService.addInvestment(bmId, memberId, amount);
+        return CustomApiResponse.onSuccess();
     }
 
     @GetMapping("/{bmId}/investment")

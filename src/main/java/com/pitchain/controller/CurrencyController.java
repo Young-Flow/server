@@ -23,7 +23,7 @@ public class CurrencyController {
         String calculatedAmount = currencyService.calculateExchangeRate(memberId, amount);
         String exchangeRateUpdateDateTime = currencyService.getExchangeRateUpdateDateTime();
 
-        CurrencyDto.ResponseDto result = new CurrencyDto.ResponseDto();
+        CurrencyDto result = new CurrencyDto();
         result.setCalculatedAmount(calculatedAmount);
         result.setExchangeRateUpdateDateTime(exchangeRateUpdateDateTime);
 

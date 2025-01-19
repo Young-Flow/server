@@ -94,7 +94,7 @@ public class CommentService {
                 new GeneralHandler(ErrorStatus.COMMENT_NOT_FOUND));
 
         Member commentWriter = comment.getMember();
-        checkAuthority(member, commentWriter);
+        validateWriter(member, commentWriter);
 
         String content = dto.getContent();
         comment.changeComment(content);
@@ -108,7 +108,7 @@ public class CommentService {
                 new GeneralHandler(ErrorStatus.COMMENT_NOT_FOUND));
 
         Member commentWriter = comment.getMember();
-        checkAuthority(member, commentWriter);
+        validateWriter(member, commentWriter);
 
         if (isReplyComment(comment)) {
             commentRepository.deleteById(commentId);
@@ -122,7 +122,7 @@ public class CommentService {
         return childComments.isEmpty();
     }
 
-    private static void checkAuthority(Member member, Member commentWriter) {
+    private static void validateWriter(Member member, Member commentWriter) {
         if (!commentWriter.equals(member)) {
             throw new GeneralHandler(ErrorStatus.MEMBER_FORBIDDEN);
         }
