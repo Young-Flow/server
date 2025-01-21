@@ -58,6 +58,8 @@ jobs:
       run: chmod +x gradlew
 
     - name: Build with Gradle, without test
+      env:
+        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       run: ./gradlew clean build -x test
       
     - name: Configure AWS credentials

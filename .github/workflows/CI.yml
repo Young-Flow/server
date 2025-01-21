@@ -46,4 +46,6 @@ jobs:
       run: chmod +x gradlew
 
     - name: 6. Build with Gradle
+      env:
+        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       run: ./gradlew clean build
