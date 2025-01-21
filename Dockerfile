@@ -11,6 +11,8 @@ RUN keytool -import -trustcacerts \
     -alias custom-cert \
     -file /ssl/koreaexim.pem
 
+ENV SPRING_PROFILES_ACTIVE=prod
+
 COPY build/libs/*.jar app.jar
 
 ENTRYPOINT ["java","-jar","/app.jar"]
