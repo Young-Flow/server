@@ -10,13 +10,11 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "에러 테스트", description = "에러 테스트를 위한 컨트롤러")
-@RestController("/dev-error")
+@RequestMapping("/dev-error")
+@RestController
 public class ErrorController {
 
     @Operation(summary = "ConstraintViolationException 발생")
