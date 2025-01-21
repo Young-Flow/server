@@ -29,7 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/oauth**",
             "/resources/**", "/favicon.ico", // resource
             "/swagger-ui/**", "/api-docs/**", "/v3/api-docs**", "/v3/api-docs/**", // swagger
-            "/token" // todo 배포 시 삭제
+            "/dev**" // 개발용
     };
 
     @Override

@@ -3,6 +3,7 @@ package com.pitchain.common.exception;
 import com.pitchain.common.apiPayload.dto.CustomApiResponse;
 import com.pitchain.common.apiPayload.dto.ResponseDTO;
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
+import io.sentry.Sentry;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,7 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
     // Bean Validation API를 통한 검증 실패 시 호출
     @ExceptionHandler
     public ResponseEntity<Object> validation(ConstraintViolationException e, WebRequest request) {
+        sendToSentry(e);
         String errorMessage = e.getConstraintViolations().stream()
                 .map(constraintViolation -> constraintViolation.getMessage())
                 .findFirst()
@@ -40,40 +42,47 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
     // @Valid 어노테이션으로 검증 실패 시 호출
     @Override
     public ResponseEntity<Object> handleMethodArgumentNotValid(
-            MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+            MethodArgumentNotValidException e, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        e.printStackTrace();
+        sendToSentry(e);
 
         Map<String, String> errors = new LinkedHashMap<>();
-
-        ex.getBindingResult().getFieldErrors().stream()
+        e.getBindingResult().getFieldErrors().stream()
                 .forEach(fieldError -> {
                     String fieldName = fieldError.getField();
                     String errorMessage = Optional.ofNullable(fieldError.getDefaultMessage()).orElse("");
                     errors.merge(fieldName, errorMessage, (existingErrorMessage, newErrorMessage) -> existingErrorMessage + ", " + newErrorMessage);
                 });
 
-        return handleExceptionInternalArgs(ex, HttpHeaders.EMPTY, ErrorStatus.valueOf("_BAD_REQUEST"), request, errors);
+        return handleExceptionInternalArgs(e, HttpHeaders.EMPTY, ErrorStatus.valueOf("_BAD_REQUEST"), request, errors);
     }
 
     // IllegalArgumentException 처리
     @ExceptionHandler
     public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException e, WebRequest request) {
-        log.error("IllegalArgumentException occurred: {}", e.getMessage(), e);
+        e.printStackTrace();
+        sendToSentry(e);
         return handleExceptionInternalFalse(e, ErrorStatus._BAD_REQUEST, HttpHeaders.EMPTY, HttpStatus.BAD_REQUEST, request, e.getMessage());
     }
 
     // 일반적인 Exception 처리
     @ExceptionHandler
     public ResponseEntity<Object> exception(Exception e, WebRequest request) {
+        sendToSentry(e);
         e.printStackTrace();
-
         return handleExceptionInternalFalse(e, ErrorStatus._INTERNAL_SERVER_ERROR, HttpHeaders.EMPTY, ErrorStatus._INTERNAL_SERVER_ERROR.getHttpStatus(), request, e.getMessage());
     }
 
     // GeneralHandler 타입의 예외 처리(커스텀 예외 처리)
     @ExceptionHandler(value = GeneralHandler.class)
     public ResponseEntity onThrowException(GeneralHandler generalHandler, HttpServletRequest request) {
+        sendToSentry(generalHandler);
         ResponseDTO errorHttpStatus = generalHandler.getErrorHttpStatus();
         return handleExceptionInternal(generalHandler, errorHttpStatus, null, request);
+    }
+
+    private static void sendToSentry(Exception e) {
+        Sentry.captureException(e);
     }
 
     // 예외와 에러 상태를 받아 ResponseEntity 생성
