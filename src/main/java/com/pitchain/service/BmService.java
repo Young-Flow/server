@@ -2,6 +2,7 @@ package com.pitchain.service;
 
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.constant.S3UploadTarget;
+import com.pitchain.common.constant.SubCategory;
 import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.dto.BmWithLikeDto;
 import com.pitchain.dto.req.CreateBmReq;
@@ -9,7 +10,6 @@ import com.pitchain.dto.req.UpdateBmReq;
 import com.pitchain.dto.res.BmDetailRes;
 import com.pitchain.dto.res.PtImgRes;
 import com.pitchain.entity.Bm;
-import com.pitchain.entity.BmSubCategory;
 import com.pitchain.entity.Member;
 import com.pitchain.entity.PtImg;
 import com.pitchain.repository.BmRepository;
@@ -57,10 +57,9 @@ public class BmService {
 
         long likeCnt = myBmRepository.countByBm(bmWithLikeDto.getBm());
 
-        List<BmSubCategory> bmSubCategories = bmRepository.getBmSubCategoriesByBmId(bmId);
-        List<String> subCategories = bmSubCategories.stream()
-                        .map(bmSubCategory -> bmSubCategory.getSubCategory().getKoreanName())
-                        .toList();
+        List<String> subCategories = bmRepository.getSubCategoriesByBmId(bmId).stream()
+                .map(SubCategory::getKoreanName)
+                .toList();
 
         return BmDetailRes.createRes(bmWithLikeDto, likeCnt, ptImgResList, subCategories);
     }
