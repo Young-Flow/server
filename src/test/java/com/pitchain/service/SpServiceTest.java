@@ -52,7 +52,7 @@ class SpServiceTest {
     private Bm saveBm(Member member) {
         return bmRepository.save(new Bm(member, "bm_name", MainCategory.FOOD,"bm_company", "bm_logo_img_url",
                 "bm_intro", "bm_description", "bm_description_img_url", "bm_address", 100000L,
-                1000, 1000, LocalDate.now(), "bm_longPitchUrl"));
+                1000L, 1000, LocalDate.now(), "bm_longPitchUrl"));
     }
 
     private Sp saveSp(Bm bm) {

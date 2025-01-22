@@ -16,7 +16,7 @@ public record UpdateBmReq(
         String description,
         String address,
         Long valuationCap,
-        Integer goalInvestment,
+        Long goalInvestment,
         Integer maxIssuedShare,
         LocalDate deadline,
         String longPitchUrl

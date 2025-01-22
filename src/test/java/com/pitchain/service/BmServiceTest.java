@@ -30,7 +30,6 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
-import static org.springframework.transaction.annotation.Propagation.NEVER;
 
 @Transactional
 @SpringBootTest
@@ -56,7 +55,7 @@ class BmServiceTest {
     private static final String DESCRIPTION_IMG_URL = "bm_description_img_url";
     private static final String ADDRESS = "bm_address";
     private static final Long VALUATION_CAP = 100000L;
-    private static final Integer GOAL_INVESTMENT = 1000;
+    private static final Long GOAL_INVESTMENT = 200000L;
     private static final Integer MAX_ISSUED_SHARE = 1000;
     private static final LocalDate DEADLINE = LocalDate.now();
     private static final String LONG_PITCH_URL = "bm_longPitchUrl";
@@ -225,7 +224,7 @@ class BmServiceTest {
         final String updatedDescriptionImgUrl = "updated_bm_description_img_url";
         final String updatedAddress = "updated_bm_address";
         final Long updatedValuationCap = 200000L;
-        final Integer updatedGoalInvestment = 2000;
+        final Long updatedGoalInvestment = 2000L;
         final Integer updatedMaxIssuedShare = 2000;
         final LocalDate updatedDeadline = LocalDate.now().plusDays(30);
         final String updatedLongPitchUrl = "updated_bm_longPitchUrl";
@@ -276,7 +275,7 @@ class BmServiceTest {
         final String UPDATED_DESCRIPTION = "update_bm_description";
         final String UPDATED_ADDRESS = "update_bm_address";
         final Long UPDATED_VALUATION_CAP = 200000L;
-        final Integer UPDATED_GOAL_INVESTMENT = 2000;
+        final Long UPDATED_GOAL_INVESTMENT = 2000L;
         final Integer UPDATED_MAX_ISSUED_SHARE = 2000;
         final LocalDate UPDATED_DEADLINE = LocalDate.now().plusDays(30);
         final String UPDATED_LONG_PITCH_URL = "update_bm_longPitchUrl";

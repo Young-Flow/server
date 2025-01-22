@@ -17,7 +17,7 @@ public record InvestmentStatusRes(
         Long valuationCap,
         double pricePerShare,
         Integer maxIssuedShare,
-        Integer goalInvestment,
+        Long goalInvestment,
         LocalDate deadline
 ) {
     public static InvestmentStatusRes createRes(Bm bm, InvestmentStatusDto investmentStatusDto, int achievementRate) {

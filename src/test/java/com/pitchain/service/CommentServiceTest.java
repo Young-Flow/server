@@ -304,7 +304,7 @@ class CommentServiceTest {
     private Bm saveBm(Member member) {
         return bmRepository.save(new Bm(member, "bmName", MainCategory.FOOD,"bmCompany", "logoImg",
                 "bmIntro", "bmDescription", "bmDescriptionImg", "companyAddress", 100000L,
-                1000, 1000, LocalDate.now(), "longPitchUrl"));
+                1000L, 1000, LocalDate.now(), "longPitchUrl"));
     }
 
     private Comment saveComment(Member member, Bm bm) {

@@ -42,7 +42,7 @@ public class Bm extends BaseEntity {
     @Positive
     private Long valuationCap;
     @Positive
-    private Integer goalInvestment;
+    private Long goalInvestment;
     @Positive
     private Integer maxIssuedShare;
     private LocalDate deadline;
@@ -74,7 +74,7 @@ public class Bm extends BaseEntity {
     @Builder
     public Bm(Member member, String name, MainCategory mainCategory, String company, String logoImg,
               String intro, String description, String descriptionImg, String address,
-              Long valuationCap, Integer goalInvestment, Integer maxIssuedShare,
+              Long valuationCap, Long goalInvestment, Integer maxIssuedShare,
               LocalDate deadline, String longPitchUrl) {
         this.member = member;
         this.name = name;

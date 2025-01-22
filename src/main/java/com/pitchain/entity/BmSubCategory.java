@@ -13,7 +13,7 @@ public class BmSubCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "bm_subcategory_id")
+    @Column(name = "bm_sub_category_id")
     private Long id;
 
     @ManyToOne()
