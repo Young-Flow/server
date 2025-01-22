@@ -2,7 +2,6 @@ package com.pitchain.service;
 
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.constant.S3UploadTarget;
-import com.pitchain.common.constant.SubCategory;
 import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.dto.BmWithLikeDto;
 import com.pitchain.dto.req.CreateBmReq;
@@ -39,9 +38,7 @@ public class BmService {
         String descriptionImgURL = s3Service.uploadFile(descriptionImg, S3UploadTarget.COMPANY_DESC);
 
         Bm newBm = createBmReq.createBm(member, logoImgURL, descriptionImgURL);
-
-        List<BmSubCategory> newBmSubCategories = createNewBmSubCategories(newBm, createBmReq.subCategories());
-        newBm.addSubCategories(newBmSubCategories);
+        newBm.addSubCategories(createBmReq.subCategories());
 
         bmRepository.save(newBm);
     }
@@ -77,9 +74,7 @@ public class BmService {
         String logoImgURL = s3Service.uploadFile(logoImg, S3UploadTarget.COMPANY_LOGO);
         String descriptionImgURL = s3Service.uploadFile(descriptionImg, S3UploadTarget.COMPANY_DESC);
 
-        List<BmSubCategory> newBmSubCategories = createNewBmSubCategories(bm, updateBmReq.subCategories());
-        bm.updateSubCategories(newBmSubCategories);
-
+        bm.updateSubCategories(updateBmReq.subCategories());
         Bm updateBm = updateBmReq.createBm(logoImgURL, descriptionImgURL);
         bm.update(updateBm);
     }
@@ -120,15 +115,6 @@ public class BmService {
             uploadPtImgs.add(ptImg);
         }
         return uploadPtImgs;
-    }
-
-    private List<BmSubCategory> createNewBmSubCategories(Bm bm, List<SubCategory> subCategories) {
-        List<BmSubCategory> bmSubCategories = new ArrayList<>();
-        for (SubCategory subCategory : subCategories) {
-            BmSubCategory bmSubCategory = new BmSubCategory(bm, subCategory);
-            bmSubCategories.add(bmSubCategory);
-        }
-        return bmSubCategories;
     }
 
     private static void validateBmOwner(Bm bm, Member member) {

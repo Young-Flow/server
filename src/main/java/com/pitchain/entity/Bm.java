@@ -1,6 +1,7 @@
 package com.pitchain.entity;
 
 import com.pitchain.common.constant.MainCategory;
+import com.pitchain.common.constant.SubCategory;
 import com.pitchain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
@@ -109,13 +110,25 @@ public class Bm extends BaseEntity {
         this.ptImgs.addAll(ptImgs);
     }
 
-    public void addSubCategories(List<BmSubCategory> subCategories) {
-        this.subCategories.addAll(subCategories);
+    public void addSubCategories(List<SubCategory> subCategories) {
+        if (subCategories == null) {
+            subCategories = new ArrayList<>();
+        }
+
+        for (SubCategory subCategory : subCategories) {
+            this.subCategories.add(new BmSubCategory(this, subCategory));
+        }
     }
 
-    public void updateSubCategories(List<BmSubCategory> subCategories) {
+    public void updateSubCategories(List<SubCategory> subCategories) {
+        if (subCategories == null) {
+            subCategories = new ArrayList<>();
+        }
+
         this.subCategories.clear();
-        this.subCategories.addAll(subCategories);
+        for (SubCategory subCategory : subCategories) {
+            this.subCategories.add(new BmSubCategory(this, subCategory));
+        }
     }
 
     public void update(Bm updateBm) {

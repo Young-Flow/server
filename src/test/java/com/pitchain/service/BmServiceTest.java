@@ -82,13 +82,6 @@ class BmServiceTest {
         );
     }
 
-    private List<BmSubCategory> createBmSubCategories(Bm bm) {
-        return List.of(
-                new BmSubCategory(bm, SubCategory.AI_ML),
-                new BmSubCategory(bm, SubCategory.CAMPING)
-        );
-    }
-
     @Test
     void BM_생성_성공() {
         //given
@@ -130,9 +123,10 @@ class BmServiceTest {
         Member member = saveMember();
         Bm bm = saveBm(member);
 
-        List<BmSubCategory> bmSubCategories = createBmSubCategories(bm);
-        bm.updateSubCategories(bmSubCategories);
-        List<String> subCategories = bmSubCategories.stream().map(bmSubCategory -> bmSubCategory.getSubCategory().getKoreanName()).toList();
+        bm.updateSubCategories(SUB_CATEGORIES);
+        List<String> subCategories = bm.getSubCategories().stream()
+                        .map(bmSubCategory -> bmSubCategory.getSubCategory().getKoreanName())
+                        .toList();
 
         List<PtImg> ptImgs = createPtImgs(bm);
         bm.updatePtImgs(ptImgs);
@@ -169,9 +163,10 @@ class BmServiceTest {
         myBmRepository.save(new MyBm(member_01, bm));
         myBmRepository.save(new MyBm(member_02, bm));
 
-        List<BmSubCategory> bmSubCategories = createBmSubCategories(bm);
-        bm.updateSubCategories(bmSubCategories);
-        List<String> subCategories = bmSubCategories.stream().map(bmSubCategory -> bmSubCategory.getSubCategory().getKoreanName()).toList();
+        bm.updateSubCategories(SUB_CATEGORIES);
+        List<String> subCategories = bm.getSubCategories().stream()
+                        .map(bmSubCategory -> bmSubCategory.getSubCategory().getKoreanName())
+                        .toList();
 
         List<PtImg> ptImgs = createPtImgs(bm);
         bm.updatePtImgs(ptImgs);

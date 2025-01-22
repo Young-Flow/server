@@ -60,13 +60,6 @@ class SpServiceTest {
                 new Sp(bm, SP_VID.getOriginalFilename(), THUMBNAIL_IMG.getOriginalFilename(), SP_NAME));
     }
 
-    private List<BmSubCategory> createBmSubCategories(Bm bm) {
-        return List.of(
-                new BmSubCategory(bm, SubCategory.AI_ML),
-                new BmSubCategory(bm, SubCategory.CAMPING)
-        );
-    }
-
     @BeforeEach
     void setUp() {
         member = saveMember();
@@ -81,7 +74,7 @@ class SpServiceTest {
             "sp_vid", "sp_vid.mp4", "video/mp4", "test data 1".getBytes());
     private static final MockMultipartFile THUMBNAIL_IMG = new MockMultipartFile(
             "thumbnail_img", "thumbnail_img.png", "image/png", "test data 2".getBytes());
-
+    private static final List<SubCategory> SUB_CATEGORIES = List.of(SubCategory.BEVERAGE_COFFEE, SubCategory.ALCOHOL);
 
     @Test
     void SP_생성_성공() {
@@ -110,9 +103,10 @@ class SpServiceTest {
         //given
         Sp sp = saveSp(bm);
 
-        List<BmSubCategory> bmSubCategories = createBmSubCategories(bm);
-        bm.updateSubCategories(bmSubCategories);
-        List<String> subCategories = bmSubCategories.stream().map(bmSubCategory -> bmSubCategory.getSubCategory().getKoreanName()).toList();
+        bm.updateSubCategories(SUB_CATEGORIES);
+        List<String> subCategories = bm.getSubCategories().stream()
+                .map(bmSubCategory -> bmSubCategory.getSubCategory().getKoreanName())
+                .toList();
 
         //when
         SpDetailRes spDetail = spService.getSpDetail(member.getId(), sp.getId());
@@ -139,9 +133,10 @@ class SpServiceTest {
         myBmRepository.save(new MyBm(member, bm));
         myBmRepository.save(new MyBm(newMember, bm));
 
-        List<BmSubCategory> bmSubCategories = createBmSubCategories(bm);
-        bm.updateSubCategories(bmSubCategories);
-        List<String> subCategories = bmSubCategories.stream().map(bmSubCategory -> bmSubCategory.getSubCategory().getKoreanName()).toList();
+        bm.updateSubCategories(SUB_CATEGORIES);
+        List<String> subCategories = bm.getSubCategories().stream()
+                .map(bmSubCategory -> bmSubCategory.getSubCategory().getKoreanName())
+                .toList();
 
         //when
         SpDetailRes spDetail = spService.getSpDetail(member.getId(), sp.getId());
