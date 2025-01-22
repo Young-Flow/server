@@ -2,6 +2,7 @@ package com.pitchain.service;
 
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.constant.S3UploadTarget;
+import com.pitchain.common.constant.SubCategory;
 import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.dto.BmWithLikeDto;
 import com.pitchain.dto.req.CreateBmReq;
@@ -9,6 +10,7 @@ import com.pitchain.dto.req.UpdateBmReq;
 import com.pitchain.dto.res.BmDetailRes;
 import com.pitchain.dto.res.PtImgRes;
 import com.pitchain.entity.Bm;
+import com.pitchain.entity.BmSubCategory;
 import com.pitchain.entity.Member;
 import com.pitchain.entity.PtImg;
 import com.pitchain.repository.BmRepository;
@@ -37,6 +39,10 @@ public class BmService {
         String descriptionImgURL = s3Service.uploadFile(descriptionImg, S3UploadTarget.COMPANY_DESC);
 
         Bm newBm = createBmReq.createBm(member, logoImgURL, descriptionImgURL);
+
+        List<BmSubCategory> newBmSubCategories = createNewBmSubCategories(newBm, createBmReq.subCategories());
+        newBm.addSubCategories(newBmSubCategories);
+
         bmRepository.save(newBm);
     }
 
@@ -54,7 +60,12 @@ public class BmService {
 
         long likeCnt = myBmRepository.countByBm(bmWithLikeDto.getBm());
 
-        return BmDetailRes.createRes(bmWithLikeDto, likeCnt, ptImgResList);
+        List<BmSubCategory> bmSubCategories = bmRepository.getBmSubCategoriesByBmId(bmId);
+        List<String> subCategories = bmSubCategories.stream()
+                        .map(bmSubCategory -> bmSubCategory.getSubCategory().getKoreanName())
+                        .toList();
+
+        return BmDetailRes.createRes(bmWithLikeDto, likeCnt, ptImgResList, subCategories);
     }
 
     public void updateBm(Long memberId, Long bmId, UpdateBmReq updateBmReq, MultipartFile logoImg, MultipartFile descriptionImg) {
@@ -66,8 +77,10 @@ public class BmService {
         String logoImgURL = s3Service.uploadFile(logoImg, S3UploadTarget.COMPANY_LOGO);
         String descriptionImgURL = s3Service.uploadFile(descriptionImg, S3UploadTarget.COMPANY_DESC);
 
-        Bm updateBm = updateBmReq.createBm(logoImgURL, descriptionImgURL);
+        List<BmSubCategory> newBmSubCategories = createNewBmSubCategories(bm, updateBmReq.subCategories());
+        bm.updateSubCategories(newBmSubCategories);
 
+        Bm updateBm = updateBmReq.createBm(logoImgURL, descriptionImgURL);
         bm.update(updateBm);
     }
 
@@ -82,6 +95,15 @@ public class BmService {
         List<PtImg> uploadedPtImgs = uploadPtImgs(uploadPtImgs, bm);
 
         bm.updatePtImgs(uploadedPtImgs);
+    }
+
+    public void deleteBm(Long memberId, Long bmId) {
+        Member member = entityFacade.getMember(memberId);
+        Bm bm = entityFacade.getBm(bmId);
+
+        validateBmOwner(bm, member);
+
+        bmRepository.delete(bm);
     }
 
     private void deletePtImgs(Bm bm) {
@@ -100,13 +122,13 @@ public class BmService {
         return uploadPtImgs;
     }
 
-    public void deleteBm(Long memberId, Long bmId) {
-        Member member = entityFacade.getMember(memberId);
-        Bm bm = entityFacade.getBm(bmId);
-
-        validateBmOwner(bm, member);
-
-        bmRepository.delete(bm);
+    private List<BmSubCategory> createNewBmSubCategories(Bm bm, List<SubCategory> subCategories) {
+        List<BmSubCategory> bmSubCategories = new ArrayList<>();
+        for (SubCategory subCategory : subCategories) {
+            BmSubCategory bmSubCategory = new BmSubCategory(bm, subCategory);
+            bmSubCategories.add(bmSubCategory);
+        }
+        return bmSubCategories;
     }
 
     private static void validateBmOwner(Bm bm, Member member) {

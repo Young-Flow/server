@@ -3,7 +3,6 @@ package com.pitchain.service;
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.constant.Country;
 import com.pitchain.common.constant.MainCategory;
-import com.pitchain.common.constant.SubCategory;
 import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.dto.res.InvestmentStatusRes;
 import com.pitchain.entity.Bm;
@@ -113,7 +112,7 @@ class InvestmentServiceTest {
     }
 
     private Bm saveBm(Member member) {
-        return bmRepository.save(new Bm(member, "bmName", MainCategory.FOOD, SubCategory.BEVERAGE_COFFEE, "bmCompany", "logoImg",
+        return bmRepository.save(new Bm(member, "bmName", MainCategory.FOOD, "bmCompany", "logoImg",
                 "bmIntro", "bmDescription", "bmDescriptionImg", "companyAddress", 100000L,
                 1000, 1000, LocalDate.now(), "longPitchUrl"));
     }

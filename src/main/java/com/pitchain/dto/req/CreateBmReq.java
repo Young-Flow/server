@@ -6,11 +6,12 @@ import com.pitchain.entity.Bm;
 import com.pitchain.entity.Member;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public record CreateBmReq(
         String name,
         MainCategory mainCategory,
-        SubCategory subCategory,
+        List<SubCategory> subCategories,
         String company,
         String intro,
         String description,
@@ -26,7 +27,6 @@ public record CreateBmReq(
                 .member(member)
                 .name(name)
                 .mainCategory(mainCategory)
-                .subCategory(subCategory)
                 .company(company)
                 .logoImg(logoImg)
                 .intro(intro)

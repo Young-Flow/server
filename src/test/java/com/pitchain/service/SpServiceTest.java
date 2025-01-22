@@ -6,10 +6,7 @@ import com.pitchain.common.constant.S3UploadTarget;
 import com.pitchain.common.constant.SubCategory;
 import com.pitchain.dto.req.CreateSpReq;
 import com.pitchain.dto.res.SpDetailRes;
-import com.pitchain.entity.Bm;
-import com.pitchain.entity.Member;
-import com.pitchain.entity.MyBm;
-import com.pitchain.entity.Sp;
+import com.pitchain.entity.*;
 import com.pitchain.repository.BmRepository;
 import com.pitchain.repository.MemberRepository;
 import com.pitchain.repository.MyBmRepository;
@@ -53,7 +50,7 @@ class SpServiceTest {
     }
 
     private Bm saveBm(Member member) {
-        return bmRepository.save(new Bm(member, "bm_name", MainCategory.FOOD, SubCategory.BEVERAGE_COFFEE, "bm_company", "bm_logo_img_url",
+        return bmRepository.save(new Bm(member, "bm_name", MainCategory.FOOD,"bm_company", "bm_logo_img_url",
                 "bm_intro", "bm_description", "bm_description_img_url", "bm_address", 100000L,
                 1000, 1000, LocalDate.now(), "bm_longPitchUrl"));
     }
@@ -61,6 +58,13 @@ class SpServiceTest {
     private Sp saveSp(Bm bm) {
         return spRepository.save(
                 new Sp(bm, SP_VID.getOriginalFilename(), THUMBNAIL_IMG.getOriginalFilename(), SP_NAME));
+    }
+
+    private List<BmSubCategory> createBmSubCategories(Bm bm) {
+        return List.of(
+                new BmSubCategory(bm, SubCategory.AI_ML),
+                new BmSubCategory(bm, SubCategory.CAMPING)
+        );
     }
 
     @BeforeEach
@@ -106,6 +110,10 @@ class SpServiceTest {
         //given
         Sp sp = saveSp(bm);
 
+        List<BmSubCategory> bmSubCategories = createBmSubCategories(bm);
+        bm.updateSubCategories(bmSubCategories);
+        List<String> subCategories = bmSubCategories.stream().map(bmSubCategory -> bmSubCategory.getSubCategory().getKoreanName()).toList();
+
         //when
         SpDetailRes spDetail = spService.getSpDetail(member.getId(), sp.getId());
 
@@ -117,7 +125,7 @@ class SpServiceTest {
         assertThat(spDetail.name()).isEqualTo(sp.getName());
         assertThat(spDetail.logoImg()).isEqualTo(sp.getBm().getLogoImg());
         assertThat(spDetail.mainCategory()).isEqualTo(sp.getBm().getMainCategory().getKoreanName());
-        assertThat(spDetail.subCategory()).isEqualTo(sp.getBm().getSubCategory().getKoreanName());
+        assertThat(spDetail.subCategories()).isEqualTo(subCategories);
         assertThat(spDetail.company()).isEqualTo(sp.getBm().getCompany());
         assertThat(spDetail.isLiked()).isEqualTo(false);
         assertThat(spDetail.likeCnt()).isEqualTo(0L);
@@ -131,6 +139,10 @@ class SpServiceTest {
         myBmRepository.save(new MyBm(member, bm));
         myBmRepository.save(new MyBm(newMember, bm));
 
+        List<BmSubCategory> bmSubCategories = createBmSubCategories(bm);
+        bm.updateSubCategories(bmSubCategories);
+        List<String> subCategories = bmSubCategories.stream().map(bmSubCategory -> bmSubCategory.getSubCategory().getKoreanName()).toList();
+
         //when
         SpDetailRes spDetail = spService.getSpDetail(member.getId(), sp.getId());
 
@@ -142,7 +154,7 @@ class SpServiceTest {
         assertThat(spDetail.name()).isEqualTo(sp.getName());
         assertThat(spDetail.logoImg()).isEqualTo(sp.getBm().getLogoImg());
         assertThat(spDetail.mainCategory()).isEqualTo(sp.getBm().getMainCategory().getKoreanName());
-        assertThat(spDetail.subCategory()).isEqualTo(sp.getBm().getSubCategory().getKoreanName());
+        assertThat(spDetail.subCategories()).isEqualTo(subCategories);
         assertThat(spDetail.company()).isEqualTo(sp.getBm().getCompany());
         assertThat(spDetail.isLiked()).isEqualTo(true);
         assertThat(spDetail.likeCnt()).isEqualTo(2L);

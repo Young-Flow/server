@@ -2,7 +2,6 @@ package com.pitchain.service;
 
 import com.pitchain.common.constant.Country;
 import com.pitchain.common.constant.MainCategory;
-import com.pitchain.common.constant.SubCategory;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.Member;
 import com.pitchain.entity.MyBm;
@@ -68,7 +67,7 @@ class MyBmServiceTest {
     }
 
     private Bm saveBm(Member member) {
-        Bm bm = new Bm(member, "bmName", MainCategory.FOOD, SubCategory.BEVERAGE_COFFEE, "bmCompany", "logoImg",
+        Bm bm = new Bm(member, "bmName", MainCategory.FOOD,"bmCompany", "logoImg",
                 "bmIntro", "bmDescription", "bmDescriptionImg", "companyAddress", 100000L,
                 1000, 1000, LocalDate.now(), "longPitchUrl");
         return bmRepository.save(bm);

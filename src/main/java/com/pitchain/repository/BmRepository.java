@@ -2,8 +2,8 @@ package com.pitchain.repository;
 
 import com.pitchain.dto.BmWithLikeDto;
 import com.pitchain.entity.Bm;
+import com.pitchain.entity.BmSubCategory;
 import com.pitchain.entity.PtImg;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -22,6 +22,13 @@ public interface BmRepository extends JpaRepository<Bm, Long> {
                 GROUP BY b, mb.member.id
             """)
     Optional<BmWithLikeDto> getBmWithLikeDto(Long memberId, Long bmId);
+
+    @Query("""
+                SELECT bsc
+                FROM BmSubCategory bsc
+                WHERE bsc.bm.id = :bmId
+            """)
+    List<BmSubCategory> getBmSubCategoriesByBmId(Long bmId);
 
     @Query("""
                 SELECT pi

@@ -5,11 +5,12 @@ import com.pitchain.common.constant.SubCategory;
 import com.pitchain.entity.Bm;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public record UpdateBmReq(
         String name,
         MainCategory mainCategory,
-        SubCategory subCategory,
+        List<SubCategory> subCategories,
         String company,
         String intro,
         String description,
@@ -24,7 +25,6 @@ public record UpdateBmReq(
         return Bm.builder()
                 .name(name)
                 .mainCategory(mainCategory)
-                .subCategory(subCategory)
                 .company(company)
                 .logoImg(logoImg)
                 .intro(intro)

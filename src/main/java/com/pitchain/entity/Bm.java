@@ -1,7 +1,6 @@
 package com.pitchain.entity;
 
 import com.pitchain.common.constant.MainCategory;
-import com.pitchain.common.constant.SubCategory;
 import com.pitchain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
@@ -30,8 +29,6 @@ public class Bm extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private MainCategory mainCategory;
-    @Enumerated(EnumType.STRING)
-    private SubCategory subCategory;
     private String company;
     private String logoImg;
     @Column(length = 100)
@@ -54,6 +51,9 @@ public class Bm extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BmSubCategory> subCategories = new ArrayList<>();
+
     @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY)
     private List<Investment> investments = new ArrayList<>();
 
@@ -71,14 +71,13 @@ public class Bm extends BaseEntity {
     }
 
     @Builder
-    public Bm(Member member, String name, MainCategory mainCategory, SubCategory subCategory,
-              String company, String logoImg, String intro, String description, String descriptionImg,
-              String address, Long valuationCap, Integer goalInvestment, Integer maxIssuedShare,
+    public Bm(Member member, String name, MainCategory mainCategory, String company, String logoImg,
+              String intro, String description, String descriptionImg, String address,
+              Long valuationCap, Integer goalInvestment, Integer maxIssuedShare,
               LocalDate deadline, String longPitchUrl) {
         this.member = member;
         this.name = name;
         this.mainCategory = mainCategory;
-        this.subCategory = subCategory;
         this.company = company;
         this.logoImg = logoImg;
         this.intro = intro;
@@ -110,10 +109,18 @@ public class Bm extends BaseEntity {
         this.ptImgs.addAll(ptImgs);
     }
 
+    public void addSubCategories(List<BmSubCategory> subCategories) {
+        this.subCategories.addAll(subCategories);
+    }
+
+    public void updateSubCategories(List<BmSubCategory> subCategories) {
+        this.subCategories.clear();
+        this.subCategories.addAll(subCategories);
+    }
+
     public void update(Bm updateBm) {
         this.name = updateBm.getName();
         this.mainCategory = updateBm.getMainCategory();
-        this.subCategory = updateBm.getSubCategory();
         this.company = updateBm.getCompany();
         this.logoImg = updateBm.getLogoImg();
         this.intro = updateBm.getIntro();

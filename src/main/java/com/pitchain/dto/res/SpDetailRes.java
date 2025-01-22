@@ -5,6 +5,8 @@ import com.pitchain.entity.Bm;
 import com.pitchain.entity.Sp;
 import lombok.Builder;
 
+import java.util.List;
+
 @Builder
 public record SpDetailRes(
         Long bmId,
@@ -14,12 +16,12 @@ public record SpDetailRes(
         String name,
         String logoImg,
         String mainCategory,
-        String subCategory,
+        List<String> subCategories,
         String company,
         boolean isLiked,
         long likeCnt
 ) {
-    public static SpDetailRes createRes(SpWithLikeDto spWithLikeDto, long likeCnt) {
+    public static SpDetailRes createRes(SpWithLikeDto spWithLikeDto, long likeCnt, List<String> subCategories) {
         Sp sp = spWithLikeDto.getSp();
         Bm bm = sp.getBm();
         return SpDetailRes.builder()
@@ -30,7 +32,7 @@ public record SpDetailRes(
                 .name(sp.getName())
                 .logoImg(bm.getLogoImg())
                 .mainCategory(bm.getMainCategory().getKoreanName())
-                .subCategory(bm.getSubCategory().getKoreanName())
+                .subCategories(subCategories)
                 .company(bm.getCompany())
                 .isLiked(spWithLikeDto.isLiked())
                 .likeCnt(likeCnt)

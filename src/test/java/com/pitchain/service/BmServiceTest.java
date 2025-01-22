@@ -10,10 +10,7 @@ import com.pitchain.dto.req.CreateBmReq;
 import com.pitchain.dto.req.UpdateBmReq;
 import com.pitchain.dto.res.BmDetailRes;
 import com.pitchain.dto.res.PtImgRes;
-import com.pitchain.entity.Bm;
-import com.pitchain.entity.Member;
-import com.pitchain.entity.MyBm;
-import com.pitchain.entity.PtImg;
+import com.pitchain.entity.*;
 import com.pitchain.repository.BmRepository;
 import com.pitchain.repository.MemberRepository;
 import com.pitchain.repository.MyBmRepository;
@@ -33,6 +30,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
+import static org.springframework.transaction.annotation.Propagation.NEVER;
 
 @Transactional
 @SpringBootTest
@@ -50,7 +48,7 @@ class BmServiceTest {
 
     private static final String NAME = "bm_name";
     private static final MainCategory MAIN_CATEGORY = MainCategory.FOOD;
-    private static final SubCategory SUB_CATEGORY = SubCategory.BEVERAGE_COFFEE;
+    private static final List<SubCategory> SUB_CATEGORIES = List.of(SubCategory.BEVERAGE_COFFEE, SubCategory.ALCOHOL);
     private static final String COMPANY = "bm_company";
     private static final String LOGO_IMG_URL = "bm_logo_img_url";
     private static final String INTRO = "bm_intro";
@@ -72,7 +70,7 @@ class BmServiceTest {
         return memberRepository.save(new Member("member_name", UUID.randomUUID().toString(), Country.ROK, Strings.EMPTY));
     }
     private Bm saveBm(Member member) {
-        return bmRepository.save(new Bm(member, NAME, MAIN_CATEGORY, SUB_CATEGORY, COMPANY, LOGO_IMG_URL,
+        return bmRepository.save(new Bm(member, NAME, MAIN_CATEGORY, COMPANY, LOGO_IMG_URL,
                 INTRO, DESCRIPTION, DESCRIPTION_IMG_URL, ADDRESS, VALUATION_CAP,
                 GOAL_INVESTMENT, MAX_ISSUED_SHARE, DEADLINE, LONG_PITCH_URL));
     }
@@ -84,11 +82,18 @@ class BmServiceTest {
         );
     }
 
+    private List<BmSubCategory> createBmSubCategories(Bm bm) {
+        return List.of(
+                new BmSubCategory(bm, SubCategory.AI_ML),
+                new BmSubCategory(bm, SubCategory.CAMPING)
+        );
+    }
+
     @Test
     void BM_생성_성공() {
         //given
         Member member = saveMember();
-        CreateBmReq createBmReq = new CreateBmReq(NAME, MAIN_CATEGORY, SUB_CATEGORY, COMPANY,
+        CreateBmReq createBmReq = new CreateBmReq(NAME, MAIN_CATEGORY, SUB_CATEGORIES, COMPANY,
                 INTRO, DESCRIPTION, ADDRESS, VALUATION_CAP, GOAL_INVESTMENT, MAX_ISSUED_SHARE, DEADLINE, LONG_PITCH_URL);
 
         when(s3Service.uploadFile(LOGO_IMG, S3UploadTarget.COMPANY_LOGO))
@@ -105,7 +110,7 @@ class BmServiceTest {
 
         assertThat(bm.getName()).isEqualTo(NAME);
         assertThat(bm.getMainCategory()).isEqualTo(MAIN_CATEGORY);
-        assertThat(bm.getSubCategory()).isEqualTo(SUB_CATEGORY);
+        assertThat(bm.getSubCategories().stream().map(BmSubCategory::getSubCategory).toList()).isEqualTo(SUB_CATEGORIES);
         assertThat(bm.getCompany()).isEqualTo(COMPANY);
         assertThat(bm.getLogoImg()).isEqualTo(LOGO_IMG_URL);
         assertThat(bm.getIntro()).isEqualTo(INTRO);
@@ -125,6 +130,10 @@ class BmServiceTest {
         Member member = saveMember();
         Bm bm = saveBm(member);
 
+        List<BmSubCategory> bmSubCategories = createBmSubCategories(bm);
+        bm.updateSubCategories(bmSubCategories);
+        List<String> subCategories = bmSubCategories.stream().map(bmSubCategory -> bmSubCategory.getSubCategory().getKoreanName()).toList();
+
         List<PtImg> ptImgs = createPtImgs(bm);
         bm.updatePtImgs(ptImgs);
         List<PtImgRes> ptImgResList = ptImgs.stream().map(PtImgRes::createRes).toList();
@@ -138,7 +147,6 @@ class BmServiceTest {
         assertThat(bmDetail.company()).isEqualTo(bm.getCompany());
         assertThat(bmDetail.intro()).isEqualTo(bm.getIntro());
         assertThat(bmDetail.mainCategory()).isEqualTo(bm.getMainCategory().getKoreanName());
-        assertThat(bmDetail.subCategory()).isEqualTo(bm.getSubCategory().getKoreanName());
         assertThat(bmDetail.logoImg()).isEqualTo(bm.getLogoImg());
         assertThat(bmDetail.description()).isEqualTo(bm.getDescription());
         assertThat(bmDetail.descriptionImg()).isEqualTo(bm.getDescriptionImg());
@@ -149,6 +157,7 @@ class BmServiceTest {
         assertThat(bmDetail.isLiked()).isFalse();
         assertThat(bmDetail.likeCnt()).isEqualTo(0);
         assertThat(bmDetail.ptImgResList()).isEqualTo(ptImgResList);
+        assertThat(bmDetail.subCategories()).isEqualTo(subCategories);
     }
 
     @Test
@@ -159,6 +168,10 @@ class BmServiceTest {
         Bm bm = saveBm(member_01);
         myBmRepository.save(new MyBm(member_01, bm));
         myBmRepository.save(new MyBm(member_02, bm));
+
+        List<BmSubCategory> bmSubCategories = createBmSubCategories(bm);
+        bm.updateSubCategories(bmSubCategories);
+        List<String> subCategories = bmSubCategories.stream().map(bmSubCategory -> bmSubCategory.getSubCategory().getKoreanName()).toList();
 
         List<PtImg> ptImgs = createPtImgs(bm);
         bm.updatePtImgs(ptImgs);
@@ -173,7 +186,6 @@ class BmServiceTest {
         assertThat(bmDetail.company()).isEqualTo(bm.getCompany());
         assertThat(bmDetail.intro()).isEqualTo(bm.getIntro());
         assertThat(bmDetail.mainCategory()).isEqualTo(bm.getMainCategory().getKoreanName());
-        assertThat(bmDetail.subCategory()).isEqualTo(bm.getSubCategory().getKoreanName());
         assertThat(bmDetail.logoImg()).isEqualTo(bm.getLogoImg());
         assertThat(bmDetail.description()).isEqualTo(bm.getDescription());
         assertThat(bmDetail.descriptionImg()).isEqualTo(bm.getDescriptionImg());
@@ -184,6 +196,7 @@ class BmServiceTest {
         assertThat(bmDetail.isLiked()).isTrue();
         assertThat(bmDetail.likeCnt()).isEqualTo(2);
         assertThat(bmDetail.ptImgResList()).isEqualTo(ptImgResList);
+        assertThat(bmDetail.subCategories()).isEqualTo(subCategories);
     }
 
     @Test
@@ -209,7 +222,7 @@ class BmServiceTest {
 
         final String updatedName = "updated_bm_name";
         final MainCategory updatedMainCategory = MainCategory.COMMUNICATION_SECURITY_DATA;
-        final SubCategory updatedSubCategory = SubCategory.SAAS;
+        final List<SubCategory> updatedSubCategories = List.of(SubCategory.DATA_ANALYTICS, SubCategory.CYBER_SECURITY);
         final String updatedCompany = "updated_bm_company";
         final String updatedLogoImgUrl = "updated_bm_logo_img_url";
         final String updatedIntro = "updated_bm_intro";
@@ -223,7 +236,7 @@ class BmServiceTest {
         final String updatedLongPitchUrl = "updated_bm_longPitchUrl";
 
         UpdateBmReq updateBmReq = new UpdateBmReq(updatedName, updatedMainCategory,
-                updatedSubCategory, updatedCompany, updatedIntro, updatedDescription,
+                updatedSubCategories, updatedCompany, updatedIntro, updatedDescription,
                 updatedAddress, updatedValuationCap, updatedGoalInvestment,
                 updatedMaxIssuedShare, updatedDeadline, updatedLongPitchUrl
         );
@@ -240,7 +253,7 @@ class BmServiceTest {
         Bm updatedBm = bmRepository.findById(bm.getId()).orElseThrow();
         assertThat(updatedBm.getName()).isEqualTo(updatedName);
         assertThat(updatedBm.getMainCategory()).isEqualTo(updatedMainCategory);
-        assertThat(updatedBm.getSubCategory()).isEqualTo(updatedSubCategory);
+        assertThat(updatedBm.getSubCategories().stream().map(BmSubCategory::getSubCategory).toList()).isEqualTo(updatedSubCategories);
         assertThat(updatedBm.getCompany()).isEqualTo(updatedCompany);
         assertThat(updatedBm.getLogoImg()).isEqualTo(updatedLogoImgUrl);
         assertThat(updatedBm.getIntro()).isEqualTo(updatedIntro);
@@ -262,7 +275,7 @@ class BmServiceTest {
 
         final String UPDATED_NAME = "update_bm_name";
         final MainCategory UPDATED_MAIN_CATEGORY = MainCategory.COMMUNICATION_SECURITY_DATA;
-        final SubCategory UPDATED_SUB_CATEGORY = SubCategory.SAAS;
+        final List<SubCategory> UPDATED_SUB_CATEGORIES = List.of(SubCategory.DATA_ANALYTICS, SubCategory.CYBER_SECURITY);
         final String UPDATED_COMPANY = "update_bm_company";
         final String UPDATED_INTRO = "update_bm_intro";
         final String UPDATED_DESCRIPTION = "update_bm_description";
@@ -274,7 +287,7 @@ class BmServiceTest {
         final String UPDATED_LONG_PITCH_URL = "update_bm_longPitchUrl";
 
         UpdateBmReq updateBmReq = new UpdateBmReq(UPDATED_NAME, UPDATED_MAIN_CATEGORY,
-                UPDATED_SUB_CATEGORY, UPDATED_COMPANY, UPDATED_INTRO, UPDATED_DESCRIPTION,
+                UPDATED_SUB_CATEGORIES, UPDATED_COMPANY, UPDATED_INTRO, UPDATED_DESCRIPTION,
                 UPDATED_ADDRESS, UPDATED_VALUATION_CAP, UPDATED_GOAL_INVESTMENT,
                 UPDATED_MAX_ISSUED_SHARE, UPDATED_DEADLINE, UPDATED_LONG_PITCH_URL
         );
