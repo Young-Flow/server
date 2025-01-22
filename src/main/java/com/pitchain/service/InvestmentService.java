@@ -47,7 +47,7 @@ public class InvestmentService {
         return InvestmentStatusRes.createRes(bm, investmentStatusDto, achievementRate);
     }
 
-    private int getAchievementRate(int goalInvestment, long raisedAmount) {
+    private int getAchievementRate(long goalInvestment, long raisedAmount) {
         int rate = (int) ((raisedAmount / (double) goalInvestment) * 100);
         return Math.min(rate, 100);
     }

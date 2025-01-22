@@ -14,7 +14,7 @@ public record BmDetailRes(
         String company,
         String intro,
         String mainCategory,
-        String subCategory,
+        List<String> subCategories,
         String logoImg,
         String description,
         String descriptionImg,
@@ -26,7 +26,7 @@ public record BmDetailRes(
         long likeCnt,
         List<PtImgRes> ptImgResList
 ) {
-    public static BmDetailRes createRes(BmWithLikeDto bmWithLikeDto, long likeCnt, List<PtImgRes> ptImgResList) {
+    public static BmDetailRes createRes(BmWithLikeDto bmWithLikeDto, long likeCnt, List<PtImgRes> ptImgResList, List<String> subCategories) {
         Bm bm = bmWithLikeDto.getBm();
         return BmDetailRes.builder()
                 .id(bm.getId())
@@ -34,7 +34,7 @@ public record BmDetailRes(
                 .company(bm.getCompany())
                 .intro(bm.getIntro())
                 .mainCategory(bm.getMainCategory().getKoreanName())
-                .subCategory(bm.getSubCategory().getKoreanName())
+                .subCategories(subCategories)
                 .logoImg(bm.getLogoImg())
                 .description(bm.getDescription())
                 .descriptionImg(bm.getDescriptionImg())

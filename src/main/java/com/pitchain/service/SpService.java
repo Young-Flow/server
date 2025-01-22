@@ -42,11 +42,14 @@ public class SpService {
     @Transactional(readOnly = true)
     public List<SpDetailRes> getSpDetails(Long memberId) {
         List<SpWithLikeDto> spWithLikeDtos = spRepository.findAllWithLike(memberId);
+
         return spWithLikeDtos.stream()
                 .map(spWithLikeDto -> {
                     Sp sp = spWithLikeDto.getSp();
-                    long likeCnt = myBmRepository.countByBm(sp.getBm());
-                    return SpDetailRes.createRes(spWithLikeDto, likeCnt);
+                    Bm bm = sp.getBm();
+                    long likeCnt = myBmRepository.countByBm(bm);
+                    List<String> subCategories = bm.getSubCategories();
+                    return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories);
                 })
                 .toList();
     }
@@ -55,10 +58,11 @@ public class SpService {
     public SpDetailRes getSpDetail(Long memberId, Long spId) {
         SpWithLikeDto spWithLikeDto = spRepository.findSpWithLike(memberId, spId)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.SP_NOT_FOUND));
+        Bm bm = spWithLikeDto.getSp().getBm();
+        long likeCnt = myBmRepository.countByBm(bm);
+        List<String> subCategories = bm.getSubCategories();
 
-        long likeCnt = myBmRepository.countByBm(spWithLikeDto.getSp().getBm());
-
-        return SpDetailRes.createRes(spWithLikeDto, likeCnt);
+        return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories);
     }
 
     public void updateSp(Long memberId, Long spId, String name, MultipartFile spVid, MultipartFile thumbnailImg) {

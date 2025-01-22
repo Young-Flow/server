@@ -3,7 +3,6 @@ package com.pitchain.service;
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.constant.Country;
 import com.pitchain.common.constant.MainCategory;
-import com.pitchain.common.constant.SubCategory;
 import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.dto.CommentDto;
 import com.pitchain.dto.res.BaseCommentRes;
@@ -303,9 +302,9 @@ class CommentServiceTest {
     }
 
     private Bm saveBm(Member member) {
-        return bmRepository.save(new Bm(member, "bmName", MainCategory.FOOD, SubCategory.BEVERAGE_COFFEE, "bmCompany", "logoImg",
+        return bmRepository.save(new Bm(member, "bmName", MainCategory.FOOD,"bmCompany", "logoImg",
                 "bmIntro", "bmDescription", "bmDescriptionImg", "companyAddress", 100000L,
-                1000, 1000, LocalDate.now(), "longPitchUrl"));
+                1000L, 1000, LocalDate.now(), "longPitchUrl"));
     }
 
     private Comment saveComment(Member member, Bm bm) {

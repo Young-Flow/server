@@ -24,7 +24,6 @@ public record ReplyCommentRes(
                 .writerId(member.getId())
                 .writerProfileImg(member.getProfileImg())
                 .writerName(member.getName())
-                .writerProfileImg(member.getProfileImg())
                 .content(comment.getContent())
                 .delYN(comment.isDelYN())
                 .createdAt(comment.getCreatedAt())
