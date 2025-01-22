@@ -104,9 +104,7 @@ class SpServiceTest {
         Sp sp = saveSp(bm);
 
         bm.updateSubCategories(SUB_CATEGORIES);
-        List<String> subCategories = bm.getSubCategories().stream()
-                .map(bmSubCategory -> bmSubCategory.getSubCategory().getKoreanName())
-                .toList();
+        List<String> subCategories = bm.getSubCategories();
 
         //when
         SpDetailRes spDetail = spService.getSpDetail(member.getId(), sp.getId());
@@ -134,9 +132,7 @@ class SpServiceTest {
         myBmRepository.save(new MyBm(newMember, bm));
 
         bm.updateSubCategories(SUB_CATEGORIES);
-        List<String> subCategories = bm.getSubCategories().stream()
-                .map(bmSubCategory -> bmSubCategory.getSubCategory().getKoreanName())
-                .toList();
+        List<String> subCategories = bm.getSubCategories();
 
         //when
         SpDetailRes spDetail = spService.getSpDetail(member.getId(), sp.getId());

@@ -48,7 +48,7 @@ public class SpService {
                     Sp sp = spWithLikeDto.getSp();
                     Bm bm = sp.getBm();
                     long likeCnt = myBmRepository.countByBm(bm);
-                    List<String> subCategories = getSubCategories(bm);
+                    List<String> subCategories = bm.getSubCategories();
                     return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories);
                 })
                 .toList();
@@ -60,7 +60,7 @@ public class SpService {
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.SP_NOT_FOUND));
         Bm bm = spWithLikeDto.getSp().getBm();
         long likeCnt = myBmRepository.countByBm(bm);
-        List<String> subCategories = getSubCategories(bm);
+        List<String> subCategories = bm.getSubCategories();
 
         return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories);
     }
@@ -88,12 +88,6 @@ public class SpService {
         validateSpOwner(sp, member);
 
         spRepository.delete(sp);
-    }
-
-    private static List<String> getSubCategories(Bm bm) {
-        return bm.getSubCategories().stream()
-                .map(bmSubCategory -> bmSubCategory.getSubCategory().getKoreanName())
-                .toList();
     }
 
     private static void validateSpOwner(Sp sp, Member member) {

@@ -136,4 +136,10 @@ public class Bm extends BaseEntity {
         this.deadline = updateBm.getDeadline();
         this.longPitchUrl = updateBm.getLongPitchUrl();
     }
+
+    public List<String> getSubCategories() {
+        return this.subCategories.stream()
+                .map(bmSubCategory -> bmSubCategory.getSubCategory().getKoreanName())
+                .toList();
+    }
 }

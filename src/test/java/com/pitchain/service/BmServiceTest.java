@@ -102,7 +102,7 @@ class BmServiceTest {
 
         assertThat(bm.getName()).isEqualTo(NAME);
         assertThat(bm.getMainCategory()).isEqualTo(MAIN_CATEGORY);
-        assertThat(bm.getSubCategories().stream().map(BmSubCategory::getSubCategory).toList()).isEqualTo(SUB_CATEGORIES);
+        assertThat(bm.getSubCategories()).isEqualTo(SUB_CATEGORIES.stream().map(SubCategory::getKoreanName).toList());
         assertThat(bm.getCompany()).isEqualTo(COMPANY);
         assertThat(bm.getLogoImg()).isEqualTo(LOGO_IMG_URL);
         assertThat(bm.getIntro()).isEqualTo(INTRO);
@@ -123,9 +123,7 @@ class BmServiceTest {
         Bm bm = saveBm(member);
 
         bm.updateSubCategories(SUB_CATEGORIES);
-        List<String> subCategories = bm.getSubCategories().stream()
-                        .map(bmSubCategory -> bmSubCategory.getSubCategory().getKoreanName())
-                        .toList();
+        List<String> subCategories = bm.getSubCategories();
 
         List<PtImg> ptImgs = createPtImgs(bm);
         bm.updatePtImgs(ptImgs);
@@ -163,9 +161,7 @@ class BmServiceTest {
         myBmRepository.save(new MyBm(member_02, bm));
 
         bm.updateSubCategories(SUB_CATEGORIES);
-        List<String> subCategories = bm.getSubCategories().stream()
-                        .map(bmSubCategory -> bmSubCategory.getSubCategory().getKoreanName())
-                        .toList();
+        List<String> subCategories = bm.getSubCategories();
 
         List<PtImg> ptImgs = createPtImgs(bm);
         bm.updatePtImgs(ptImgs);
@@ -247,7 +243,7 @@ class BmServiceTest {
         Bm updatedBm = bmRepository.findById(bm.getId()).orElseThrow();
         assertThat(updatedBm.getName()).isEqualTo(updatedName);
         assertThat(updatedBm.getMainCategory()).isEqualTo(updatedMainCategory);
-        assertThat(updatedBm.getSubCategories().stream().map(BmSubCategory::getSubCategory).toList()).isEqualTo(updatedSubCategories);
+        assertThat(updatedBm.getSubCategories()).isEqualTo(updatedSubCategories.stream().map(SubCategory::getKoreanName).toList());
         assertThat(updatedBm.getCompany()).isEqualTo(updatedCompany);
         assertThat(updatedBm.getLogoImg()).isEqualTo(updatedLogoImgUrl);
         assertThat(updatedBm.getIntro()).isEqualTo(updatedIntro);
