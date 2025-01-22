@@ -111,24 +111,14 @@ public class Bm extends BaseEntity {
     }
 
     public void addSubCategories(List<SubCategory> subCategories) {
-        if (subCategories == null) {
-            subCategories = new ArrayList<>();
-        }
-
         for (SubCategory subCategory : subCategories) {
             this.subCategories.add(new BmSubCategory(this, subCategory));
         }
     }
 
     public void updateSubCategories(List<SubCategory> subCategories) {
-        if (subCategories == null) {
-            subCategories = new ArrayList<>();
-        }
-
         this.subCategories.clear();
-        for (SubCategory subCategory : subCategories) {
-            this.subCategories.add(new BmSubCategory(this, subCategory));
-        }
+        addSubCategories(subCategories);
     }
 
     public void update(Bm updateBm) {

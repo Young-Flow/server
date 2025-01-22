@@ -4,6 +4,7 @@ import com.pitchain.common.constant.MainCategory;
 import com.pitchain.common.constant.SubCategory;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.Member;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
 public record CreateBmReq(
         String name,
         MainCategory mainCategory,
-        List<SubCategory> subCategories,
+        @NotNull List<SubCategory> subCategories,
         String company,
         String intro,
         String description,
