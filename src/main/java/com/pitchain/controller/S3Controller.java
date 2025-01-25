@@ -9,6 +9,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import static com.pitchain.service.S3Service.getFileURL;
+
 @RestController
 @RequiredArgsConstructor
 public class S3Controller {
@@ -20,7 +22,7 @@ public class S3Controller {
     public CustomApiResponse<String> uploadFile(@RequestPart MultipartFile file,
                                                 @RequestParam S3UploadTarget s3UploadTarget) {
         String fileKey = s3Service.uploadFile(file, s3UploadTarget);
-        String fileURL = s3Service.getFileURL(fileKey);
+        String fileURL = getFileURL(fileKey);
         return CustomApiResponse.onSuccess(fileURL);
     }
 

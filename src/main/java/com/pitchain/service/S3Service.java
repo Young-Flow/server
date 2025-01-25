@@ -47,11 +47,11 @@ public class S3Service {
         return fileKey;
     }
 
-    public static String getFileURL(String fileName) {
-        if (fileName == null) {
+    public static String getFileURL(String fileKey) {
+        if (fileKey == null) {
             return Strings.EMPTY;
         }
-        return cdnDomain + "/" + fileName;
+        return cdnDomain + "/" + fileKey;
     }
 
     private static void validateMimeType(MultipartFile file, S3UploadTarget target) {
