@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
@@ -33,6 +34,7 @@ import static org.mockito.Mockito.when;
 
 @Transactional
 @SpringBootTest
+@ActiveProfiles("dev-profile")
 class BmServiceTest {
     @MockBean
     private S3Service s3Service;
@@ -49,28 +51,28 @@ class BmServiceTest {
     private static final MainCategory MAIN_CATEGORY = MainCategory.FOOD;
     private static final List<SubCategory> SUB_CATEGORIES = List.of(SubCategory.BEVERAGE_COFFEE, SubCategory.ALCOHOL);
     private static final String COMPANY = "bm_company";
-    private static final String LOGO_IMG_URL = "bm_logo_img_url";
+    private static final String LOGO_IMG_KEY = "bm_logo_img_key";
     private static final String INTRO = "bm_intro";
     private static final String DESCRIPTION = "bm_description";
-    private static final String DESCRIPTION_IMG_URL = "bm_description_img_url";
+    private static final String DESC_IMG_KEY = "bm_desc_img_key";
     private static final String ADDRESS = "bm_address";
     private static final Long VALUATION_CAP = 100000L;
     private static final Long GOAL_INVESTMENT = 200000L;
     private static final Integer MAX_ISSUED_SHARE = 1000;
     private static final LocalDate DEADLINE = LocalDate.now();
-    private static final String LONG_PITCH_URL = "bm_longPitchUrl";
+    private static final String LONG_PITCH_URL = "bm_long_pitch_url";
 
     private static final MockMultipartFile LOGO_IMG = new MockMultipartFile(
             "logo", "logo.png", "image/png", "test data 1".getBytes());
-    private static final MockMultipartFile DESCRIPTION_IMG = new MockMultipartFile(
+    private static final MockMultipartFile DESC_IMG = new MockMultipartFile(
             "description", "description.png", "image/png", "test data 2".getBytes());
 
     private Member saveMember() {
         return memberRepository.save(new Member("member_name", UUID.randomUUID().toString(), Country.ROK, Strings.EMPTY));
     }
     private Bm saveBm(Member member) {
-        return bmRepository.save(new Bm(member, NAME, MAIN_CATEGORY, COMPANY, LOGO_IMG_URL,
-                INTRO, DESCRIPTION, DESCRIPTION_IMG_URL, ADDRESS, VALUATION_CAP,
+        return bmRepository.save(new Bm(member, NAME, MAIN_CATEGORY, COMPANY, LOGO_IMG_KEY,
+                INTRO, DESCRIPTION, DESC_IMG_KEY, ADDRESS, VALUATION_CAP,
                 GOAL_INVESTMENT, MAX_ISSUED_SHARE, DEADLINE, LONG_PITCH_URL));
     }
     private List<PtImg> createPtImgs(Bm bm) {
@@ -89,12 +91,12 @@ class BmServiceTest {
                 INTRO, DESCRIPTION, ADDRESS, VALUATION_CAP, GOAL_INVESTMENT, MAX_ISSUED_SHARE, DEADLINE, LONG_PITCH_URL);
 
         when(s3Service.uploadFile(LOGO_IMG, S3UploadTarget.COMPANY_LOGO))
-                .thenReturn(LOGO_IMG_URL);
-        when(s3Service.uploadFile(DESCRIPTION_IMG, S3UploadTarget.COMPANY_DESC))
-                .thenReturn(DESCRIPTION_IMG_URL);
+                .thenReturn(LOGO_IMG_KEY);
+        when(s3Service.uploadFile(DESC_IMG, S3UploadTarget.COMPANY_DESC))
+                .thenReturn(DESC_IMG_KEY);
 
         //when
-        bmService.createBm(member.getId(), createBmReq, LOGO_IMG, DESCRIPTION_IMG);
+        bmService.createBm(member.getId(), createBmReq, LOGO_IMG, DESC_IMG);
 
         //then
         List<Bm> all = bmRepository.findAll();
@@ -104,16 +106,16 @@ class BmServiceTest {
         assertThat(bm.getMainCategory()).isEqualTo(MAIN_CATEGORY);
         assertThat(bm.getSubCategories()).isEqualTo(SUB_CATEGORIES.stream().map(SubCategory::getKoreanName).toList());
         assertThat(bm.getCompany()).isEqualTo(COMPANY);
-        assertThat(bm.getLogoImg()).isEqualTo(LOGO_IMG_URL);
+        assertThat(bm.getLogoImgKey()).isEqualTo(LOGO_IMG_KEY);
         assertThat(bm.getIntro()).isEqualTo(INTRO);
         assertThat(bm.getDescription()).isEqualTo(DESCRIPTION);
-        assertThat(bm.getDescriptionImg()).isEqualTo(DESCRIPTION_IMG_URL);
+        assertThat(bm.getDescImgKey()).isEqualTo(DESC_IMG_KEY);
         assertThat(bm.getAddress()).isEqualTo(ADDRESS);
         assertThat(bm.getValuationCap()).isEqualTo(VALUATION_CAP);
         assertThat(bm.getGoalInvestment()).isEqualTo(GOAL_INVESTMENT);
         assertThat(bm.getMaxIssuedShare()).isEqualTo(MAX_ISSUED_SHARE);
         assertThat(bm.getDeadline()).isEqualTo(DEADLINE);
-        assertThat(bm.getLongPitchUrl()).isEqualTo(LONG_PITCH_URL);
+        assertThat(bm.getLongPitchURL()).isEqualTo(LONG_PITCH_URL);
     }
 
     @Test
@@ -127,7 +129,10 @@ class BmServiceTest {
 
         List<PtImg> ptImgs = createPtImgs(bm);
         bm.updatePtImgs(ptImgs);
-        List<PtImgRes> ptImgResList = ptImgs.stream().map(PtImgRes::createRes).toList();
+        List<PtImgRes> ptImgResList = ptImgs.stream()
+                .map(ptImg -> PtImgRes.createRes(ptImg.getSerialNum(),
+                        s3Service.getFileURL(ptImg.getImgKey())))
+                .toList();
 
         //when
         BmDetailRes bmDetail = bmService.getBmDetail(member.getId(), bm.getId());
@@ -138,13 +143,13 @@ class BmServiceTest {
         assertThat(bmDetail.company()).isEqualTo(bm.getCompany());
         assertThat(bmDetail.intro()).isEqualTo(bm.getIntro());
         assertThat(bmDetail.mainCategory()).isEqualTo(bm.getMainCategory().getKoreanName());
-        assertThat(bmDetail.logoImg()).isEqualTo(bm.getLogoImg());
+        assertThat(bmDetail.logoImgURL()).isEqualTo(s3Service.getFileURL(bm.getLogoImgKey()));
         assertThat(bmDetail.description()).isEqualTo(bm.getDescription());
-        assertThat(bmDetail.descriptionImg()).isEqualTo(bm.getDescriptionImg());
+        assertThat(bmDetail.descImgURL()).isEqualTo(s3Service.getFileURL(bm.getDescImgKey()));
         assertThat(bmDetail.address()).isEqualTo(bm.getAddress());
         assertThat(bmDetail.createdAt()).isEqualTo(bm.getCreatedAt());
-        assertThat(bmDetail.longPitchUrl()).isEqualTo(bm.getLongPitchUrl());
-        assertThat(bmDetail.spURL()).isEqualTo(bm.getShortPitchURL());
+        assertThat(bmDetail.longPitchURL()).isEqualTo(bm.getLongPitchURL());
+        assertThat(bmDetail.spURL()).isEqualTo(s3Service.getFileURL(bm.getSpKey()));
         assertThat(bmDetail.isLiked()).isFalse();
         assertThat(bmDetail.likeCnt()).isEqualTo(0);
         assertThat(bmDetail.ptImgResList()).isEqualTo(ptImgResList);
@@ -165,7 +170,10 @@ class BmServiceTest {
 
         List<PtImg> ptImgs = createPtImgs(bm);
         bm.updatePtImgs(ptImgs);
-        List<PtImgRes> ptImgResList = ptImgs.stream().map(PtImgRes::createRes).toList();
+        List<PtImgRes> ptImgResList = ptImgs.stream()
+                .map(ptImg -> PtImgRes.createRes(ptImg.getSerialNum(),
+                        s3Service.getFileURL(ptImg.getImgKey())))
+                .toList();
 
         //when
         BmDetailRes bmDetail = bmService.getBmDetail(member_01.getId(), bm.getId());
@@ -176,13 +184,13 @@ class BmServiceTest {
         assertThat(bmDetail.company()).isEqualTo(bm.getCompany());
         assertThat(bmDetail.intro()).isEqualTo(bm.getIntro());
         assertThat(bmDetail.mainCategory()).isEqualTo(bm.getMainCategory().getKoreanName());
-        assertThat(bmDetail.logoImg()).isEqualTo(bm.getLogoImg());
+        assertThat(bmDetail.logoImgURL()).isEqualTo(s3Service.getFileURL(bm.getLogoImgKey()));
         assertThat(bmDetail.description()).isEqualTo(bm.getDescription());
-        assertThat(bmDetail.descriptionImg()).isEqualTo(bm.getDescriptionImg());
+        assertThat(bmDetail.descImgURL()).isEqualTo(s3Service.getFileURL(bm.getDescImgKey()));
         assertThat(bmDetail.address()).isEqualTo(bm.getAddress());
         assertThat(bmDetail.createdAt()).isEqualTo(bm.getCreatedAt());
-        assertThat(bmDetail.longPitchUrl()).isEqualTo(bm.getLongPitchUrl());
-        assertThat(bmDetail.spURL()).isEqualTo(bm.getShortPitchURL());
+        assertThat(bmDetail.longPitchURL()).isEqualTo(bm.getLongPitchURL());
+        assertThat(bmDetail.spURL()).isEqualTo(s3Service.getFileURL(bm.getSpKey()));
         assertThat(bmDetail.isLiked()).isTrue();
         assertThat(bmDetail.likeCnt()).isEqualTo(2);
         assertThat(bmDetail.ptImgResList()).isEqualTo(ptImgResList);
@@ -214,30 +222,30 @@ class BmServiceTest {
         final MainCategory updatedMainCategory = MainCategory.COMMUNICATION_SECURITY_DATA;
         final List<SubCategory> updatedSubCategories = List.of(SubCategory.DATA_ANALYTICS, SubCategory.CYBER_SECURITY);
         final String updatedCompany = "updated_bm_company";
-        final String updatedLogoImgUrl = "updated_bm_logo_img_url";
+        final String updatedLogoImgKey = "updated_bm_logo_img_key";
         final String updatedIntro = "updated_bm_intro";
         final String updatedDescription = "updated_bm_description";
-        final String updatedDescriptionImgUrl = "updated_bm_description_img_url";
+        final String updatedDescImgKey = "updated_bm_desc_img_key";
         final String updatedAddress = "updated_bm_address";
         final Long updatedValuationCap = 200000L;
         final Long updatedGoalInvestment = 2000L;
         final Integer updatedMaxIssuedShare = 2000;
         final LocalDate updatedDeadline = LocalDate.now().plusDays(30);
-        final String updatedLongPitchUrl = "updated_bm_longPitchUrl";
+        final String updatedLongPitchURL = "updated_bm_long_pitch_url";
 
         UpdateBmReq updateBmReq = new UpdateBmReq(updatedName, updatedMainCategory,
                 updatedSubCategories, updatedCompany, updatedIntro, updatedDescription,
                 updatedAddress, updatedValuationCap, updatedGoalInvestment,
-                updatedMaxIssuedShare, updatedDeadline, updatedLongPitchUrl
+                updatedMaxIssuedShare, updatedDeadline, updatedLongPitchURL
         );
 
         when(s3Service.uploadFile(LOGO_IMG, S3UploadTarget.COMPANY_LOGO))
-                .thenReturn(updatedLogoImgUrl);
-        when(s3Service.uploadFile(DESCRIPTION_IMG, S3UploadTarget.COMPANY_DESC))
-                .thenReturn(updatedDescriptionImgUrl);
+                .thenReturn(updatedLogoImgKey);
+        when(s3Service.uploadFile(DESC_IMG, S3UploadTarget.COMPANY_DESC))
+                .thenReturn(updatedDescImgKey);
 
         //when
-        bmService.updateBm(member.getId(), bm.getId(), updateBmReq, LOGO_IMG, DESCRIPTION_IMG);
+        bmService.updateBm(member.getId(), bm.getId(), updateBmReq, LOGO_IMG, DESC_IMG);
 
         //then
         Bm updatedBm = bmRepository.findById(bm.getId()).orElseThrow();
@@ -245,16 +253,16 @@ class BmServiceTest {
         assertThat(updatedBm.getMainCategory()).isEqualTo(updatedMainCategory);
         assertThat(updatedBm.getSubCategories()).isEqualTo(updatedSubCategories.stream().map(SubCategory::getKoreanName).toList());
         assertThat(updatedBm.getCompany()).isEqualTo(updatedCompany);
-        assertThat(updatedBm.getLogoImg()).isEqualTo(updatedLogoImgUrl);
+        assertThat(updatedBm.getLogoImgKey()).isEqualTo(updatedLogoImgKey);
         assertThat(updatedBm.getIntro()).isEqualTo(updatedIntro);
         assertThat(updatedBm.getDescription()).isEqualTo(updatedDescription);
-        assertThat(updatedBm.getDescriptionImg()).isEqualTo(updatedDescriptionImgUrl);
+        assertThat(updatedBm.getDescImgKey()).isEqualTo(updatedDescImgKey);
         assertThat(updatedBm.getAddress()).isEqualTo(updatedAddress);
         assertThat(updatedBm.getValuationCap()).isEqualTo(updatedValuationCap);
         assertThat(updatedBm.getGoalInvestment()).isEqualTo(updatedGoalInvestment);
         assertThat(updatedBm.getMaxIssuedShare()).isEqualTo(updatedMaxIssuedShare);
         assertThat(updatedBm.getDeadline()).isEqualTo(updatedDeadline);
-        assertThat(updatedBm.getLongPitchUrl()).isEqualTo(updatedLongPitchUrl);
+        assertThat(updatedBm.getLongPitchURL()).isEqualTo(updatedLongPitchURL);
     }
 
     @Test
@@ -274,7 +282,7 @@ class BmServiceTest {
         final Long UPDATED_GOAL_INVESTMENT = 2000L;
         final Integer UPDATED_MAX_ISSUED_SHARE = 2000;
         final LocalDate UPDATED_DEADLINE = LocalDate.now().plusDays(30);
-        final String UPDATED_LONG_PITCH_URL = "update_bm_longPitchUrl";
+        final String UPDATED_LONG_PITCH_URL = "updated_bm_long_pitch_url";
 
         UpdateBmReq updateBmReq = new UpdateBmReq(UPDATED_NAME, UPDATED_MAIN_CATEGORY,
                 UPDATED_SUB_CATEGORIES, UPDATED_COMPANY, UPDATED_INTRO, UPDATED_DESCRIPTION,
@@ -325,7 +333,7 @@ class BmServiceTest {
         for (int i = 0; i < ptImgs.size(); i++) {
             assertThat(updatedPtImgs.get(i).getSerialNum()).isEqualTo(i);
             assertThat(updatedPtImgs.get(i).getBm().getId()).isEqualTo(updatedBm.getId());
-            assertThat(updatedPtImgs.get(i).getImg()).isEqualTo("fake_" + (i + 1));
+            assertThat(updatedPtImgs.get(i).getImgKey()).isEqualTo("fake_" + (i + 1));
         }
     }
 
@@ -361,7 +369,7 @@ class BmServiceTest {
         for (int i = 0; i < updatePtImgs.size(); i++) {
             assertThat(updatedPtImgs.get(i).getSerialNum()).isEqualTo(i);
             assertThat(updatedPtImgs.get(i).getBm().getId()).isEqualTo(updatedBm.getId());
-            assertThat(updatedPtImgs.get(i).getImg()).isEqualTo("fake_" + (i + 1));
+            assertThat(updatedPtImgs.get(i).getImgKey()).isEqualTo("fake_" + (i + 1));
         }
     }
 

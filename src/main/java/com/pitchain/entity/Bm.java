@@ -31,13 +31,13 @@ public class Bm extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private MainCategory mainCategory;
     private String company;
-    private String logoImg;
+    private String logoImgKey;
     @Column(length = 100)
     private String intro;
     @Column(length = 10000)
     private String description;
 
-    private String descriptionImg;
+    private String descImgKey;
     private String address;
     @Positive
     private Long valuationCap;
@@ -46,7 +46,8 @@ public class Bm extends BaseEntity {
     @Positive
     private Integer maxIssuedShare;
     private LocalDate deadline;
-    private String longPitchUrl;
+    @Column(name = "long_pitch_url")
+    private String longPitchURL;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -72,30 +73,31 @@ public class Bm extends BaseEntity {
     }
 
     @Builder
-    public Bm(Member member, String name, MainCategory mainCategory, String company, String logoImg,
-              String intro, String description, String descriptionImg, String address,
+    public Bm(Member member, String name, MainCategory mainCategory, String company, String logoImgKey,
+              String intro, String description, String descImgKey, String address,
               Long valuationCap, Long goalInvestment, Integer maxIssuedShare,
-              LocalDate deadline, String longPitchUrl) {
+              LocalDate deadline, String longPitchURL) {
         this.member = member;
         this.name = name;
         this.mainCategory = mainCategory;
         this.company = company;
-        this.logoImg = logoImg;
+        this.logoImgKey = logoImgKey;
         this.intro = intro;
         this.description = description;
-        this.descriptionImg = descriptionImg;
+        this.descImgKey = descImgKey;
         this.address = address;
         this.valuationCap = valuationCap;
         this.goalInvestment = goalInvestment;
         this.maxIssuedShare = maxIssuedShare;
         this.deadline = deadline;
-        this.longPitchUrl = longPitchUrl;
+        this.longPitchURL = longPitchURL;
     }
 
-    public String getShortPitchURL() {
-        if (sp == null)
+    public String getSpKey() {
+        if (sp == null) {
             return Strings.EMPTY;
-        return sp.getShortPitchURL();
+        }
+        return sp.getSpKey();
     }
 
     public boolean isOwner(Long memberId) {
@@ -125,16 +127,16 @@ public class Bm extends BaseEntity {
         this.name = updateBm.getName();
         this.mainCategory = updateBm.getMainCategory();
         this.company = updateBm.getCompany();
-        this.logoImg = updateBm.getLogoImg();
+        this.logoImgKey = updateBm.getLogoImgKey();
         this.intro = updateBm.getIntro();
         this.description = updateBm.getDescription();
-        this.descriptionImg = updateBm.getDescriptionImg();
+        this.descImgKey = updateBm.getDescImgKey();
         this.address = updateBm.getAddress();
         this.valuationCap = updateBm.getValuationCap();
         this.goalInvestment = updateBm.getGoalInvestment();
         this.maxIssuedShare = updateBm.getMaxIssuedShare();
         this.deadline = updateBm.getDeadline();
-        this.longPitchUrl = updateBm.getLongPitchUrl();
+        this.longPitchURL = updateBm.getLongPitchURL();
     }
 
     public List<String> getSubCategories() {

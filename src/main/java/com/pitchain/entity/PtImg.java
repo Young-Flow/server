@@ -22,11 +22,11 @@ public class PtImg {
     private int serialNum;
 
     @Column(nullable = false)
-    private String img;
+    private String imgKey;
 
-    public PtImg(Bm bm, int serialNum, String img) {
+    public PtImg(Bm bm, int serialNum, String imgKey) {
         this.bm = bm;
         this.serialNum = serialNum;
-        this.img = img;
+        this.imgKey = imgKey;
     }
 }

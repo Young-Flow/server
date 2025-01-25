@@ -16,6 +16,7 @@ import com.pitchain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import static com.pitchain.service.S3Service.getFileURL;
 
 import java.util.List;
 
@@ -77,11 +78,16 @@ public class CommentService {
 
         return comments.stream()
                 .map(comment -> {
-                    List<ReplyCommentRes> replyCommentResList = comment.getChildComments().stream().map(ReplyCommentRes::createRes).toList();
+                    List<ReplyCommentRes> replyCommentResList = comment.getChildComments().stream()
+                            .map(childComment -> ReplyCommentRes.createRes(
+                                    childComment, getFileURL(childComment.getMember().getProfileImgKey())
+                            ))
+                            .toList();
+
                     if (comment.isDelYN()) {
                         return DeletedCommentRes.createRes(comment, replyCommentResList);
                     }
-                    return CommentRes.createRes(comment, replyCommentResList);
+                    return CommentRes.createRes(comment, replyCommentResList, getFileURL(comment.getMember().getProfileImgKey()));
                 })
                 .toList();
     }

@@ -15,18 +15,19 @@ public record BmDetailRes(
         String intro,
         String mainCategory,
         List<String> subCategories,
-        String logoImg,
+        String logoImgURL,
         String description,
-        String descriptionImg,
+        String descImgURL,
         String address,
         LocalDateTime createdAt,
-        String longPitchUrl,
+        String longPitchURL,
         String spURL,
         boolean isLiked,
         long likeCnt,
         List<PtImgRes> ptImgResList
 ) {
-    public static BmDetailRes createRes(BmWithLikeDto bmWithLikeDto, long likeCnt, List<PtImgRes> ptImgResList, List<String> subCategories) {
+    public static BmDetailRes createRes(BmWithLikeDto bmWithLikeDto, long likeCnt, List<PtImgRes> ptImgResList, List<String> subCategories,
+                                        String spURL, String logoImgURL, String descImgURL) {
         Bm bm = bmWithLikeDto.getBm();
         return BmDetailRes.builder()
                 .id(bm.getId())
@@ -35,13 +36,13 @@ public record BmDetailRes(
                 .intro(bm.getIntro())
                 .mainCategory(bm.getMainCategory().getKoreanName())
                 .subCategories(subCategories)
-                .logoImg(bm.getLogoImg())
+                .logoImgURL(logoImgURL)
                 .description(bm.getDescription())
-                .descriptionImg(bm.getDescriptionImg())
+                .descImgURL(descImgURL)
                 .address(bm.getAddress())
                 .createdAt(bm.getCreatedAt())
-                .longPitchUrl(bm.getLongPitchUrl())
-                .spURL(bm.getShortPitchURL())
+                .longPitchURL(bm.getLongPitchURL())
+                .spURL(spURL)
                 .isLiked(bmWithLikeDto.isLiked())
                 .likeCnt(likeCnt)
                 .ptImgResList(ptImgResList)

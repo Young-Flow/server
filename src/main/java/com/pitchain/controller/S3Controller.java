@@ -19,14 +19,15 @@ public class S3Controller {
     @PostMapping(value = "/s3", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public CustomApiResponse<String> uploadFile(@RequestPart MultipartFile file,
                                                 @RequestParam S3UploadTarget s3UploadTarget) {
-        String fileURL = s3Service.uploadFile(file, s3UploadTarget);
+        String fileKey = s3Service.uploadFile(file, s3UploadTarget);
+        String fileURL = s3Service.getFileURL(fileKey);
         return CustomApiResponse.onSuccess(fileURL);
     }
 
     @Operation(summary = "파일(이미지, 동영상) 삭제 / 개발용")
     @DeleteMapping("/s3")
-    public CustomApiResponse deleteFile(@RequestParam String fileURL) {
-        s3Service.deleteFile(fileURL);
+    public CustomApiResponse deleteFile(@RequestParam String fileKey) {
+        s3Service.deleteFile(fileKey);
         return CustomApiResponse.onSuccess();
     }
 }

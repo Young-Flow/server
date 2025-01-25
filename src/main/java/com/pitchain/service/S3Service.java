@@ -1,6 +1,5 @@
 package com.pitchain.service;
 
-
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.constant.S3UploadTarget;
 import com.pitchain.common.exception.GeneralHandler;
@@ -17,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.UUID;
 
 @Slf4j
@@ -30,21 +28,30 @@ public class S3Service {
     private String imageBucket;
     @Value("${spring.cloud.aws.s3.bucket.video}")
     private String videoBucket;
+    @Value("${spring.cloud.aws.s3.cdn}")
+    private static String cdnDomain;
 
     public String uploadFile(MultipartFile file, S3UploadTarget target) {
-        String fileURL = Strings.EMPTY;
+        String fileKey = Strings.EMPTY;
         if (file == null || file.isEmpty())
-            return fileURL;
+            return fileKey;
 
         try {
             validateMimeType(file, target);
-            fileURL = upload(file, target);
+            fileKey = upload(file, target);
         } catch (IOException e) {
             throw new GeneralHandler(ErrorStatus.FAIL_STREAM_CONVERT);
         } catch (S3Exception e) {
             throw new GeneralHandler(ErrorStatus.FAIL_S3_UPLOAD);
         }
-        return fileURL;
+        return fileKey;
+    }
+
+    public static String getFileURL(String fileName) {
+        if (fileName == null) {
+            return Strings.EMPTY;
+        }
+        return cdnDomain + "/" + fileName;
     }
 
     private static void validateMimeType(MultipartFile file, S3UploadTarget target) {
@@ -54,10 +61,10 @@ public class S3Service {
     }
 
     private String upload(MultipartFile file, S3UploadTarget target) throws IOException {
-        String fileName = UUID.randomUUID().toString();
-        String uploadFileUrl = putS3(file, fileName, target);
+        String fileName = UUID.randomUUID() + file.getOriginalFilename();
+        String fileKey = putS3(file, fileName, target);
 
-        return uploadFileUrl;
+        return fileKey;
     }
 
     private String putS3(MultipartFile file, String fileName, S3UploadTarget target) throws IOException {
@@ -73,7 +80,7 @@ public class S3Service {
                         .build()
         );
 
-        return uploadFile.getURL().toString();
+        return uploadFile.getFilename();  //key
     }
 
     private String getTargetBucket(S3UploadTarget target) {
@@ -83,23 +90,11 @@ public class S3Service {
         };
     }
 
-    public void deleteFile(String fileURL) {
+    public void deleteFile(String fileKey) {
         try {
-            URI uri = URI.create(fileURL);
-            String bucketName = extractBucketName(uri);
-            String bucketKey = extractBucketKey(uri);
-            s3Operations.deleteObject(bucketName, bucketKey);
+            s3Operations.deleteObject(imageBucket, fileKey);
         } catch (Exception e) {
             throw new GeneralHandler(ErrorStatus.INVALID_BUCKET_URL);
         }
-    }
-
-    public String extractBucketName(URI uri) {
-        String host = uri.getHost();
-        return host.split("\\.")[0];
-    }
-
-    public String extractBucketKey(URI uri) {
-        return uri.getPath().substring(1);
     }
 }

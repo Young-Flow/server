@@ -10,27 +10,28 @@ import java.util.List;
 @Builder
 public record SpDetailRes(
         Long bmId,
-        String shortPitchURL,
-        String thumbnailImg,
+        String spURL,
+        String thumbnailImgURL,
         int views,
         String name,
-        String logoImg,
+        String logoImgURL,
         String mainCategory,
         List<String> subCategories,
         String company,
         boolean isLiked,
         long likeCnt
 ) {
-    public static SpDetailRes createRes(SpWithLikeDto spWithLikeDto, long likeCnt, List<String> subCategories) {
+    public static SpDetailRes createRes(SpWithLikeDto spWithLikeDto, String spURL, String thumbnailImgURL,
+                                        long likeCnt, List<String> subCategories, String logoImgURL) {
         Sp sp = spWithLikeDto.getSp();
         Bm bm = sp.getBm();
         return SpDetailRes.builder()
                 .bmId(sp.getBm().getId())
-                .shortPitchURL(sp.getShortPitchURL())
-                .thumbnailImg(sp.getThumbnailImg())
+                .spURL(spURL)
+                .thumbnailImgURL(thumbnailImgURL)
                 .views(sp.getViews())
                 .name(sp.getName())
-                .logoImg(bm.getLogoImg())
+                .logoImgURL(logoImgURL)
                 .mainCategory(bm.getMainCategory().getKoreanName())
                 .subCategories(subCategories)
                 .company(bm.getCompany())
