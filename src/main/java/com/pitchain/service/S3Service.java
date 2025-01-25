@@ -28,7 +28,8 @@ public class S3Service {
     private String imageBucket;
     @Value("${spring.cloud.aws.s3.bucket.video}")
     private String videoBucket;
-    private static String cdnDomain;
+    @Value("${spring.cloud.aws.s3.cdn}")
+    private String cdnDomain;
 
     public String uploadFile(MultipartFile file, S3UploadTarget target) {
         String fileKey = Strings.EMPTY;
@@ -46,11 +47,11 @@ public class S3Service {
         return fileKey;
     }
 
-    public static String getFileURL(String fileKey) {
+    public String getFileURL(String fileKey) {
         if (fileKey == null) {
             return Strings.EMPTY;
         }
-        return getCdnDomain() + "/" + fileKey;
+        return cdnDomain + "/" + fileKey;
     }
 
     private static void validateMimeType(MultipartFile file, S3UploadTarget target) {
@@ -103,14 +104,5 @@ public class S3Service {
             case IMAGE -> imageBucket;
             case VIDEO -> videoBucket;
         };
-    }
-
-    @Value("${spring.cloud.aws.s3.cdn}")
-    private void setCdnDomain(String cdnDomain) {
-        this.cdnDomain = cdnDomain;
-    }
-
-    private static String getCdnDomain() {
-        return cdnDomain;
     }
 }

@@ -24,7 +24,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-import static com.pitchain.service.S3Service.getFileURL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -113,11 +112,11 @@ class SpServiceTest {
 
         //then
         assertThat(spDetail.bmId()).isEqualTo(sp.getBm().getId());
-        assertThat(spDetail.spURL()).isEqualTo(getFileURL(sp.getSpKey()));
-        assertThat(spDetail.thumbnailImgURL()).isEqualTo(getFileURL(sp.getThumbnailImgKey()));
+        assertThat(spDetail.spURL()).isEqualTo(s3Service.getFileURL(sp.getSpKey()));
+        assertThat(spDetail.thumbnailImgURL()).isEqualTo(s3Service.getFileURL(sp.getThumbnailImgKey()));
         assertThat(spDetail.views()).isEqualTo(sp.getViews());
         assertThat(spDetail.name()).isEqualTo(sp.getName());
-        assertThat(spDetail.logoImgURL()).isEqualTo(getFileURL(sp.getBm().getLogoImgKey()));
+        assertThat(spDetail.logoImgURL()).isEqualTo(s3Service.getFileURL(sp.getBm().getLogoImgKey()));
         assertThat(spDetail.mainCategory()).isEqualTo(sp.getBm().getMainCategory().getKoreanName());
         assertThat(spDetail.subCategories()).isEqualTo(subCategories);
         assertThat(spDetail.company()).isEqualTo(sp.getBm().getCompany());
@@ -141,11 +140,11 @@ class SpServiceTest {
 
         //then
         assertThat(spDetail.bmId()).isEqualTo(sp.getBm().getId());
-        assertThat(spDetail.spURL()).isEqualTo(getFileURL(sp.getSpKey()));
-        assertThat(spDetail.thumbnailImgURL()).isEqualTo(getFileURL(sp.getThumbnailImgKey()));
+        assertThat(spDetail.spURL()).isEqualTo(s3Service.getFileURL(sp.getSpKey()));
+        assertThat(spDetail.thumbnailImgURL()).isEqualTo(s3Service.getFileURL(sp.getThumbnailImgKey()));
         assertThat(spDetail.views()).isEqualTo(sp.getViews());
         assertThat(spDetail.name()).isEqualTo(sp.getName());
-        assertThat(spDetail.logoImgURL()).isEqualTo(getFileURL(sp.getBm().getLogoImgKey()));
+        assertThat(spDetail.logoImgURL()).isEqualTo(s3Service.getFileURL(sp.getBm().getLogoImgKey()));
         assertThat(spDetail.mainCategory()).isEqualTo(sp.getBm().getMainCategory().getKoreanName());
         assertThat(spDetail.subCategories()).isEqualTo(subCategories);
         assertThat(spDetail.company()).isEqualTo(sp.getBm().getCompany());

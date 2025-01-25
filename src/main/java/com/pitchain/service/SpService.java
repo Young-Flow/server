@@ -19,8 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-import static com.pitchain.service.S3Service.getFileURL;
-
 @Transactional
 @RequiredArgsConstructor
 @Service
@@ -52,14 +50,14 @@ public class SpService {
         return spWithLikeDtos.stream()
                 .map(spWithLikeDto -> {
                     Sp sp = spWithLikeDto.getSp();
-                    String spURL = getFileURL(sp.getSpKey());
-                    String thumbnailImgURL = getFileURL(sp.getThumbnailImgKey());
+                    String spURL = s3Service.getFileURL(sp.getSpKey());
+                    String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
 
                     Bm bm = sp.getBm();
                     long likeCnt = myBmRepository.countByBm(bm);
                     List<String> subCategories = bm.getSubCategories();
 
-                    String logoImgURL = getFileURL(bm.getLogoImgKey());
+                    String logoImgURL = s3Service.getFileURL(bm.getLogoImgKey());
                     return SpDetailRes.createRes(spWithLikeDto, spURL,thumbnailImgURL, likeCnt, subCategories, logoImgURL);
                 })
                 .toList();
@@ -70,13 +68,13 @@ public class SpService {
         SpWithLikeDto spWithLikeDto = spRepository.findSpWithLike(memberId, spId)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.SP_NOT_FOUND));
         Sp sp = spWithLikeDto.getSp();
-        String spURL = getFileURL(sp.getSpKey());
-        String thumbnailImgURL = getFileURL(sp.getThumbnailImgKey());
+        String spURL = s3Service.getFileURL(sp.getSpKey());
+        String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
 
         Bm bm = sp.getBm();
         long likeCnt = myBmRepository.countByBm(bm);
         List<String> subCategories = bm.getSubCategories();
-        String logoImgURL = getFileURL(bm.getLogoImgKey());
+        String logoImgURL = s3Service.getFileURL(bm.getLogoImgKey());
 
         return SpDetailRes.createRes(spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories, logoImgURL);
     }

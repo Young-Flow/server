@@ -22,8 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.pitchain.service.S3Service.getFileURL;
-
 @RequiredArgsConstructor
 @Transactional
 @Service
@@ -56,9 +54,9 @@ public class BmService {
         List<PtImgRes> ptImgResList = getPtImgResList(bmId);
         List<String> subCategories = bm.getSubCategories();
 
-        String spURL = getFileURL(bm.getSpKey());
-        String logoImgURL = getFileURL(bm.getLogoImgKey());
-        String descImgURL = getFileURL(bm.getDescImgKey());
+        String spURL = s3Service.getFileURL(bm.getSpKey());
+        String logoImgURL = s3Service.getFileURL(bm.getLogoImgKey());
+        String descImgURL = s3Service.getFileURL(bm.getDescImgKey());
 
         return BmDetailRes.createRes(bmWithLikeDto, likeCnt, ptImgResList, subCategories, spURL, logoImgURL, descImgURL);
     }
@@ -103,7 +101,7 @@ public class BmService {
         List<PtImg> ptImgs = bmRepository.getPtImgsByBmId(bmId);
         List<PtImgRes> ptImgResList = ptImgs.stream()
                 .map(ptImg -> PtImgRes.createRes(ptImg.getSerialNum(),
-                        getFileURL(ptImg.getImgKey())))
+                        s3Service.getFileURL(ptImg.getImgKey())))
                 .toList();
         return ptImgResList;
     }
