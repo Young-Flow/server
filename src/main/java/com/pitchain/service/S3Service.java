@@ -50,7 +50,7 @@ public class S3Service {
         if (fileKey == null) {
             return Strings.EMPTY;
         }
-        return cdnDomain + "/" + fileKey;
+        return getCdnDomain() + "/" + fileKey;
     }
 
     private static void validateMimeType(MultipartFile file, S3UploadTarget target) {
@@ -108,5 +108,9 @@ public class S3Service {
     @Value("${spring.cloud.aws.s3.cdn}")
     private void setCdnDomain(String cdnDomain) {
         this.cdnDomain = cdnDomain;
+    }
+
+    private static String getCdnDomain() {
+        return cdnDomain;
     }
 }
