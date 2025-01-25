@@ -28,7 +28,6 @@ public class S3Service {
     private String imageBucket;
     @Value("${spring.cloud.aws.s3.bucket.video}")
     private String videoBucket;
-    @Value("${spring.cloud.aws.s3.cdn}")
     private static String cdnDomain;
 
     public String uploadFile(MultipartFile file, S3UploadTarget target) {
@@ -83,6 +82,22 @@ public class S3Service {
         return uploadFile.getFilename();  //key
     }
 
+    public void deleteImg(String fileKey) {
+        deleteFile(imageBucket, fileKey);
+    }
+
+    public void deleteVid(String fileKey) {
+        deleteFile(videoBucket, fileKey);
+    }
+
+    private void deleteFile(String bucket, String fileKey) {
+        try {
+            s3Operations.deleteObject(bucket, fileKey);
+        } catch (Exception e) {
+            throw new GeneralHandler(ErrorStatus.INVALID_BUCKET_URL);
+        }
+    }
+
     private String getTargetBucket(S3UploadTarget target) {
         return switch (target.getMime()) {
             case IMAGE -> imageBucket;
@@ -90,11 +105,8 @@ public class S3Service {
         };
     }
 
-    public void deleteFile(String fileKey) {
-        try {
-            s3Operations.deleteObject(imageBucket, fileKey);
-        } catch (Exception e) {
-            throw new GeneralHandler(ErrorStatus.INVALID_BUCKET_URL);
-        }
+    @Value("${spring.cloud.aws.s3.cdn}")
+    private void setCdnDomain(String cdnDomain) {
+        this.cdnDomain = cdnDomain;
     }
 }

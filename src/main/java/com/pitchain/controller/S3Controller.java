@@ -26,10 +26,17 @@ public class S3Controller {
         return CustomApiResponse.onSuccess(fileURL);
     }
 
-    @Operation(summary = "파일(이미지, 동영상) 삭제 / 개발용")
-    @DeleteMapping("/s3")
-    public CustomApiResponse deleteFile(@RequestParam String fileKey) {
-        s3Service.deleteFile(fileKey);
+    @Operation(summary = "파일(이미지) 삭제 / 개발용")
+    @DeleteMapping("/s3/images")
+    public CustomApiResponse deleteImg(@RequestParam String fileKey) {
+        s3Service.deleteImg(fileKey);
+        return CustomApiResponse.onSuccess();
+    }
+
+    @Operation(summary = "파일(동영상) 삭제 / 개발용")
+    @DeleteMapping("/s3/videos")
+    public CustomApiResponse deleteVid(@RequestParam String fileKey) {
+        s3Service.deleteVid(fileKey);
         return CustomApiResponse.onSuccess();
     }
 }

@@ -2,7 +2,6 @@ package com.pitchain.service;
 
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.constant.S3UploadTarget;
-import com.pitchain.common.constant.SubCategory;
 import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.dto.BmWithLikeDto;
 import com.pitchain.dto.req.CreateBmReq;
@@ -111,7 +110,7 @@ public class BmService {
 
     private void deletePtImgs(Bm bm) {
         List<PtImg> ptImgs = bm.getPtImgs();
-        ptImgs.forEach(pi -> s3Service.deleteFile(pi.getImgKey()));
+        ptImgs.forEach(pi -> s3Service.deleteImg(pi.getImgKey()));
     }
 
     private List<PtImg> uploadPtImgs(List<MultipartFile> ptImgs, Bm bm) {

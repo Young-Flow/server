@@ -72,11 +72,11 @@ public class SpService {
         Sp sp = spWithLikeDto.getSp();
         String spURL = getFileURL(sp.getSpKey());
         String thumbnailImgURL = getFileURL(sp.getThumbnailImgKey());
+
         Bm bm = sp.getBm();
         long likeCnt = myBmRepository.countByBm(bm);
         List<String> subCategories = bm.getSubCategories();
         String logoImgURL = getFileURL(bm.getLogoImgKey());
-
 
         return SpDetailRes.createRes(spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories, logoImgURL);
     }
@@ -87,8 +87,8 @@ public class SpService {
 
         validateSpOwner(sp, member);
 
-        s3Service.deleteFile(sp.getSpKey());
-        s3Service.deleteFile(sp.getThumbnailImgKey());
+        s3Service.deleteVid(sp.getSpKey());
+        s3Service.deleteImg(sp.getThumbnailImgKey());
 
         String spKey = s3Service.uploadFile(spVid, S3UploadTarget.COMPANY_VIDEO);
         String thumbnailImgKey = s3Service.uploadFile(thumbnailImg, S3UploadTarget.COMPANY_THUMBNAIL);
