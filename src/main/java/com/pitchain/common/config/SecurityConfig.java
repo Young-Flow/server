@@ -26,6 +26,13 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    public static final String[] whitelist = {
+            "/oauth**",
+            "/resources/**", "/favicon.ico", // resource
+            "/swagger-ui/**", "/api-docs/**", "/v3/api-docs**", "/v3/api-docs/**", // swagger
+            "/health-check", // health check
+    };
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.httpBasic(AbstractHttpConfigurer::disable)
@@ -39,7 +46,7 @@ public class SecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return web -> web.ignoring().requestMatchers(JwtAuthenticationFilter.whitelist);
+        return web -> web.ignoring().requestMatchers(whitelist);
     }
 
     @Bean
