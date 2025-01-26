@@ -48,7 +48,7 @@ public class S3Service {
     }
 
     public String getFileURL(String fileKey) {
-        if (fileKey == null) {
+        if (fileKey == null || fileKey.equals(Strings.EMPTY)) {
             return Strings.EMPTY;
         }
         return cdnDomain + "/" + fileKey;
