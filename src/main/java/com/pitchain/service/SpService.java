@@ -32,10 +32,14 @@ public class SpService {
         Member member = entityFacade.getMember(memberId);
         Bm bm = entityFacade.getBm(createSpReq.bmId());
 
-        String spVidURL = s3Service.uploadFile(spVid, S3UploadTarget.COMPANY_VIDEO);
-        String thumbnailImgURL = s3Service.uploadFile(thumbnailImg, S3UploadTarget.COMPANY_THUMBNAIL);
+        String spOriginKey = s3Service.uploadFile(spVid, S3UploadTarget.COMPANY_VIDEO);
 
-        Sp sp = new Sp(bm, spVidURL, thumbnailImgURL, createSpReq.name());
+        //TO DO - AWS Lambda에서 정상적으로 트랜스코딩 완료됐으면 여기로 알려주기
+
+        String spKey = createSpM3U8Key(spOriginKey);
+        String thumbnailImgKey = s3Service.uploadFile(thumbnailImg, S3UploadTarget.COMPANY_THUMBNAIL);
+
+        Sp sp = new Sp(bm, spKey, thumbnailImgKey, createSpReq.name());
         spRepository.save(sp);
     }
 
@@ -46,10 +50,15 @@ public class SpService {
         return spWithLikeDtos.stream()
                 .map(spWithLikeDto -> {
                     Sp sp = spWithLikeDto.getSp();
+                    String spURL = s3Service.getFileURL(sp.getSpKey());
+                    String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
+
                     Bm bm = sp.getBm();
                     long likeCnt = myBmRepository.countByBm(bm);
                     List<String> subCategories = bm.getSubCategories();
-                    return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories);
+
+                    String logoImgURL = s3Service.getFileURL(bm.getLogoImgKey());
+                    return SpDetailRes.createRes(spWithLikeDto, spURL,thumbnailImgURL, likeCnt, subCategories, logoImgURL);
                 })
                 .toList();
     }
@@ -58,11 +67,16 @@ public class SpService {
     public SpDetailRes getSpDetail(Long memberId, Long spId) {
         SpWithLikeDto spWithLikeDto = spRepository.findSpWithLike(memberId, spId)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.SP_NOT_FOUND));
-        Bm bm = spWithLikeDto.getSp().getBm();
+        Sp sp = spWithLikeDto.getSp();
+        String spURL = s3Service.getFileURL(sp.getSpKey());
+        String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
+
+        Bm bm = sp.getBm();
         long likeCnt = myBmRepository.countByBm(bm);
         List<String> subCategories = bm.getSubCategories();
+        String logoImgURL = s3Service.getFileURL(bm.getLogoImgKey());
 
-        return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories);
+        return SpDetailRes.createRes(spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories, logoImgURL);
     }
 
     public void updateSp(Long memberId, Long spId, String name, MultipartFile spVid, MultipartFile thumbnailImg) {
@@ -71,13 +85,13 @@ public class SpService {
 
         validateSpOwner(sp, member);
 
-        s3Service.deleteFile(sp.getShortPitchURL());
-        s3Service.deleteFile(sp.getThumbnailImg());
+        s3Service.deleteVid(sp.getSpKey());
+        s3Service.deleteImg(sp.getThumbnailImgKey());
 
-        String spVidURL = s3Service.uploadFile(spVid, S3UploadTarget.COMPANY_VIDEO);
-        String thumbnailImgURL = s3Service.uploadFile(thumbnailImg, S3UploadTarget.COMPANY_THUMBNAIL);
+        String spKey = s3Service.uploadFile(spVid, S3UploadTarget.COMPANY_VIDEO);
+        String thumbnailImgKey = s3Service.uploadFile(thumbnailImg, S3UploadTarget.COMPANY_THUMBNAIL);
 
-        Sp updateSp = new Sp(sp.getBm(), spVidURL, thumbnailImgURL, name);
+        Sp updateSp = new Sp(sp.getBm(), spKey, thumbnailImgKey, name);
         sp.update(updateSp);
     }
 
@@ -94,5 +108,14 @@ public class SpService {
         if (!sp.isOwner(member.getId())) {
             throw new GeneralHandler(ErrorStatus.MEMBER_FORBIDDEN);
         }
+    }
+
+    private String createSpM3U8Key(String spKey) {
+        String removedFileKey = removeFileExtension(spKey);
+        return removedFileKey + ".m3u8";
+    }
+
+    public String removeFileExtension(String originalFileName) {
+        return originalFileName.split("\\.")[0];
     }
 }

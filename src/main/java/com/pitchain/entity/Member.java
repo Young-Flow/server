@@ -30,7 +30,7 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Country country;
 
-    private String profileImg;
+    private String profileImgKey;
 
     @OneToMany(mappedBy = "member")
     private List<Investment> investments = new ArrayList<>();
@@ -44,10 +44,10 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member")
     private List<Comment> comments = new ArrayList<>();
 
-    public Member(String name, String email, Country country, String profileImg) {
+    public Member(String name, String email, Country country, String profileImgKey) {
         this.name = name;
         this.email = email;
         this.country = country;
-        this.profileImg = profileImg;
+        this.profileImgKey = profileImgKey;
     }
 }

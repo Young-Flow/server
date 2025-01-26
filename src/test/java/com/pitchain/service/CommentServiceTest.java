@@ -42,6 +42,8 @@ class CommentServiceTest {
     private CommentService commentService;
     @Autowired
     private CommentRepository commentRepository;
+    @Autowired
+    private S3Service s3Service;
 
     @AfterEach
     void tearDown() {
@@ -141,10 +143,9 @@ class CommentServiceTest {
         Bm bm = saveBm(memberA);
 
         Comment parentComment = saveComment(memberA, bm);
-        String replyCommentContent = "답글 내용";
 
         Member memberB = saveMember();
-        commentRepository.save(new Comment(memberB, bm, parentComment, replyCommentContent));
+        Comment replyComment = saveReplyComment(memberB, parentComment, bm);
 
         //when
         List<? extends BaseCommentRes> comments = commentService.getComments(bm.getId());
@@ -152,13 +153,15 @@ class CommentServiceTest {
         //then
         CommentRes foundComment = (CommentRes) comments.get(0);
         assertThat(foundComment.getCommentId()).isEqualTo(parentComment.getId());
-        assertThat(foundComment.getWriterId()).isEqualTo(memberA.getId());
+        assertThat(foundComment.getWriterId()).isEqualTo(parentComment.getMember().getId());
         assertThat(foundComment.getContent()).isEqualTo(parentComment.getContent());
+        assertThat(foundComment.getWriterProfileImgURL()).isEqualTo(s3Service.getFileURL(parentComment.getMember().getProfileImgKey()));
 
         List<ReplyCommentRes> replyComments = foundComment.getReplyComments();
         ReplyCommentRes replyCommentRes = replyComments.get(0);
-        assertThat(replyCommentRes.content()).isEqualTo(replyCommentContent);
-        assertThat(replyCommentRes.writerId()).isEqualTo(memberB.getId());
+        assertThat(replyCommentRes.content()).isEqualTo(replyComment.getContent());
+        assertThat(replyCommentRes.writerId()).isEqualTo(replyComment.getMember().getId());
+        assertThat(replyCommentRes.writerProfileImgURL()).isEqualTo(s3Service.getFileURL(replyComment.getMember().getProfileImgKey()));
     }
 
     @Test
@@ -173,8 +176,7 @@ class CommentServiceTest {
         commentRepository.save(parentComment);
 
         Member memberB = saveMember();
-        Comment comment = new Comment(memberB, bm, parentComment, "답글 내용");
-        Comment replyComment = commentRepository.save(comment);
+        Comment replyComment = saveReplyComment(memberB, parentComment, bm);
 
         //when
         List<? extends BaseCommentRes> comments = commentService.getComments(bm.getId());
@@ -186,6 +188,7 @@ class CommentServiceTest {
         ReplyCommentRes replyCommentRes = deletedCommentRes.getReplyComments().get(0);
         assertThat(replyCommentRes.commentId()).isEqualTo(replyComment.getId());
         assertThat(replyCommentRes.writerId()).isEqualTo(replyComment.getMember().getId());
+        assertThat(replyCommentRes.writerProfileImgURL()).isEqualTo(s3Service.getFileURL(replyComment.getMember().getProfileImgKey()));
     }
 
     @Test
@@ -264,7 +267,7 @@ class CommentServiceTest {
         Comment parentComment = saveComment(memberA, bm);
 
         Member memberB = saveMember();
-        commentRepository.save(new Comment(memberB, bm, parentComment, "답글 내용"));
+        saveReplyComment(memberB, parentComment, bm);
 
         //when
         commentService.removeComment(parentComment.getId(), memberA.getId());
@@ -298,7 +301,7 @@ class CommentServiceTest {
     }
 
     private Member saveMember() {
-        return memberRepository.save(new Member("name", UUID.randomUUID().toString(), Country.USA, "profileImg"));
+        return memberRepository.save(new Member("name", UUID.randomUUID().toString(), Country.USA, "profileImg.jpg"));
     }
 
     private Bm saveBm(Member member) {
@@ -309,5 +312,9 @@ class CommentServiceTest {
 
     private Comment saveComment(Member member, Bm bm) {
         return commentRepository.save(new Comment(member, bm, null, "댓글 내용"));
+    }
+
+    private Comment saveReplyComment(Member member, Comment parentComment, Bm bm) {
+        return commentRepository.save(new Comment(member, bm, parentComment, "답글 내용"));
     }
 }

@@ -2,7 +2,6 @@ package com.pitchain.service;
 
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.constant.S3UploadTarget;
-import com.pitchain.common.constant.SubCategory;
 import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.dto.BmWithLikeDto;
 import com.pitchain.dto.req.CreateBmReq;
@@ -32,12 +31,12 @@ public class BmService {
     private final MyBmRepository myBmRepository;
     private final S3Service s3Service;
 
-    public void createBm(Long memberId, CreateBmReq createBmReq, MultipartFile logoImg, MultipartFile descriptionImg) {
+    public void createBm(Long memberId, CreateBmReq createBmReq, MultipartFile logoImg, MultipartFile descImg) {
         Member member = entityFacade.getMember(memberId);
-        String logoImgURL = s3Service.uploadFile(logoImg, S3UploadTarget.COMPANY_LOGO);
-        String descriptionImgURL = s3Service.uploadFile(descriptionImg, S3UploadTarget.COMPANY_DESC);
+        String logoImgKey = s3Service.uploadFile(logoImg, S3UploadTarget.COMPANY_LOGO);
+        String descImgKey = s3Service.uploadFile(descImg, S3UploadTarget.COMPANY_DESC);
 
-        Bm newBm = createBmReq.createBm(member, logoImgURL, descriptionImgURL);
+        Bm newBm = createBmReq.createBm(member, logoImgKey, descImgKey);
         newBm.addSubCategories(createBmReq.subCategories());
 
         bmRepository.save(newBm);
@@ -49,32 +48,30 @@ public class BmService {
 
         BmWithLikeDto bmWithLikeDto = bmRepository.getBmWithLikeDto(member.getId(), bmId)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
+        Bm bm = bmWithLikeDto.getBm();
 
-        List<PtImg> ptImgs = bmRepository.getPtImgsByBmId(bmWithLikeDto.getBm().getId());
-        List<PtImgRes> ptImgResList = ptImgs.stream()
-                .map(PtImgRes::createRes)
-                .toList();
+        long likeCnt = myBmRepository.countByBm(bm);
+        List<PtImgRes> ptImgResList = getPtImgResList(bmId);
+        List<String> subCategories = bm.getSubCategories();
 
-        long likeCnt = myBmRepository.countByBm(bmWithLikeDto.getBm());
+        String spURL = s3Service.getFileURL(bm.getSpKey());
+        String logoImgURL = s3Service.getFileURL(bm.getLogoImgKey());
+        String descImgURL = s3Service.getFileURL(bm.getDescImgKey());
 
-        List<String> subCategories = bmRepository.getSubCategoriesByBmId(bmId).stream()
-                .map(SubCategory::getKoreanName)
-                .toList();
-
-        return BmDetailRes.createRes(bmWithLikeDto, likeCnt, ptImgResList, subCategories);
+        return BmDetailRes.createRes(bmWithLikeDto, likeCnt, ptImgResList, subCategories, spURL, logoImgURL, descImgURL);
     }
 
-    public void updateBm(Long memberId, Long bmId, UpdateBmReq updateBmReq, MultipartFile logoImg, MultipartFile descriptionImg) {
+    public void updateBm(Long memberId, Long bmId, UpdateBmReq updateBmReq, MultipartFile logoImg, MultipartFile descImg) {
         Member member = entityFacade.getMember(memberId);
         Bm bm = entityFacade.getBm(bmId);
 
         validateBmOwner(bm, member);
 
-        String logoImgURL = s3Service.uploadFile(logoImg, S3UploadTarget.COMPANY_LOGO);
-        String descriptionImgURL = s3Service.uploadFile(descriptionImg, S3UploadTarget.COMPANY_DESC);
+        String logoImgKey = s3Service.uploadFile(logoImg, S3UploadTarget.COMPANY_LOGO);
+        String descImgKey = s3Service.uploadFile(descImg, S3UploadTarget.COMPANY_DESC);
 
         bm.updateSubCategories(updateBmReq.subCategories());
-        Bm updateBm = updateBmReq.createBm(logoImgURL, descriptionImgURL);
+        Bm updateBm = updateBmReq.createBm(logoImgKey, descImgKey);
         bm.update(updateBm);
     }
 
@@ -100,17 +97,25 @@ public class BmService {
         bmRepository.delete(bm);
     }
 
+    private List<PtImgRes> getPtImgResList(Long bmId) {
+        List<PtImg> ptImgs = bmRepository.getPtImgsByBmId(bmId);
+        List<PtImgRes> ptImgResList = ptImgs.stream()
+                .map(ptImg -> PtImgRes.createRes(ptImg.getSerialNum(),
+                        s3Service.getFileURL(ptImg.getImgKey())))
+                .toList();
+        return ptImgResList;
+    }
+
     private void deletePtImgs(Bm bm) {
         List<PtImg> ptImgs = bm.getPtImgs();
-        System.out.println("ptImgs = " + ptImgs);
-        ptImgs.forEach(pi -> s3Service.deleteFile(pi.getImg()));
+        ptImgs.forEach(pi -> s3Service.deleteImg(pi.getImgKey()));
     }
 
     private List<PtImg> uploadPtImgs(List<MultipartFile> ptImgs, Bm bm) {
         List<PtImg> uploadPtImgs = new ArrayList<>();
         for (int serialNum = 0; ptImgs != null && serialNum < ptImgs.size(); serialNum++) {
-            String uploadFileURL = s3Service.uploadFile(ptImgs.get(serialNum), S3UploadTarget.COMPANY_PT);
-            PtImg ptImg = new PtImg(bm, serialNum, uploadFileURL);
+            String uploadFileKey = s3Service.uploadFile(ptImgs.get(serialNum), S3UploadTarget.COMPANY_PT);
+            PtImg ptImg = new PtImg(bm, serialNum, uploadFileKey);
             uploadPtImgs.add(ptImg);
         }
         return uploadPtImgs;

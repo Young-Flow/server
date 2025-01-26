@@ -50,14 +50,14 @@ class SpServiceTest {
     }
 
     private Bm saveBm(Member member) {
-        return bmRepository.save(new Bm(member, "bm_name", MainCategory.FOOD,"bm_company", "bm_logo_img_url",
-                "bm_intro", "bm_description", "bm_description_img_url", "bm_address", 100000L,
-                1000L, 1000, LocalDate.now(), "bm_longPitchUrl"));
+        return bmRepository.save(new Bm(member, "bm_name", MainCategory.FOOD,"bm_company", "bm_logo_img_key",
+                "bm_intro", "bm_description", "bm_desc_img_key", "bm_address", 100000L,
+                1000L, 1000, LocalDate.now(), "bm_long_pitch_url"));
     }
 
     private Sp saveSp(Bm bm) {
         return spRepository.save(
-                new Sp(bm, SP_VID.getOriginalFilename(), THUMBNAIL_IMG.getOriginalFilename(), SP_NAME));
+                new Sp(bm, SP_KEY, THUMBNAIL_IMG.getOriginalFilename(), SP_NAME));
     }
 
     @BeforeEach
@@ -70,6 +70,7 @@ class SpServiceTest {
     private Bm bm;
 
     private static final String SP_NAME = "sp_name";
+    private static final String SP_KEY = "sp_vid.m3u8";
     private static final MockMultipartFile SP_VID = new MockMultipartFile(
             "sp_vid", "sp_vid.mp4", "video/mp4", "test data 1".getBytes());
     private static final MockMultipartFile THUMBNAIL_IMG = new MockMultipartFile(
@@ -93,8 +94,8 @@ class SpServiceTest {
         List<Sp> all = spRepository.findAll();
         Sp sp = all.get(0);
         assertThat(sp.getBm()).isEqualTo(bm);
-        assertThat(sp.getShortPitchURL()).isEqualTo(SP_VID.getOriginalFilename());
-        assertThat(sp.getThumbnailImg()).isEqualTo(THUMBNAIL_IMG.getOriginalFilename());
+        assertThat(sp.getSpKey()).isEqualTo(SP_KEY);
+        assertThat(sp.getThumbnailImgKey()).isEqualTo(THUMBNAIL_IMG.getOriginalFilename());
         assertThat(sp.getName()).isEqualTo(SP_NAME);
     }
 
@@ -111,11 +112,11 @@ class SpServiceTest {
 
         //then
         assertThat(spDetail.bmId()).isEqualTo(sp.getBm().getId());
-        assertThat(spDetail.shortPitchURL()).isEqualTo(sp.getShortPitchURL());
-        assertThat(spDetail.thumbnailImg()).isEqualTo(sp.getThumbnailImg());
+        assertThat(spDetail.spURL()).isEqualTo(s3Service.getFileURL(sp.getSpKey()));
+        assertThat(spDetail.thumbnailImgURL()).isEqualTo(s3Service.getFileURL(sp.getThumbnailImgKey()));
         assertThat(spDetail.views()).isEqualTo(sp.getViews());
         assertThat(spDetail.name()).isEqualTo(sp.getName());
-        assertThat(spDetail.logoImg()).isEqualTo(sp.getBm().getLogoImg());
+        assertThat(spDetail.logoImgURL()).isEqualTo(s3Service.getFileURL(sp.getBm().getLogoImgKey()));
         assertThat(spDetail.mainCategory()).isEqualTo(sp.getBm().getMainCategory().getKoreanName());
         assertThat(spDetail.subCategories()).isEqualTo(subCategories);
         assertThat(spDetail.company()).isEqualTo(sp.getBm().getCompany());
@@ -139,11 +140,11 @@ class SpServiceTest {
 
         //then
         assertThat(spDetail.bmId()).isEqualTo(sp.getBm().getId());
-        assertThat(spDetail.shortPitchURL()).isEqualTo(sp.getShortPitchURL());
-        assertThat(spDetail.thumbnailImg()).isEqualTo(sp.getThumbnailImg());
+        assertThat(spDetail.spURL()).isEqualTo(s3Service.getFileURL(sp.getSpKey()));
+        assertThat(spDetail.thumbnailImgURL()).isEqualTo(s3Service.getFileURL(sp.getThumbnailImgKey()));
         assertThat(spDetail.views()).isEqualTo(sp.getViews());
         assertThat(spDetail.name()).isEqualTo(sp.getName());
-        assertThat(spDetail.logoImg()).isEqualTo(sp.getBm().getLogoImg());
+        assertThat(spDetail.logoImgURL()).isEqualTo(s3Service.getFileURL(sp.getBm().getLogoImgKey()));
         assertThat(spDetail.mainCategory()).isEqualTo(sp.getBm().getMainCategory().getKoreanName());
         assertThat(spDetail.subCategories()).isEqualTo(subCategories);
         assertThat(spDetail.company()).isEqualTo(sp.getBm().getCompany());
@@ -197,8 +198,8 @@ class SpServiceTest {
         List<Sp> all = spRepository.findAll();
         Sp updatedSp = all.get(0);
         assertThat(updatedSp.getBm()).isEqualTo(bm);
-        assertThat(updatedSp.getShortPitchURL()).isEqualTo(newSpVid.getOriginalFilename());
-        assertThat(updatedSp.getThumbnailImg()).isEqualTo(newThumbnailImg.getOriginalFilename());
+        assertThat(updatedSp.getSpKey()).isEqualTo(newSpVid.getOriginalFilename());
+        assertThat(updatedSp.getThumbnailImgKey()).isEqualTo(newThumbnailImg.getOriginalFilename());
         assertThat(updatedSp.getName()).isEqualTo(newName);
     }
 

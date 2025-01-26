@@ -19,23 +19,23 @@ public record UpdateBmReq(
         Long goalInvestment,
         Integer maxIssuedShare,
         LocalDate deadline,
-        String longPitchUrl
+        String longPitchURL
 ) {
-    public Bm createBm(String logoImg, String descriptionImg) {
+    public Bm createBm(String logoImgKey, String descImgKey) {
         return Bm.builder()
                 .name(name)
                 .mainCategory(mainCategory)
                 .company(company)
-                .logoImg(logoImg)
+                .logoImgKey(logoImgKey)
                 .intro(intro)
                 .description(description)
-                .descriptionImg(descriptionImg)
+                .descImgKey(descImgKey)
                 .address(address)
                 .valuationCap(valuationCap)
                 .goalInvestment(goalInvestment)
                 .maxIssuedShare(maxIssuedShare)
                 .deadline(deadline)
-                .longPitchUrl(longPitchUrl)
+                .longPitchURL(longPitchURL)
                 .build();
     }
 }

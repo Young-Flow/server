@@ -23,8 +23,8 @@ public class BmController {
     public CustomApiResponse createBm(@AuthenticationPrincipal Long memberId,
                                       @RequestPart CreateBmReq createBmReq,
                                       @RequestPart(required = false) MultipartFile logoImg,
-                                      @RequestPart(required = false) MultipartFile descriptionImg) {
-        bmService.createBm(memberId, createBmReq, logoImg, descriptionImg);
+                                      @RequestPart(required = false) MultipartFile descImg) {
+        bmService.createBm(memberId, createBmReq, logoImg, descImg);
         return CustomApiResponse.onSuccess();
     }
 
@@ -40,8 +40,8 @@ public class BmController {
                                                    @PathVariable("bmId") Long bmId,
                                                    @RequestPart UpdateBmReq updateBmReq,
                                                    @RequestPart(required = false) MultipartFile logoImg,
-                                                   @RequestPart(required = false) MultipartFile descriptionImg) {
-        bmService.updateBm(memberId, bmId, updateBmReq, logoImg, descriptionImg);
+                                                   @RequestPart(required = false) MultipartFile descImg) {
+        bmService.updateBm(memberId, bmId, updateBmReq, logoImg, descImg);
         return CustomApiResponse.onSuccess();
     }
 

@@ -12,7 +12,7 @@ import java.util.List;
 public class CommentRes extends BaseCommentRes {
     private final Long writerId;
     private final String writerName;
-    private final String writerProfileImg;
+    private final String writerProfileImgURL;
     private final String content;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
@@ -20,19 +20,19 @@ public class CommentRes extends BaseCommentRes {
     @Builder
     public CommentRes(
             Long commentId, boolean delYN, List<ReplyCommentRes> replyComments,
-            Long writerId, String writerName, String writerProfileImg, String content,
+            Long writerId, String writerName, String writerProfileImgURL, String content,
             LocalDateTime createdAt, LocalDateTime updatedAt
     ) {
         super(commentId, delYN, replyComments);
         this.writerId = writerId;
         this.writerName = writerName;
-        this.writerProfileImg = writerProfileImg;
+        this.writerProfileImgURL = writerProfileImgURL;
         this.content = content;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
-    public static CommentRes createRes(Comment comment, List<ReplyCommentRes> replyComments) {
+    public static CommentRes createRes(Comment comment, List<ReplyCommentRes> replyComments, String writerProfileImgURL) {
         Member member = comment.getMember();
         return CommentRes.builder()
                 .commentId(comment.getId())
@@ -40,7 +40,7 @@ public class CommentRes extends BaseCommentRes {
                 .replyComments(replyComments)
                 .writerId(member.getId())
                 .writerName(member.getName())
-                .writerProfileImg(member.getProfileImg())
+                .writerProfileImgURL(writerProfileImgURL)
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt())
                 .updatedAt(comment.getUpdatedAt())

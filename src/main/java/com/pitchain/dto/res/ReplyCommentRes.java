@@ -11,18 +11,18 @@ public record ReplyCommentRes(
         Long commentId,
         Long writerId,
         String writerName,
-        String writerProfileImg,
+        String writerProfileImgURL,
         String content,
         boolean delYN,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
-    public static ReplyCommentRes createRes(Comment comment) {
+    public static ReplyCommentRes createRes(Comment comment, String writerProfileImgURL) {
         Member member = comment.getMember();
         return ReplyCommentRes.builder()
                 .commentId(comment.getId())
                 .writerId(member.getId())
-                .writerProfileImg(member.getProfileImg())
+                .writerProfileImgURL(writerProfileImgURL)
                 .writerName(member.getName())
                 .content(comment.getContent())
                 .delYN(comment.isDelYN())

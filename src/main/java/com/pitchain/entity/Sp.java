@@ -21,20 +21,20 @@ public class Sp extends BaseEntity {
     private Bm bm;
 
     @Column(nullable = false)
-    private String shortPitchURL;
+    private String spKey;
 
     @Column(nullable = false)
-    private String thumbnailImg;
+    private String thumbnailImgKey;
 
     private int views;
 
     @Column(nullable = false)
     private String name;
 
-    public Sp(Bm bm, String shortPitchURL, String thumbnailImg, String name) {
+    public Sp(Bm bm, String spKey, String thumbnailImgKey, String name) {
         this.bm = bm;
-        this.shortPitchURL = shortPitchURL;
-        this.thumbnailImg = thumbnailImg;
+        this.spKey = spKey;
+        this.thumbnailImgKey = thumbnailImgKey;
         this.name = name;
         this.views = 0;
     }
@@ -44,8 +44,8 @@ public class Sp extends BaseEntity {
     }
 
     public void update(Sp updateSp) {
-        this.shortPitchURL = updateSp.shortPitchURL;
-        this.thumbnailImg = updateSp.thumbnailImg;
+        this.spKey = updateSp.spKey;
+        this.thumbnailImgKey = updateSp.thumbnailImgKey;
         this.name = updateSp.name;
     }
 }
