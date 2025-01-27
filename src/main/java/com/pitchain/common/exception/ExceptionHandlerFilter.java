@@ -32,7 +32,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
         CustomApiResponse<Object> body = CustomApiResponse.onFailure(error.getCode(), error.getMessage(), null);
 
         ObjectMapper objectMapper = new ObjectMapper();
-        response.setStatus(HttpStatus.SC_BAD_REQUEST);
+        response.setStatus(error.getHttpStatus().value());
         response.setContentType(ContentType.APPLICATION_JSON.toString());
         response.getWriter().write(objectMapper.writeValueAsString(body));
     }
