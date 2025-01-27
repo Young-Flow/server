@@ -88,6 +88,11 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
+// task 의존관계 설정
+tasks.named("generateSentryBundleIdJava") {
+    dependsOn "compileJava"
+}
+
 // pain jar 파일 생성 비활성화
 jar {
     enabled = false
@@ -96,3 +101,4 @@ jar {
 test {
     systemProperty 'spring.profiles.active', 'prod'
 }
+
