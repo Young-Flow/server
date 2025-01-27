@@ -1,6 +1,6 @@
 package com.pitchain.entity;
 
-import com.pitchain.common.constant.MainCategory;
+import com.pitchain.common.constant.SubCategory;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -9,11 +9,11 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MyCategory {
+public class CategoryPref {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "my_category_id")
+    @Column(name = "category_pref_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -21,5 +21,11 @@ public class MyCategory {
     private Member member;
 
     @Enumerated(EnumType.STRING)
-    private MainCategory category;
+    @Column(nullable = false)
+    private SubCategory subCategory;
+
+    public CategoryPref(Member member, SubCategory subCategory) {
+        this.member = member;
+        this.subCategory = subCategory;
+    }
 }

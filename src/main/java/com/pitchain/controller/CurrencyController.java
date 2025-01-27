@@ -4,6 +4,7 @@ import com.pitchain.common.apiPayload.dto.CustomApiResponse;
 import com.pitchain.dto.res.CurrencyRes;
 import com.pitchain.service.CurrencyService;
 import com.pitchain.service.ExchangeRateService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,6 +29,7 @@ public class CurrencyController {
         return CustomApiResponse.onSuccess(currencyRes);
     }
 
+    @Operation(summary = "외부 API 호출 확인 / 개발용")
     @GetMapping("/currency-test")
     public CustomApiResponse test() {
         exchangeRateService.updateExchangeRateMap();
