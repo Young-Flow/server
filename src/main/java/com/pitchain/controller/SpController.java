@@ -1,6 +1,7 @@
 package com.pitchain.controller;
 
 import com.pitchain.common.apiPayload.dto.CustomApiResponse;
+import com.pitchain.common.constant.SubCategory;
 import com.pitchain.dto.req.CreateSpReq;
 import com.pitchain.dto.res.SpDetailRes;
 import com.pitchain.service.SpService;
@@ -30,6 +31,13 @@ public class SpController {
     @GetMapping
     public CustomApiResponse<List<SpDetailRes>> getSpDetails(@AuthenticationPrincipal Long memberId) {
         List<SpDetailRes> spDetailResList = spService.getSpDetails(memberId);
+        return CustomApiResponse.onSuccess(spDetailResList);
+    }
+
+    @GetMapping("/category")
+    public CustomApiResponse<List<SpDetailRes>> getSpDetailsFilteredCategory(@AuthenticationPrincipal Long memberId,
+                                                                             @RequestParam SubCategory category) {
+        List<SpDetailRes> spDetailResList = spService.getSpDetailsFilteredCategory(memberId, category);
         return CustomApiResponse.onSuccess(spDetailResList);
     }
 

@@ -2,6 +2,7 @@ package com.pitchain.service;
 
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.constant.S3UploadTarget;
+import com.pitchain.common.constant.SubCategory;
 import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.dto.SpWithLikeDto;
 import com.pitchain.dto.req.CreateSpReq;
@@ -12,6 +13,7 @@ import com.pitchain.entity.Sp;
 import com.pitchain.repository.EntityFacade;
 import com.pitchain.repository.MyBmRepository;
 import com.pitchain.repository.SpRepository;
+import com.pitchain.repository.SpRepositoryCustom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,7 @@ import java.util.List;
 public class SpService {
     private final EntityFacade entityFacade;
     private final SpRepository spRepository;
+    private final SpRepositoryCustom spRepositoryCustom;
     private final MyBmRepository myBmRepository;
     private final S3Service s3Service;
 
@@ -58,7 +61,27 @@ public class SpService {
                     List<String> subCategories = bm.getSubCategories();
 
                     String logoImgURL = s3Service.getFileURL(bm.getLogoImgKey());
-                    return SpDetailRes.createRes(spWithLikeDto, spURL,thumbnailImgURL, likeCnt, subCategories, logoImgURL);
+                    return SpDetailRes.createRes(spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories, logoImgURL);
+                })
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<SpDetailRes> getSpDetailsFilteredCategory(Long memberId, SubCategory category) {
+        List<SpWithLikeDto> spWithLikeDtos = spRepositoryCustom.getSpWithLikeDtoFilteredCategory(memberId, category);
+
+        return spWithLikeDtos.stream()
+                .map(spWithLikeDto -> {
+                    Sp sp = spWithLikeDto.getSp();
+                    String spURL = s3Service.getFileURL(sp.getSpKey());
+                    String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
+
+                    Bm bm = sp.getBm();
+                    long likeCnt = myBmRepository.countByBm(bm);
+                    List<String> subCategories = bm.getSubCategories();
+                    String logoImgURL = s3Service.getFileURL(bm.getLogoImgKey());
+
+                    return SpDetailRes.createRes(spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories, logoImgURL);
                 })
                 .toList();
     }

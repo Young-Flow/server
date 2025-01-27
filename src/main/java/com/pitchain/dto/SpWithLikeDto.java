@@ -1,12 +1,17 @@
 package com.pitchain.dto;
 
 import com.pitchain.entity.Sp;
-import lombok.AllArgsConstructor;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
 public class SpWithLikeDto {
     Sp sp;
     boolean isLiked;
+
+    @QueryProjection
+    public SpWithLikeDto(Sp sp, boolean isLiked) {
+        this.sp = sp;
+        this.isLiked = isLiked;
+    }
 }
