@@ -10,9 +10,11 @@ import com.pitchain.dto.res.BmDetailRes;
 import com.pitchain.dto.res.PtImgRes;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.Member;
+import com.pitchain.entity.MyBmHistory;
 import com.pitchain.entity.PtImg;
 import com.pitchain.repository.BmRepository;
 import com.pitchain.repository.EntityFacade;
+import com.pitchain.repository.MyBmHistoryRepository;
 import com.pitchain.repository.MyBmRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,7 @@ public class BmService {
     private final EntityFacade entityFacade;
     private final BmRepository bmRepository;
     private final MyBmRepository myBmRepository;
+    private final MyBmHistoryRepository myBmHistoryRepository;
     private final S3Service s3Service;
 
     public void createBm(Long memberId, CreateBmReq createBmReq, MultipartFile logoImg, MultipartFile descImg) {
@@ -57,6 +60,9 @@ public class BmService {
         String spURL = s3Service.getFileURL(bm.getSpKey());
         String logoImgURL = s3Service.getFileURL(bm.getLogoImgKey());
         String descImgURL = s3Service.getFileURL(bm.getDescImgKey());
+
+        myBmHistoryRepository.findByMemberAndBm(member, bm)
+                .orElse(myBmHistoryRepository.save(new MyBmHistory(member, bm)));
 
         return BmDetailRes.createRes(bmWithLikeDto, likeCnt, ptImgResList, subCategories, spURL, logoImgURL, descImgURL);
     }
