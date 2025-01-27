@@ -18,10 +18,10 @@ import java.util.UUID;
 @SpringBootTest
 @Transactional
 @ActiveProfiles("test")
-class CategoryPrefServiceTest {
+class BmPrefServiceTest {
 
     @Autowired
-    CategoryPrefService categoryPrefService;
+    BmPrefService bmPrefService;
     @Autowired
     MemberRepository memberRepository;
 
@@ -32,7 +32,7 @@ class CategoryPrefServiceTest {
         List<SubCategory> subCategories = List.of(SubCategory.BEVERAGE_COFFEE, SubCategory.ALCOHOL);
 
         //when
-        categoryPrefService.createCategoryPref(member.getId(), subCategories);
+        bmPrefService.createCategoryPref(member.getId(), subCategories);
 
         //then
         List<CategoryPref> categoryPrefs = member.getCategoryPrefs();

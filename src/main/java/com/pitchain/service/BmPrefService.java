@@ -14,7 +14,7 @@ import java.util.List;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class CategoryPrefService {
+public class BmPrefService {
 
     private final MemberRepository memberRepository;
 

@@ -37,15 +37,12 @@ public class Member extends BaseEntity {
     private List<Investment> investments = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
-    private List<MyCategory> myCategories = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member")
     private List<MyBm> myBms = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CategoryPref> categoryPrefs = new ArrayList<>();
 
     public Member(String name, String email, Country country, String profileImgKey) {
@@ -57,6 +54,7 @@ public class Member extends BaseEntity {
 
     public void addCategoryPref(List<SubCategory> subCategories) {
         for (SubCategory subCategory : subCategories) {
+            System.out.println("subCategory = " + subCategory);
             this.categoryPrefs.add(new CategoryPref(this, subCategory));
         }
     }
