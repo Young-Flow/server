@@ -60,6 +60,12 @@ class SpServiceTest {
                 1000L, 1000, LocalDate.now(), "bm_long_pitch_url"));
     }
 
+    private Bm saveBmWithMainCategory(Member member, MainCategory mainCategory) {
+        return bmRepository.save(new Bm(member, "bm_name", mainCategory, "bm_company", "bm_logo_img_key",
+                "bm_intro", "bm_description", "bm_desc_img_key", "bm_address", 100000L,
+                1000L, 1000, LocalDate.now(), "bm_long_pitch_url"));
+    }
+
     private Sp saveSp(Bm bm) {
         return spRepository.save(
                 new Sp(bm, SP_KEY, THUMBNAIL_IMG.getOriginalFilename(), SP_NAME));
@@ -187,30 +193,25 @@ class SpServiceTest {
         Member member2 = saveMember();
         Member member3 = saveMember();
 
-        Bm bm1 = saveBm(member1);
-        Bm bm2 = saveBm(member2);
-        Bm bm3 = saveBm(member3);
+        Bm bm1 = saveBmWithMainCategory(member1, MainCategory.TECH_DIGITAL);
+        Bm bm2 = saveBmWithMainCategory(member2, MainCategory.TECH_DIGITAL);
+        Bm bm3 = saveBmWithMainCategory(member3, MainCategory.FOOD);
 
         myBmRepository.save(new MyBm(member1, bm1));
         myBmRepository.save(new MyBm(member2, bm1));
-
-        bm1.addSubCategories(List.of(SubCategory.RESALE, SubCategory.ECOMMERCE));
-        bm2.addSubCategories(List.of(SubCategory.RESALE, SubCategory.CAMPING));
-        bm3.addSubCategories(List.of(SubCategory.APP_DEVELOPMENT, SubCategory.AI_ML));
 
         Sp sp1 = saveSp(bm1);
         Sp sp2 = saveSp(bm2);
         Sp sp3 = saveSp(bm3);
 
         //when
-        List<SpDetailRes> spDetails = spService.getSpDetailsFilteredCategory(member1.getId(), SubCategory.RESALE);
+        List<SpDetailRes> spDetails = spService.getSpDetailsFilteredCategory(member1.getId(), MainCategory.TECH_DIGITAL);
 
         // then
         assertThat(spDetails).hasSize(2);
 
         assertThat(spDetails.get(0).bmId()).isEqualTo(bm1.getId());
         assertThat(spDetails.get(0).mainCategory()).isEqualTo(bm1.getMainCategory().getKoreanName());
-        assertThat(spDetails.get(0).subCategories()).containsExactlyInAnyOrder(SubCategory.RESALE.getKoreanName(), SubCategory.ECOMMERCE.getKoreanName());
         assertThat(spDetails.get(0).name()).isEqualTo(sp1.getName());
         assertThat(spDetails.get(0).views()).isEqualTo(sp1.getViews());
         assertThat(spDetails.get(0).company()).isEqualTo(bm1.getCompany());
@@ -219,7 +220,6 @@ class SpServiceTest {
 
         assertThat(spDetails.get(1).bmId()).isEqualTo(bm2.getId());
         assertThat(spDetails.get(1).mainCategory()).isEqualTo(bm2.getMainCategory().getKoreanName());
-        assertThat(spDetails.get(1).subCategories()).containsExactlyInAnyOrder(SubCategory.RESALE.getKoreanName(), SubCategory.CAMPING.getKoreanName());
         assertThat(spDetails.get(1).name()).isEqualTo(sp2.getName());
         assertThat(spDetails.get(1).views()).isEqualTo(sp2.getViews());
         assertThat(spDetails.get(1).company()).isEqualTo(bm2.getCompany());

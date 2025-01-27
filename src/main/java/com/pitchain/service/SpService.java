@@ -1,8 +1,8 @@
 package com.pitchain.service;
 
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
+import com.pitchain.common.constant.MainCategory;
 import com.pitchain.common.constant.S3UploadTarget;
-import com.pitchain.common.constant.SubCategory;
 import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.dto.SpWithLikeDto;
 import com.pitchain.dto.req.CreateSpReq;
@@ -67,8 +67,8 @@ public class SpService {
     }
 
     @Transactional(readOnly = true)
-    public List<SpDetailRes> getSpDetailsFilteredCategory(Long memberId, SubCategory category) {
-        List<SpWithLikeDto> spWithLikeDtos = spRepositoryCustom.getSpWithLikeDtoFilteredCategory(memberId, category);
+    public List<SpDetailRes> getSpDetailsFilteredCategory(Long memberId, MainCategory mainCategory) {
+        List<SpWithLikeDto> spWithLikeDtos = spRepositoryCustom.getSpWithLikeDtoFilteredCategory(memberId, mainCategory);
 
         return spWithLikeDtos.stream()
                 .map(spWithLikeDto -> {
