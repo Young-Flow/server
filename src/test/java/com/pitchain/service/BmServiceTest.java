@@ -13,6 +13,7 @@ import com.pitchain.dto.res.PtImgRes;
 import com.pitchain.entity.*;
 import com.pitchain.repository.BmRepository;
 import com.pitchain.repository.MemberRepository;
+import com.pitchain.repository.MyBmHistoryRepository;
 import com.pitchain.repository.MyBmRepository;
 import jakarta.transaction.Transactional;
 import org.apache.logging.log4j.util.Strings;
@@ -44,6 +45,8 @@ class BmServiceTest {
     private MemberRepository memberRepository;
     @Autowired
     private MyBmRepository myBmRepository;
+    @Autowired
+    private MyBmHistoryRepository myBmHistoryRepository;
 
     private static final String NAME = "bm_name";
     private static final MainCategory MAIN_CATEGORY = MainCategory.FOOD;
@@ -68,11 +71,13 @@ class BmServiceTest {
     private Member saveMember() {
         return memberRepository.save(new Member("member_name", UUID.randomUUID().toString(), Country.ROK, Strings.EMPTY));
     }
+
     private Bm saveBm(Member member) {
         return bmRepository.save(new Bm(member, NAME, MAIN_CATEGORY, COMPANY, LOGO_IMG_KEY,
                 INTRO, DESCRIPTION, DESC_IMG_KEY, ADDRESS, VALUATION_CAP,
                 GOAL_INVESTMENT, MAX_ISSUED_SHARE, DEADLINE, LONG_PITCH_URL));
     }
+
     private List<PtImg> createPtImgs(Bm bm) {
         return List.of(
                 new PtImg(bm, 1, "fake_01.jpg"),
@@ -152,6 +157,8 @@ class BmServiceTest {
         assertThat(bmDetail.likeCnt()).isEqualTo(0);
         assertThat(bmDetail.ptImgResList()).isEqualTo(ptImgResList);
         assertThat(bmDetail.subCategories()).isEqualTo(subCategories);
+
+        assertThat(myBmHistoryRepository.findByMemberAndBm(member, bm).get()).isNotNull();
     }
 
     @Test
@@ -193,6 +200,8 @@ class BmServiceTest {
         assertThat(bmDetail.likeCnt()).isEqualTo(2);
         assertThat(bmDetail.ptImgResList()).isEqualTo(ptImgResList);
         assertThat(bmDetail.subCategories()).isEqualTo(subCategories);
+
+        assertThat(myBmHistoryRepository.findByMemberAndBm(member_01, bm).get()).isNotNull();
     }
 
     @Test
