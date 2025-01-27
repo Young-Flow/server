@@ -92,6 +92,9 @@ tasks.named('test') {
 tasks.named("generateSentryBundleIdJava") {
     dependsOn "compileJava"
 }
+tasks.named("sentryCollectSourcesJava") {
+    dependsOn "compileJava"
+}
 
 // pain jar 파일 생성 비활성화
 jar {
