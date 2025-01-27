@@ -50,6 +50,14 @@ public class TokenUtil {
                 .sign(Algorithm.HMAC512(secretKey));
     }
 
+    // todo 프로토타입 시연을 위한 임시 메소드
+    public String issueAccessTokenWithoutExpiration(Long memberId) {
+        return JWT.create()
+                .withSubject(ACCESS_TOKEN_SUBJECT)
+                .withClaim("id", memberId)
+                .sign(Algorithm.HMAC512(secretKey));
+    }
+
     public String issueRefreshToken(Long memberId) {
         String refreshToken = JWT.create()
                 .withSubject(REFRESH_TOKEN_SUBJECT)
