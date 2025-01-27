@@ -54,7 +54,6 @@ public class Member extends BaseEntity {
 
     public void addCategoryPref(List<SubCategory> subCategories) {
         for (SubCategory subCategory : subCategories) {
-            System.out.println("subCategory = " + subCategory);
             this.categoryPrefs.add(new CategoryPref(this, subCategory));
         }
     }
