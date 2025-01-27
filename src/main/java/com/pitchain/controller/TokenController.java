@@ -18,7 +18,7 @@ public class TokenController {
     @Operation(summary = "토큰 발급 / 개발용")
     @GetMapping("/dev-token")
     public CustomApiResponse<String> token(@RequestParam Long id) {
-        return CustomApiResponse.onSuccess(tokenUtil.issueAccessToken(id));
+        return CustomApiResponse.onSuccess(tokenUtil.issueAccessTokenWithoutExpiration(id));
     }
 
 }
