@@ -54,6 +54,15 @@ jobs:
         mkdir -p $YML_DIR
         echo -n "$YML" | base64 --decode > $YML_DIR/$YML_NAME
 
+    - name: Copy application-test.yml
+      env:
+        YML: ${{ secrets.APPLICATION_TEST_YML }}
+        YML_DIR: src/test/resources
+        YML_NAME: application-test.yml
+      run: |
+        mkdir -p $YML_DIR
+        echo -n "$YML" | base64 --decode > $YML_DIR/$YML_NAME    
+
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 

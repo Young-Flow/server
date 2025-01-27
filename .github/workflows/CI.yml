@@ -42,10 +42,19 @@ jobs:
         mkdir -p $YML_DIR
         echo -n "$YML" | base64 --decode > $YML_DIR/$YML_NAME
 
-    - name: 5. Grant execute permission for gradlew
+    - name: 5. Copy application-test.yml
+      env:
+        YML: ${{ secrets.APPLICATION_TEST_YML }}
+        YML_DIR: src/test/resources
+        YML_NAME: application-test.yml
+      run: |
+        mkdir -p $YML_DIR
+        echo -n "$YML" | base64 --decode > $YML_DIR/$YML_NAME
+
+    - name: 6. Grant execute permission for gradlew
       run: chmod +x gradlew
 
-    - name: 6. Build with Gradle
+    - name: 7. Build with Gradle
       env:
         SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       run: ./gradlew clean build
