@@ -98,7 +98,4 @@ jar {
     enabled = false
 }
 
-test {
-    systemProperty 'spring.profiles.active', 'prod'
-}
 
