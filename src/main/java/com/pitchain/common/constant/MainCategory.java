@@ -1,5 +1,10 @@
 package com.pitchain.common.constant;
 
+import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
+import com.pitchain.common.exception.GeneralHandler;
+
+import java.util.Arrays;
+
 public enum MainCategory {
     TECH_DIGITAL("테크/디지털"),
     COMMERCE_PLATFORM_COMMUNITY("커머스/플랫폼/커뮤니티"),
@@ -23,5 +28,12 @@ public enum MainCategory {
 
     public String getKoreanName() {
         return koreanName;
+    }
+
+    public static MainCategory from(String koreanName) {
+        return Arrays.stream(values())
+                .filter(val -> koreanName.equals(val.koreanName))
+                .findFirst()
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MAIN_CATEGORY_NOT_FOUND));
     }
 }

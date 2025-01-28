@@ -36,8 +36,8 @@ public class SpController {
 
     @GetMapping("/category")
     public CustomApiResponse<List<SpDetailRes>> getSpDetailsFilteredCategory(@AuthenticationPrincipal Long memberId,
-                                                                             @RequestParam MainCategory mainCategory) {
-        List<SpDetailRes> spDetailResList = spService.getSpDetailsFilteredCategory(memberId, mainCategory);
+                                                                             @RequestParam String mainCategoryInKorean) {
+        List<SpDetailRes> spDetailResList = spService.getSpDetailsFilteredCategory(memberId, mainCategoryInKorean);
         return CustomApiResponse.onSuccess(spDetailResList);
     }
 

@@ -67,7 +67,8 @@ public class SpService {
     }
 
     @Transactional(readOnly = true)
-    public List<SpDetailRes> getSpDetailsFilteredCategory(Long memberId, MainCategory mainCategory) {
+    public List<SpDetailRes> getSpDetailsFilteredCategory(Long memberId, String mainCategoryInKorean) {
+        MainCategory mainCategory = MainCategory.from(mainCategoryInKorean);
         List<SpWithLikeDto> spWithLikeDtos = spRepositoryCustom.getSpWithLikeDtoFilteredCategory(memberId, mainCategory);
 
         return spWithLikeDtos.stream()

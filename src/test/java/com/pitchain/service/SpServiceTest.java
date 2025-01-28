@@ -205,7 +205,7 @@ class SpServiceTest {
         Sp sp3 = saveSp(bm3);
 
         //when
-        List<SpDetailRes> spDetails = spService.getSpDetailsFilteredCategory(member1.getId(), MainCategory.TECH_DIGITAL);
+        List<SpDetailRes> spDetails = spService.getSpDetailsFilteredCategory(member1.getId(), MainCategory.TECH_DIGITAL.getKoreanName());
 
         // then
         assertThat(spDetails).hasSize(2);
