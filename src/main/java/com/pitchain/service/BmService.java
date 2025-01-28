@@ -61,7 +61,7 @@ public class BmService {
         String descImgURL = s3Service.getFileURL(bm.getDescImgKey());
 
         myBmHistoryRepository.findByMemberAndBm(member, bm)
-                .orElse(myBmHistoryRepository.save(new MyBmHistory(member, bm)));
+                .orElseGet(() -> myBmHistoryRepository.save(new MyBmHistory(member, bm)));
 
         return BmDetailRes.createRes(bmWithLikeDto, likeCnt, ptImgResList, subCategories, spURL, logoImgURL, descImgURL);
     }
