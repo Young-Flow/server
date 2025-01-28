@@ -77,8 +77,8 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = GeneralHandler.class)
     public ResponseEntity onThrowException(GeneralHandler generalHandler, HttpServletRequest request) {
         sendToSentry(generalHandler);
-        ResponseDTO errorHttpStatus = generalHandler.getErrorHttpStatus();
-        return handleExceptionInternal(generalHandler, errorHttpStatus, null, request);
+        ResponseDTO error = generalHandler.getError();
+        return handleExceptionInternal(generalHandler, error, null, request);
     }
 
     private static void sendToSentry(Exception e) {
