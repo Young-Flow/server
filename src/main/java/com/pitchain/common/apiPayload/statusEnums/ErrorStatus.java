@@ -59,15 +59,6 @@ public enum ErrorStatus implements ResponseStatus {
                 .message(message)
                 .code(code)
                 .isSuccess(false)
-                .build();
-    }
-
-    @Override
-    public ResponseDTO getHttpStatusDto() {
-        return ResponseDTO.builder()
-                .message(message)
-                .code(code)
-                .isSuccess(false)
                 .httpStatus(httpStatus)
                 .build();
     }

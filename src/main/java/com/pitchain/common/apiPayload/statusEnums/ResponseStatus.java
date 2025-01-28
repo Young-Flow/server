@@ -6,6 +6,4 @@ public interface ResponseStatus {
 
     public ResponseDTO getDto();
 
-    public ResponseDTO getHttpStatusDto();
-
 }

@@ -22,15 +22,6 @@ public enum SuccessStatus implements ResponseStatus {
                 .message(message)
                 .code(code)
                 .isSuccess(true)
-                .build();
-    }
-
-    @Override
-    public ResponseDTO getHttpStatusDto() {
-        return ResponseDTO.builder()
-                .message(message)
-                .code(code)
-                .isSuccess(true)
                 .httpStatus(httpStatus)
                 .build();
     }

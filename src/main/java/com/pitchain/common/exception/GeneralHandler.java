@@ -17,8 +17,4 @@ public class GeneralHandler extends RuntimeException {
     public ResponseDTO getError() {
         return this.errorStatus.getDto();
     }
-
-    public ResponseDTO getErrorHttpStatus() {
-        return this.errorStatus.getHttpStatusDto();
-    }
 }
