@@ -58,10 +58,44 @@ dependencies {
 
     // httpclient5
     implementation 'org.apache.httpcomponents.client5:httpclient5'
+
+    // QueryDSL 추가
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+    testImplementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
 }
+
+// ------------------
+// Querydsl 설정부
+def generated = 'build/generated/querydsl'
+
+// querydsl QClass 파일 생성 위치를 지정
+tasks.withType(JavaCompile) {
+    options.getGeneratedSourceOutputDirectory().set(file(generated))
+}
+// java source set 에 querydsl QClass 위치 추가
+sourceSets {
+    main.java.srcDirs += [generated]
+}
+// gradle clean 시에 QClass 디렉토리 삭제
+clean {
+    delete file(generated)
+}
+// ------------------
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+// task 의존관계 설정
+tasks.named("generateSentryBundleIdJava") {
+    dependsOn "compileJava"
+}
+tasks.named("sentryCollectSourcesJava") {
+    dependsOn "compileJava"
+    dependsOn "compileTestJava"
 }
 
 // pain jar 파일 생성 비활성화
@@ -69,6 +103,4 @@ jar {
     enabled = false
 }
 
-test {
-    systemProperty 'spring.profiles.active', 'prod'
-}
+

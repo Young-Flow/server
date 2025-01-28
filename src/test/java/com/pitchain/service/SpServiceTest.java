@@ -6,7 +6,10 @@ import com.pitchain.common.constant.S3UploadTarget;
 import com.pitchain.common.constant.SubCategory;
 import com.pitchain.dto.req.CreateSpReq;
 import com.pitchain.dto.res.SpDetailRes;
-import com.pitchain.entity.*;
+import com.pitchain.entity.Bm;
+import com.pitchain.entity.Member;
+import com.pitchain.entity.MyBm;
+import com.pitchain.entity.Sp;
 import com.pitchain.repository.BmRepository;
 import com.pitchain.repository.MemberRepository;
 import com.pitchain.repository.MyBmRepository;
@@ -52,7 +55,13 @@ class SpServiceTest {
     }
 
     private Bm saveBm(Member member) {
-        return bmRepository.save(new Bm(member, "bm_name", MainCategory.FOOD,"bm_company", "bm_logo_img_key",
+        return bmRepository.save(new Bm(member, "bm_name", MainCategory.FOOD, "bm_company", "bm_logo_img_key",
+                "bm_intro", "bm_description", "bm_desc_img_key", "bm_address", 100000L,
+                1000L, 1000, LocalDate.now(), "bm_long_pitch_url"));
+    }
+
+    private Bm saveBmWithMainCategory(Member member, MainCategory mainCategory) {
+        return bmRepository.save(new Bm(member, "bm_name", mainCategory, "bm_company", "bm_logo_img_key",
                 "bm_intro", "bm_description", "bm_desc_img_key", "bm_address", 100000L,
                 1000L, 1000, LocalDate.now(), "bm_long_pitch_url"));
     }
@@ -175,6 +184,47 @@ class SpServiceTest {
                         List.of(sp_1.getBm().getId(), sp_2.getBm().getId())
                 );
         assertThat(isContainBmIds).isTrue();
+    }
+
+    @Test
+    void SP_카테고리_필터링_조회() {
+        //given
+        Member member1 = saveMember();
+        Member member2 = saveMember();
+        Member member3 = saveMember();
+
+        Bm bm1 = saveBmWithMainCategory(member1, MainCategory.TECH_DIGITAL);
+        Bm bm2 = saveBmWithMainCategory(member2, MainCategory.TECH_DIGITAL);
+        Bm bm3 = saveBmWithMainCategory(member3, MainCategory.FOOD);
+
+        myBmRepository.save(new MyBm(member1, bm1));
+        myBmRepository.save(new MyBm(member2, bm1));
+
+        Sp sp1 = saveSp(bm1);
+        Sp sp2 = saveSp(bm2);
+        Sp sp3 = saveSp(bm3);
+
+        //when
+        List<SpDetailRes> spDetails = spService.getSpDetailsFilteredCategory(member1.getId(), MainCategory.TECH_DIGITAL.getKoreanName());
+
+        // then
+        assertThat(spDetails).hasSize(2);
+
+        assertThat(spDetails.get(0).bmId()).isEqualTo(bm1.getId());
+        assertThat(spDetails.get(0).mainCategory()).isEqualTo(bm1.getMainCategory().getKoreanName());
+        assertThat(spDetails.get(0).name()).isEqualTo(sp1.getName());
+        assertThat(spDetails.get(0).views()).isEqualTo(sp1.getViews());
+        assertThat(spDetails.get(0).company()).isEqualTo(bm1.getCompany());
+        assertThat(spDetails.get(0).isLiked()).isTrue();
+        assertThat(spDetails.get(0).likeCnt()).isEqualTo(2);
+
+        assertThat(spDetails.get(1).bmId()).isEqualTo(bm2.getId());
+        assertThat(spDetails.get(1).mainCategory()).isEqualTo(bm2.getMainCategory().getKoreanName());
+        assertThat(spDetails.get(1).name()).isEqualTo(sp2.getName());
+        assertThat(spDetails.get(1).views()).isEqualTo(sp2.getViews());
+        assertThat(spDetails.get(1).company()).isEqualTo(bm2.getCompany());
+        assertThat(spDetails.get(1).isLiked()).isFalse();
+        assertThat(spDetails.get(1).likeCnt()).isEqualTo(0);
     }
 
     @Test
