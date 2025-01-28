@@ -18,9 +18,13 @@ public class BmPrefService {
 
     private final MemberRepository memberRepository;
 
-    public void createCategoryPref(Long memberId, List<SubCategory> subCategories) {
+    public void createCategoryPref(Long memberId, List<String> subCategoriesInKorean) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        List<SubCategory> subCategories = subCategoriesInKorean.stream()
+                .map(SubCategory::from)
+                .toList();
 
         member.addCategoryPref(subCategories);
     }

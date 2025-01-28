@@ -29,6 +29,9 @@ public enum ErrorStatus implements ResponseStatus {
     // bm
     BM_NOT_FOUND(HttpStatus.NOT_FOUND, "BM4041","존재하지 않는 BM입니다."),
 
+    // subCategory
+    SUB_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "SUB_CATEGORY4041", "존재하지 않는 서브 카테고리입니다."),
+
     // sp
     SP_NOT_FOUND(HttpStatus.NOT_FOUND, "SP4041","존재하지 않는 SP입니다."),
 
