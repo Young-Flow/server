@@ -45,7 +45,6 @@ public class BmService {
         bmRepository.save(newBm);
     }
 
-    @Transactional(readOnly = true)
     public BmDetailRes getBmDetail(Long memberId, Long bmId) {
         Member member = entityFacade.getMember(memberId);
 
