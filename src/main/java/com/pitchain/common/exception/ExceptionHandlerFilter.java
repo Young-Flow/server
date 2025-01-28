@@ -22,9 +22,10 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } catch (RuntimeException e) {
-            GeneralHandler generalHandler = (GeneralHandler) e;
-            ResponseDTO error = generalHandler.getError();
-            setResponse(response, error);
+            if (e instanceof GeneralHandler generalHandler) {
+              ResponseDTO error = generalHandler.getError();
+              setResponse(response, error);
+            }
         }
     }
 
