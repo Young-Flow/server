@@ -4,7 +4,7 @@ import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.constant.Country;
 import com.pitchain.common.constant.MainCategory;
 import com.pitchain.common.exception.GeneralHandler;
-import com.pitchain.dto.CommentDto;
+import com.pitchain.dto.req.CommentReq;
 import com.pitchain.dto.res.BaseCommentRes;
 import com.pitchain.dto.res.CommentRes;
 import com.pitchain.dto.res.DeletedCommentRes;
@@ -60,12 +60,12 @@ class CommentServiceTest {
         Member member = saveMember();
         Bm bm = saveBm(member);
 
-        CommentDto.AddCommentDto commentDto = new CommentDto.AddCommentDto();
+        CommentReq.AddCommentReq addCommentReq = new CommentReq.AddCommentReq();
         String content = "댓글 내용";
-        commentDto.setContent(content);
+        addCommentReq.setContent(content);
 
         //when
-        commentService.addComment(bm.getId(), member.getId(), commentDto);
+        commentService.addComment(bm.getId(), member.getId(), addCommentReq);
 
         //then
         List<Comment> comments = commentRepository.findByBm(bm);
@@ -87,13 +87,13 @@ class CommentServiceTest {
         Comment parentComment = saveComment(member, bm);
         Long parentCommentId = parentComment.getId();
 
-        CommentDto.AddCommentDto replyCommentDto = new CommentDto.AddCommentDto();
+        CommentReq.AddCommentReq addReplyCommentReq = new CommentReq.AddCommentReq();
         String replyCommentContent = "답글 내용";
-        replyCommentDto.setContent(replyCommentContent);
-        replyCommentDto.setParentCommentId(parentCommentId);
+        addReplyCommentReq.setContent(replyCommentContent);
+        addReplyCommentReq.setParentCommentId(parentCommentId);
 
         //when
-        commentService.addComment(bm.getId(), member.getId(), replyCommentDto);
+        commentService.addComment(bm.getId(), member.getId(), addReplyCommentReq);
 
         //then
         List<Comment> comments = commentRepository.findByBm(bm);
@@ -202,12 +202,12 @@ class CommentServiceTest {
         Comment comment = saveComment(member, bm);
         Long commentId = comment.getId();
 
-        CommentDto.ModifyCommentDto modifyCommentDto = new CommentDto.ModifyCommentDto();
+        CommentReq.ModifyCommentReq modifyCommentReq = new CommentReq.ModifyCommentReq();
         String modifiedContent = "변경된 댓글 내용";
-        modifyCommentDto.setContent(modifiedContent);
+        modifyCommentReq.setContent(modifiedContent);
 
         //when
-        commentService.modifyComment(commentId, member.getId(), modifyCommentDto);
+        commentService.modifyComment(commentId, member.getId(), modifyCommentReq);
 
         //then
         Comment modifiedComment = commentRepository.findById(commentId).orElseThrow();
@@ -228,13 +228,13 @@ class CommentServiceTest {
         Member invalidMember = saveMember();
         Long invalidId = Long.MAX_VALUE;
 
-        CommentDto.ModifyCommentDto modifyCommentDto = new CommentDto.ModifyCommentDto();
-        modifyCommentDto.setContent("댓글 내용");
+        CommentReq.ModifyCommentReq modifyCommentReq = new CommentReq.ModifyCommentReq();
+        modifyCommentReq.setContent("댓글 내용");
 
         //when
-        GeneralHandler error1 = Assertions.assertThrows(GeneralHandler.class, () -> commentService.modifyComment(commentId, invalidMember.getId(), modifyCommentDto));
-        GeneralHandler error2 = Assertions.assertThrows(GeneralHandler.class, () -> commentService.modifyComment(invalidId, member.getId(), modifyCommentDto));
-        GeneralHandler error3 = Assertions.assertThrows(GeneralHandler.class, () -> commentService.modifyComment(commentId, invalidId, modifyCommentDto));
+        GeneralHandler error1 = Assertions.assertThrows(GeneralHandler.class, () -> commentService.modifyComment(commentId, invalidMember.getId(), modifyCommentReq));
+        GeneralHandler error2 = Assertions.assertThrows(GeneralHandler.class, () -> commentService.modifyComment(invalidId, member.getId(), modifyCommentReq));
+        GeneralHandler error3 = Assertions.assertThrows(GeneralHandler.class, () -> commentService.modifyComment(commentId, invalidId, modifyCommentReq));
 
         //then
         assertThat(error1.getErrorStatus()).isEqualTo(ErrorStatus.MEMBER_FORBIDDEN);

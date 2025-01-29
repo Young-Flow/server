@@ -2,7 +2,7 @@ package com.pitchain.service;
 
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.exception.GeneralHandler;
-import com.pitchain.dto.CommentDto;
+import com.pitchain.dto.req.CommentReq;
 import com.pitchain.dto.res.BaseCommentRes;
 import com.pitchain.dto.res.CommentRes;
 import com.pitchain.dto.res.DeletedCommentRes;
@@ -29,14 +29,14 @@ public class CommentService {
     private final S3Service s3Service;
 
     @Transactional
-    public void addComment(Long bmId, Long memberId, CommentDto.AddCommentDto dto) {
+    public void addComment(Long bmId, Long memberId, CommentReq.AddCommentReq req) {
         Member member = memberRepository.findById(memberId).orElseThrow(() ->
                 new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
         Bm bm = bmRepository.findById(bmId).orElseThrow(() ->
                 new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
 
-        String content = dto.getContent();
-        Long parentCommentId = dto.getParentCommentId();
+        String content = req.getContent();
+        Long parentCommentId = req.getParentCommentId();
 
         if (isOwnedBy(parentCommentId)) {
             addReplyComment(member, bm, content, parentCommentId);
@@ -93,7 +93,7 @@ public class CommentService {
     }
 
     @Transactional
-    public void modifyComment(Long commentId, Long memberId, CommentDto.ModifyCommentDto dto) {
+    public void modifyComment(Long commentId, Long memberId, CommentReq.ModifyCommentReq req) {
         Member member = memberRepository.findById(memberId).orElseThrow(() ->
                 new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
         Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
@@ -102,7 +102,7 @@ public class CommentService {
         Member commentWriter = comment.getMember();
         validateWriter(member, commentWriter);
 
-        String content = dto.getContent();
+        String content = req.getContent();
         comment.changeComment(content);
     }
 

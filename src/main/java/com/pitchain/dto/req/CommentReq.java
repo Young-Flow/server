@@ -1,15 +1,15 @@
-package com.pitchain.dto;
+package com.pitchain.dto.req;
 
 import jakarta.annotation.Nullable;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-public class CommentDto {
+public class CommentReq {
 
     @Getter
     @Setter
-    public static class AddCommentDto {
+    public static class AddCommentReq {
         @Nullable
         private Long parentCommentId;
         private String content;
@@ -17,7 +17,7 @@ public class CommentDto {
 
     @Getter
     @Setter
-    public static class ModifyCommentDto {
+    public static class ModifyCommentReq {
         private String content;
     }
 }

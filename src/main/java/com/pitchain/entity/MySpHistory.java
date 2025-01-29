@@ -1,5 +1,6 @@
 package com.pitchain.entity;
 
+import com.pitchain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -8,11 +9,11 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MyBmHistory {
+public class MySpHistory extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "my_bm_history_id")
+    @Column(name = "my_sp_history_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -23,8 +24,16 @@ public class MyBmHistory {
     @JoinColumn(name = "bm_id")
     private Bm bm;
 
-    public MyBmHistory(Member member, Bm bm) {
+    @Column(nullable = false)
+    private int viewTime;  //단위: ms
+
+    public MySpHistory(Member member, Bm bm, int viewTime) {
         this.member = member;
         this.bm = bm;
+        this.viewTime = viewTime;
+    }
+
+    public void updateViewTime(int viewTime) {
+        this.viewTime = viewTime;
     }
 }

@@ -1,7 +1,7 @@
 package com.pitchain.controller;
 
 import com.pitchain.common.apiPayload.dto.CustomApiResponse;
-import com.pitchain.dto.CommentDto;
+import com.pitchain.dto.req.CommentReq;
 import com.pitchain.dto.res.BaseCommentRes;
 import com.pitchain.service.CommentService;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +20,8 @@ public class CommentController {
     @PostMapping("/{bmId}/comments")
     public CustomApiResponse addComment(@PathVariable("bmId") Long bmId,
                                         @AuthenticationPrincipal Long memberId,
-                                        @RequestBody CommentDto.AddCommentDto dto) {
-        commentService.addComment(bmId, memberId, dto);
+                                        @RequestBody CommentReq.AddCommentReq req) {
+        commentService.addComment(bmId, memberId, req);
         return CustomApiResponse.onSuccess();
     }
 
@@ -35,8 +35,8 @@ public class CommentController {
     public CustomApiResponse modifyComment(@PathVariable("bmId") Long bmId,
                                            @PathVariable("commentId") Long commentId,
                                            @AuthenticationPrincipal Long memberId,
-                                           @RequestBody CommentDto.ModifyCommentDto dto) {
-        commentService.modifyComment(commentId, memberId, dto);
+                                           @RequestBody CommentReq.ModifyCommentReq req) {
+        commentService.modifyComment(commentId, memberId, req);
         return CustomApiResponse.onSuccess();
     }
 
