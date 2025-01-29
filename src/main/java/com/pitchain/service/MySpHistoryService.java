@@ -12,8 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class MySpHistoryService {
@@ -29,12 +27,10 @@ public class MySpHistoryService {
         Bm bm = bmRepository.findById(bmId)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
 
-        Optional<MySpHistory> existingMySpHistory = mySpHistoryRepository.findByMemberAndBm(member, bm);
-        if (existingMySpHistory.isEmpty()) {
-            mySpHistoryRepository.save(new MySpHistory(member, bm, viewTime));
-        } else {
-            MySpHistory mySpHistory = existingMySpHistory.get();
-            mySpHistory.updateViewTime(viewTime);
-        }
+        mySpHistoryRepository.findByMemberAndBm(member, bm)
+                .ifPresentOrElse(
+                        existingHistory -> existingHistory.updateViewTime(viewTime),
+                        () -> mySpHistoryRepository.save(new MySpHistory(member, bm, viewTime))
+                );
     }
 }
