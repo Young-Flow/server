@@ -29,7 +29,7 @@ public class Investment  extends BaseEntity {
     private long amount;
 
     @Builder
-    private Investment(Member member, Bm bm, long amount) {
+    public Investment(Member member, Bm bm, long amount) {
         this.member = member;
         this.bm = bm;
         this.amount = amount;
