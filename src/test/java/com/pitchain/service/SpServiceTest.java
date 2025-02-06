@@ -6,14 +6,9 @@ import com.pitchain.common.constant.S3UploadTarget;
 import com.pitchain.common.constant.SubCategory;
 import com.pitchain.dto.req.CreateSpReq;
 import com.pitchain.dto.res.SpDetailRes;
-import com.pitchain.entity.Bm;
-import com.pitchain.entity.Member;
-import com.pitchain.entity.MyBm;
-import com.pitchain.entity.Sp;
-import com.pitchain.repository.BmRepository;
-import com.pitchain.repository.MemberRepository;
-import com.pitchain.repository.MyBmRepository;
-import com.pitchain.repository.SpRepository;
+import com.pitchain.entity.*;
+import com.pitchain.repository.*;
+import jakarta.persistence.EntityManager;
 import org.apache.logging.log4j.util.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,6 +44,8 @@ class SpServiceTest {
     private BmRepository bmRepository;
     @Autowired
     private MyBmRepository myBmRepository;
+    @Autowired
+    private CategoryPrefRepository categoryPrefRepository;
 
     private Member saveMember() {
         return memberRepository.save(new Member("member_name", UUID.randomUUID().toString(), Country.ROK, Strings.EMPTY));
@@ -116,7 +113,7 @@ class SpServiceTest {
         Sp sp = saveSp(bm);
 
         bm.updateSubCategories(SUB_CATEGORIES);
-        List<String> subCategories = bm.getSubCategories();
+        List<String> subCategories = bm.getKoreanSubCategories();
 
         //when
         SpDetailRes spDetail = spService.getSpDetail(member.getId(), sp.getId());
@@ -144,7 +141,7 @@ class SpServiceTest {
         myBmRepository.save(new MyBm(newMember, bm));
 
         bm.updateSubCategories(SUB_CATEGORIES);
-        List<String> subCategories = bm.getSubCategories();
+        List<String> subCategories = bm.getKoreanSubCategories();
 
         //when
         SpDetailRes spDetail = spService.getSpDetail(member.getId(), sp.getId());
@@ -251,6 +248,38 @@ class SpServiceTest {
                 .map(SpDetailRes::bmId)
                 .toList())
                 .containsExactlyInAnyOrder(bm1.getId(), bm2.getId(), bm3.getId());
+    }
+
+    @Test
+    void 나의_선호_카테고리로_SP_조회() {
+        //given
+        Member member = saveMember();
+        categoryPrefRepository.save(new CategoryPref(member, SubCategory.AI_ML));
+        categoryPrefRepository.save(new CategoryPref(member, SubCategory.DATA_ANALYTICS));
+
+        Member member1 = saveMember();
+        Member member2 = saveMember();
+        Member member3 = saveMember();
+
+        Bm bm1 = saveBm(member1);
+        bm1.addSubCategories(List.of(SubCategory.AI_ML, SubCategory.APP_DEVELOPMENT));
+        Bm bm2 = saveBm(member2);
+        bm2.addSubCategories(List.of(SubCategory.BLOCKCHAIN_WEB3, SubCategory.DATA_ANALYTICS));
+        Bm bm3 = saveBm(member3);
+        bm3.addSubCategories(List.of(SubCategory.BEVERAGE_COFFEE, SubCategory.ALCOHOL));
+
+        saveSp(bm);
+        Sp sp1 = saveSp(bm1);
+        Sp sp2 = saveSp(bm2);
+        Sp sp3 = saveSp(bm3);
+
+        //when
+        List<SpDetailRes> spDetails = spService.getRecommendationByPref(member.getId());
+
+        //then
+        // 검증 생략
+        System.out.println("spDetails = " + spDetails.size());
+        spDetails.forEach(System.out::println);
     }
 
     @Test

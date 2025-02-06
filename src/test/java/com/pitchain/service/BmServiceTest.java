@@ -109,7 +109,7 @@ class BmServiceTest {
 
         assertThat(bm.getName()).isEqualTo(NAME);
         assertThat(bm.getMainCategory()).isEqualTo(MAIN_CATEGORY);
-        assertThat(bm.getSubCategories()).isEqualTo(SUB_CATEGORIES.stream().map(SubCategory::getKoreanName).toList());
+        assertThat(bm.getKoreanSubCategories()).isEqualTo(SUB_CATEGORIES.stream().map(SubCategory::getKoreanName).toList());
         assertThat(bm.getCompany()).isEqualTo(COMPANY);
         assertThat(bm.getLogoImgKey()).isEqualTo(LOGO_IMG_KEY);
         assertThat(bm.getIntro()).isEqualTo(INTRO);
@@ -130,7 +130,7 @@ class BmServiceTest {
         Bm bm = saveBm(member);
 
         bm.updateSubCategories(SUB_CATEGORIES);
-        List<String> subCategories = bm.getSubCategories();
+        List<String> subCategories = bm.getKoreanSubCategories();
 
         List<PtImg> ptImgs = createPtImgs(bm);
         bm.updatePtImgs(ptImgs);
@@ -173,7 +173,7 @@ class BmServiceTest {
         myBmRepository.save(new MyBm(member_02, bm));
 
         bm.updateSubCategories(SUB_CATEGORIES);
-        List<String> subCategories = bm.getSubCategories();
+        List<String> subCategories = bm.getKoreanSubCategories();
 
         List<PtImg> ptImgs = createPtImgs(bm);
         bm.updatePtImgs(ptImgs);
@@ -260,7 +260,7 @@ class BmServiceTest {
         Bm updatedBm = bmRepository.findById(bm.getId()).orElseThrow();
         assertThat(updatedBm.getName()).isEqualTo(updatedName);
         assertThat(updatedBm.getMainCategory()).isEqualTo(updatedMainCategory);
-        assertThat(updatedBm.getSubCategories()).isEqualTo(updatedSubCategories.stream().map(SubCategory::getKoreanName).toList());
+        assertThat(updatedBm.getKoreanSubCategories()).isEqualTo(updatedSubCategories.stream().map(SubCategory::getKoreanName).toList());
         assertThat(updatedBm.getCompany()).isEqualTo(updatedCompany);
         assertThat(updatedBm.getLogoImgKey()).isEqualTo(updatedLogoImgKey);
         assertThat(updatedBm.getIntro()).isEqualTo(updatedIntro);
