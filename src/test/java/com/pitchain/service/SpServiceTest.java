@@ -243,11 +243,14 @@ class SpServiceTest {
         Sp sp3 = saveSp(bm3);
 
         //when
-        List<SpDetailRes> spDetails = spService.getSpDetailsRecommendedFromAi(member1.getId(), List.of(sp1.getId(), sp2.getId(), sp3.getId()));
+        List<SpDetailRes> spDetails = spService.getSpDetailsRecommendedFromAi(member1.getId(), List.of(bm1.getId(), bm2.getId(), bm3.getId()));
 
         //then
-        spDetails.forEach(System.out::println);
         assertThat(spDetails).hasSize(3);
+        assertThat(spDetails.stream()
+                .map(SpDetailRes::bmId)
+                .toList())
+                .containsExactlyInAnyOrder(bm1.getId(), bm2.getId(), bm3.getId());
     }
 
     @Test
