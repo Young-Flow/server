@@ -40,6 +40,9 @@ public enum ErrorStatus implements ResponseStatus {
     // comment
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENT4041", "존재하지 않는 댓글입니다."),
 
+    // categoryPref
+    CATEGORY_PREF_NOT_FOUND(HttpStatus.NOT_FOUND, "CATEGORY_PREF4041", "존재하지 않는 카테고리 선호도입니다."),
+
     // S3
     FAIL_S3_UPLOAD(HttpStatus.BAD_REQUEST, "S3_4001", "S3 업로드에 실패했습니다."),
 
@@ -47,7 +50,6 @@ public enum ErrorStatus implements ResponseStatus {
 
     // FILE,
     INVALID_MIME_TYPE(HttpStatus.BAD_REQUEST, "FILE4001", "유효하지 않은 파일 형식입니다."),
-
     FAIL_STREAM_CONVERT(HttpStatus.BAD_REQUEST, "FILE4002", "스트림 변환에 실패했습니다.");
 
     private final HttpStatus httpStatus;

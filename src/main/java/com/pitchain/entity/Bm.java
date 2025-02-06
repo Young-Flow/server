@@ -5,10 +5,7 @@ import com.pitchain.common.constant.SubCategory;
 import com.pitchain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.apache.logging.log4j.util.Strings;
 
 import java.time.LocalDate;
@@ -18,6 +15,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class Bm extends BaseEntity {
 
     @Id
@@ -139,7 +137,7 @@ public class Bm extends BaseEntity {
         this.longPitchURL = updateBm.getLongPitchURL();
     }
 
-    public List<String> getSubCategories() {
+    public List<String> getKoreanSubCategories() {
         return this.subCategories.stream()
                 .map(bmSubCategory -> bmSubCategory.getSubCategory().getKoreanName())
                 .toList();

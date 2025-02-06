@@ -54,7 +54,7 @@ public class BmService {
 
         long likeCnt = myBmRepository.countByBm(bm);
         List<PtImgRes> ptImgResList = getPtImgResList(bmId);
-        List<String> subCategories = bm.getSubCategories();
+        List<String> subCategories = bm.getKoreanSubCategories();
 
         String spURL = s3Service.getFileURL(bm.getSpKey());
         String logoImgURL = s3Service.getFileURL(bm.getLogoImgKey());

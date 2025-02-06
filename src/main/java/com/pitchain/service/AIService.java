@@ -1,8 +1,10 @@
 package com.pitchain.service;
 
+import com.pitchain.common.constant.Country;
 import com.pitchain.dto.PreferenceInfoDto;
 import com.pitchain.dto.res.MemberPreferenceInfoRes;
 import com.pitchain.dto.res.PreferenceInfoRes;
+import com.pitchain.entity.Member;
 import com.pitchain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Transactional
@@ -47,5 +50,11 @@ public class AIService {
 
     private static void send2AIServer(List<MemberPreferenceInfoRes> memberPreferenceInfoResList) {
         new RestTemplate().postForObject("modelUrl", memberPreferenceInfoResList, Void.class);
+    }
+
+    public Long createMember() {
+        return memberRepository.save(
+                new Member("name", UUID.randomUUID().toString(), Country.USA, "profileImg.jpg")
+        ).getId();
     }
 }
