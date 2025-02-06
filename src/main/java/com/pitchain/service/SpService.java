@@ -103,6 +103,25 @@ public class SpService {
         return SpDetailRes.createRes(spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories, logoImgURL);
     }
 
+    public List<SpDetailRes> getSpDetailsRecommendedFromAi(Long memberId, List<Long> bmIds) {
+        List<SpWithLikeDto> spWithLikeDtos = spRepository.getSpWithLikeDtoRecommendedFromAi(memberId, bmIds);
+
+        return spWithLikeDtos.stream()
+                .map(spWithLikeDto -> {
+                    Sp sp = spWithLikeDto.getSp();
+                    String spURL = s3Service.getFileURL(sp.getSpKey());
+                    String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
+
+                    Bm bm = sp.getBm();
+                    long likeCnt = myBmRepository.countByBm(bm);
+                    List<String> subCategories = bm.getSubCategories();
+                    String logoImgURL = s3Service.getFileURL(bm.getLogoImgKey());
+
+                    return SpDetailRes.createRes(spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories, logoImgURL);
+                })
+                .toList();
+    }
+
     public void updateSp(Long memberId, Long spId, String name, MultipartFile spVid, MultipartFile thumbnailImg) {
         Member member = entityFacade.getMember(memberId);
         Sp sp = entityFacade.getSp(spId);

@@ -228,6 +228,29 @@ class SpServiceTest {
     }
 
     @Test
+    void AI로_추천받은_SP_조회() {
+        //given
+        Member member1 = saveMember();
+        Member member2 = saveMember();
+        Member member3 = saveMember();
+
+        Bm bm1 = saveBmWithMainCategory(member1, MainCategory.TECH_DIGITAL);
+        Bm bm2 = saveBmWithMainCategory(member2, MainCategory.TECH_DIGITAL);
+        Bm bm3 = saveBmWithMainCategory(member3, MainCategory.FOOD);
+
+        Sp sp1 = saveSp(bm1);
+        Sp sp2 = saveSp(bm2);
+        Sp sp3 = saveSp(bm3);
+
+        //when
+        List<SpDetailRes> spDetails = spService.getSpDetailsRecommendedFromAi(member1.getId(), List.of(sp1.getId(), sp2.getId(), sp3.getId()));
+
+        //then
+        spDetails.forEach(System.out::println);
+        assertThat(spDetails).hasSize(3);
+    }
+
+    @Test
     void SP_수정_성공() {
         //given
         Sp sp = saveSp(bm);

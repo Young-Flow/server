@@ -1,7 +1,6 @@
 package com.pitchain.controller;
 
 import com.pitchain.common.apiPayload.dto.CustomApiResponse;
-import com.pitchain.common.constant.MainCategory;
 import com.pitchain.dto.req.CreateSpReq;
 import com.pitchain.dto.res.SpDetailRes;
 import com.pitchain.service.SpService;
@@ -46,6 +45,13 @@ public class SpController {
                                                       @PathVariable Long spId) {
         SpDetailRes spDetailRes = spService.getSpDetail(memberId, spId);
         return CustomApiResponse.onSuccess(spDetailRes);
+    }
+
+    @GetMapping("/recommendation")
+    public CustomApiResponse<List<SpDetailRes>> getSpDetailsRecommendedFromAi(@AuthenticationPrincipal Long memberId,
+                                                                              @RequestParam List<Long> bmIds) {
+        List<SpDetailRes> spDetailResList = spService.getSpDetailsRecommendedFromAi(memberId, bmIds);
+        return CustomApiResponse.onSuccess(spDetailResList);
     }
 
     @PutMapping(value = "/{spId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
