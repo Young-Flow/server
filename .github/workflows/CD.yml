@@ -66,7 +66,7 @@ jobs:
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        role-to-assume: arn:aws:iam::440744244245:user/pitchain-github-actions-iam-user
+        role-to-assume: arn:aws:iam::440744244245:role/pitchain-github-actions-role
         aws-region: ${{ env.AWS_REGION }}
 
     - name: Upload to AWS S3
