@@ -5,13 +5,11 @@ on:
     branches: [ "dev" ]
     
 env:
-  AWS_REGION: ap-northeast-2                   # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: pitchain                   # set this to your Amazon ECR repository name
-  ECS_SERVICE: pitchain-service                 # set this to your Amazon ECS service name
-  ECS_CLUSTER: pitchain-cluster                 # set this to your Amazon ECS cluster name
-  ECS_TASK_DEFINITION: pitchain-task-definition.json  # Task Definition의 파일 이름
-  CONTAINER_NAME: pitchain-cont           # set this to the name of the container in the
-  
+  AWS_REGION: ap-northeast-2
+  S3_BUCKET_NAME: pitchain-server-s3-bucket
+  CODE_DEPLOY_APPLICATION_NAME: pitchain-codedeploy-app
+  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: pitchain-codedeploy-deployment-group
+
 permissions:
   id-token: write
   contents: read
@@ -38,12 +36,6 @@ jobs:
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
         restore-keys: |
           ${{ runner.os }}-gradle-
-
-    - name: Copy koreaexim.pem
-      env:
-        KOREAEXIM_PEM: ${{ secrets.KOREAEXIM_PEM }}
-      run: |
-        echo -n "$KOREAEXIM_PEM" | base64 --decode > koreaexim.pem
 
     - name: Copy application-prod.yml
       env:
@@ -74,39 +66,22 @@ jobs:
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        role-to-assume: arn:aws:iam::491085415955:role/pitchain-gitactions-role
-        aws-region: ap-northeast-2
+        role-to-assume: arn:aws:iam::440744244245:user/pitchain-github-actions-iam-user
+        aws-region: ${{ env.AWS_REGION }}
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
-
-    - name: Build, tag, and push image to Amazon ECR
-      id: build-image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_TAG: ${{ github.sha }}
+    - name: Upload to AWS S3
       run: |
-        docker build --platform linux/amd64 -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+        aws deploy push \
+          --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
+          --ignore-hidden-files \
+          --s3-location s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip \
+          --source .
 
-    - name: Copy Task Definition JSON
+    - name: Deploy to AWS EC2 from S3
       run: |
-        echo '${{ secrets.TASK_DEFINITION_JSON }}' > ${{ env.ECS_TASK_DEFINITION }}
+        aws deploy create-deployment \
+          --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
+          --deployment-config-name CodeDeployDefault.AllAtOnce \
+          --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
+          --s3-location bucket=$S3_BUCKET_NAME,key=$GITHUB_SHA.zip,bundleType=zip
 
-    - name: Fill in the new image ID in the Amazon ECS task definition
-      id: task-def
-      uses: aws-actions/amazon-ecs-render-task-definition@v1
-      with:
-        task-definition: ${{ env.ECS_TASK_DEFINITION }}
-        container-name: ${{ env.CONTAINER_NAME }}
-        image: ${{ steps.build-image.outputs.image }}
-
-    - name: Deploy Amazon ECS task definition
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-      with:
-        task-definition: ${{ steps.task-def.outputs.task-definition }}
-        service: ${{ env.ECS_SERVICE }}
-        cluster: ${{ env.ECS_CLUSTER }}
-        wait-for-service-stability: true
