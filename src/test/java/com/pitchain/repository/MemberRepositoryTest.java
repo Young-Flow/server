@@ -2,12 +2,11 @@ package com.pitchain.repository;
 
 import com.pitchain.common.constant.Country;
 import com.pitchain.common.constant.MainCategory;
-import com.pitchain.dto.res.MemberPreferenceInfoRes;
 import com.pitchain.dto.PreferenceInfoDto;
+import com.pitchain.dto.res.MemberPreferenceInfoRes;
 import com.pitchain.dto.res.PreferenceInfoRes;
 import com.pitchain.entity.*;
 import org.apache.logging.log4j.util.Strings;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -16,10 +15,9 @@ import org.springframework.mock.web.MockMultipartFile;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 class MemberRepositoryTest {
@@ -38,7 +36,7 @@ class MemberRepositoryTest {
     private MySpHistoryRepository mySpHistoryRepository;
 
     private Member saveMember() {
-        return memberRepository.save(new Member("member_name", UUID.randomUUID().toString(), Country.ROK, Strings.EMPTY));
+        return memberRepository.save(new Member("member_name", Country.ROK, Strings.EMPTY));
     }
 
     private Bm saveBm(Member member) {

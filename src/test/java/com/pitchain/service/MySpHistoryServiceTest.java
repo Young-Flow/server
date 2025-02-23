@@ -16,7 +16,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 @Transactional
 @SpringBootTest
@@ -75,11 +74,11 @@ class MySpHistoryServiceTest {
     }
 
     private Member saveMember() {
-        return memberRepository.save(new Member("name", UUID.randomUUID().toString(), Country.USA, "profileImg.jpg"));
+        return memberRepository.save(new Member("name", Country.USA, "profileImg.jpg"));
     }
 
     private Bm saveBm(Member member) {
-        return bmRepository.save(new Bm(member, "bmName", MainCategory.FOOD,"bmCompany", "logoImg",
+        return bmRepository.save(new Bm(member, "bmName", MainCategory.FOOD, "bmCompany", "logoImg",
                 "bmIntro", "bmDescription", "bmDescriptionImg", "companyAddress", 100000L,
                 1000L, 1000, LocalDate.now(), "longPitchUrl"));
     }

@@ -15,7 +15,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Transactional
@@ -54,7 +53,7 @@ public class AIService {
 
     public Long createMember() {
         return memberRepository.save(
-                new Member("name", UUID.randomUUID().toString(), Country.USA, "profileImg.jpg")
+                new Member("name", Country.USA, "profileImg.jpg")
         ).getId();
     }
 }

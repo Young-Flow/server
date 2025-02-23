@@ -14,7 +14,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(uniqueConstraints = {@UniqueConstraint(name = "EMAIL_UNIQUE", columnNames = {"email"})})
+@Table
 public class Member extends BaseEntity {
 
     @Id
@@ -24,9 +24,6 @@ public class Member extends BaseEntity {
 
     @Column(nullable = false)
     private String name;
-
-    @Column(nullable = false)
-    private String email;
 
     @Enumerated(EnumType.STRING)
     private Country country;
@@ -45,9 +42,8 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CategoryPref> categoryPrefs = new ArrayList<>();
 
-    public Member(String name, String email, Country country, String profileImgKey) {
+    public Member(String name, Country country, String profileImgKey) {
         this.name = name;
-        this.email = email;
         this.country = country;
         this.profileImgKey = profileImgKey;
     }

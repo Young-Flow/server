@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -67,7 +66,7 @@ class InvestmentServiceTest {
 
         //when
         GeneralHandler error1 = Assertions.assertThrows(GeneralHandler.class, () -> investmentService.addInvestment(invalidId, member.getId(), amount));
-        GeneralHandler error2 = Assertions.assertThrows(GeneralHandler.class, () -> investmentService.addInvestment(bm.getId(),invalidId, amount));
+        GeneralHandler error2 = Assertions.assertThrows(GeneralHandler.class, () -> investmentService.addInvestment(bm.getId(), invalidId, amount));
 
         //then
         assertThat(error1.getErrorStatus()).isEqualTo(ErrorStatus.BM_NOT_FOUND);
@@ -93,7 +92,7 @@ class InvestmentServiceTest {
         InvestmentStatusRes investmentStatus = investmentService.getInvestmentStatus(bmId);
 
         //then
-        Bm bm  = bmRepository.findById(bmId).orElseThrow();
+        Bm bm = bmRepository.findById(bmId).orElseThrow();
         assertThat(investmentStatus.deadline()).isEqualTo(bm.getDeadline());
         assertThat(investmentStatus.pricePerShare()).isEqualTo(bm.getPricePerShare());
         assertThat(investmentStatus.maxIssuedShare()).isEqualTo(bm.getMaxIssuedShare());
@@ -110,7 +109,7 @@ class InvestmentServiceTest {
     }
 
     private Member saveMember() {
-        return memberRepository.save(new Member("name", UUID.randomUUID().toString(), Country.USA, "profileImg"));
+        return memberRepository.save(new Member("name", Country.USA, "profileImg"));
     }
 
     private Bm saveBm(Member member) {
