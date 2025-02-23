@@ -1,8 +1,10 @@
 package com.pitchain.entity;
 
 import com.pitchain.common.constant.Country;
+import com.pitchain.common.constant.OauthProvider;
 import com.pitchain.common.constant.SubCategory;
 import com.pitchain.common.entity.BaseEntity;
+import com.pitchain.oauth2.member.OauthMemberInfo;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -30,6 +32,10 @@ public class Member extends BaseEntity {
 
     private String profileImgKey;
 
+    private String socialId;
+
+    private OauthProvider oauthProvider;
+
     @OneToMany(mappedBy = "member")
     private List<Investment> investments = new ArrayList<>();
 
@@ -46,6 +52,11 @@ public class Member extends BaseEntity {
         this.name = name;
         this.country = country;
         this.profileImgKey = profileImgKey;
+    }
+
+    public Member(OauthMemberInfo request) {
+        this.socialId = request.getSocialId();
+        this.oauthProvider = request.getOauthProvider();
     }
 
     public void addCategoryPref(List<SubCategory> subCategories) {
