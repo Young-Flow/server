@@ -1,8 +1,10 @@
 package com.pitchain.entity;
 
 import com.pitchain.common.constant.Country;
+import com.pitchain.common.constant.OauthProvider;
 import com.pitchain.common.constant.SubCategory;
 import com.pitchain.common.entity.BaseEntity;
+import com.pitchain.oauth2.member.OauthMemberInfo;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -14,7 +16,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(uniqueConstraints = {@UniqueConstraint(name = "EMAIL_UNIQUE", columnNames = {"email"})})
+@Table
 public class Member extends BaseEntity {
 
     @Id
@@ -25,13 +27,14 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private String email;
-
     @Enumerated(EnumType.STRING)
     private Country country;
 
     private String profileImgKey;
+
+    private String socialId;
+
+    private OauthProvider oauthProvider;
 
     @OneToMany(mappedBy = "member")
     private List<Investment> investments = new ArrayList<>();
@@ -45,11 +48,15 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CategoryPref> categoryPrefs = new ArrayList<>();
 
-    public Member(String name, String email, Country country, String profileImgKey) {
+    public Member(String name, Country country, String profileImgKey) {
         this.name = name;
-        this.email = email;
         this.country = country;
         this.profileImgKey = profileImgKey;
+    }
+
+    public Member(OauthMemberInfo request) {
+        this.socialId = request.getSocialId();
+        this.oauthProvider = request.getOauthProvider();
     }
 
     public void addCategoryPref(List<SubCategory> subCategories) {

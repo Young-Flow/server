@@ -8,7 +8,6 @@ import com.pitchain.dto.req.CreateSpReq;
 import com.pitchain.dto.res.SpDetailRes;
 import com.pitchain.entity.*;
 import com.pitchain.repository.*;
-import jakarta.persistence.EntityManager;
 import org.apache.logging.log4j.util.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -48,7 +46,7 @@ class SpServiceTest {
     private CategoryPrefRepository categoryPrefRepository;
 
     private Member saveMember() {
-        return memberRepository.save(new Member("member_name", UUID.randomUUID().toString(), Country.ROK, Strings.EMPTY));
+        return memberRepository.save(new Member("member_name", Country.ROK, Strings.EMPTY));
     }
 
     private Bm saveBm(Member member) {

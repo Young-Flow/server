@@ -1,11 +1,13 @@
 package com.pitchain.repository;
 
+import com.pitchain.common.constant.OauthProvider;
 import com.pitchain.dto.PreferenceInfoDto;
 import com.pitchain.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
@@ -24,4 +26,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
                 LEFT JOIN Investment  i ON bm.id = i.bm.id AND i.member.id = m.id
             """)
     List<PreferenceInfoDto> getMemberPreferenceInfos();
+
+    Optional<Member> findByOauthProviderAndSocialId(OauthProvider oauthProvider, String socialId);
 }

@@ -10,7 +10,10 @@ import com.pitchain.dto.req.CreateBmReq;
 import com.pitchain.dto.req.UpdateBmReq;
 import com.pitchain.dto.res.BmDetailRes;
 import com.pitchain.dto.res.PtImgRes;
-import com.pitchain.entity.*;
+import com.pitchain.entity.Bm;
+import com.pitchain.entity.Member;
+import com.pitchain.entity.MyBm;
+import com.pitchain.entity.PtImg;
 import com.pitchain.repository.BmRepository;
 import com.pitchain.repository.MemberRepository;
 import com.pitchain.repository.MyBmHistoryRepository;
@@ -22,12 +25,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -71,7 +73,7 @@ class BmServiceTest {
             "description", "description.png", "image/png", "test data 2".getBytes());
 
     private Member saveMember() {
-        return memberRepository.save(new Member("member_name", UUID.randomUUID().toString(), Country.ROK, Strings.EMPTY));
+        return memberRepository.save(new Member("member_name", Country.ROK, Strings.EMPTY));
     }
 
     private Bm saveBm(Member member) {

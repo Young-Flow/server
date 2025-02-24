@@ -15,7 +15,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -65,11 +64,11 @@ class MyBmServiceTest {
     }
 
     private Member saveMember() {
-        return memberRepository.save(new Member("name", UUID.randomUUID().toString(), Country.USA, "profileImg"));
+        return memberRepository.save(new Member("name", Country.USA, "profileImg"));
     }
 
     private Bm saveBm(Member member) {
-        Bm bm = new Bm(member, "bmName", MainCategory.FOOD,"bmCompany", "logoImg",
+        Bm bm = new Bm(member, "bmName", MainCategory.FOOD, "bmCompany", "logoImg",
                 "bmIntro", "bmDescription", "bmDescriptionImg", "companyAddress", 100000L,
                 1000L, 1000, LocalDate.now(), "longPitchUrl");
         return bmRepository.save(bm);

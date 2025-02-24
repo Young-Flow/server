@@ -14,7 +14,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -62,7 +61,7 @@ class BmPrefServiceTest {
     }
 
     private Member saveMember() {
-        return memberRepository.save(new Member("name", UUID.randomUUID().toString(), Country.USA, "profileImg.jpg"));
+        return memberRepository.save(new Member("name", Country.USA, "profileImg.jpg"));
     }
 
 }
