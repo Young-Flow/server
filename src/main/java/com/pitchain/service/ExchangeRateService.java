@@ -41,6 +41,7 @@ public class ExchangeRateService {
      * 가장 최근의 통화별 일환율 조회
      * 일환율 업데이트 전이면 어제 환율 조회
      * 일환율 업데이트 후면 오늘 환율 조회
+     *
      * @return
      */
     public Map<String, String> getLatestExchangeRateMap() {
@@ -54,6 +55,7 @@ public class ExchangeRateService {
      * 한국수출입은행 현재환율 API 호출을 통한 통화별 일환율 조회 및 DB에 저장
      * 비영업일이면 어제 일환율을 저장
      * 매일 11시 30분 업데이트
+     *
      * @return Map<String, String>
      */
     @Scheduled(cron = "${koreaexim.updateTime.cron}")
@@ -61,22 +63,35 @@ public class ExchangeRateService {
         String uri = generateRequestURI();
         ExchangeRateRes[] exchangeRateList = restTemplate.getForObject(uri, ExchangeRateRes[].class);
 
-        String todayDate = getTodayDate();
-        Map<String, String> exchangeRateMap = getExchangeRateMap(exchangeRateList, todayDate);
+        Map<String, String> usdBasedExchangeRateMap = getExchangeRateMap(exchangeRateList);
 
-        redisExchangeRateUtil.setExchangeRateMap(todayDate, exchangeRateMap);
+        redisExchangeRateUtil.setExchangeRateMap(getTodayDate(), usdBasedExchangeRateMap);
     }
 
-    private Map<String, String> getExchangeRateMap(ExchangeRateRes[] exchangeRateList, String todayDate) {
+    private Map<String, String> getExchangeRateMap(ExchangeRateRes[] exchangeRateList) {
         if (isNonBusinessDay(exchangeRateList)) {
             return redisExchangeRateUtil.getExchangeRateMap(getYesterdayDate());
         }
 
-        return convertListToMap(exchangeRateList, todayDate);
-
+        Map<String, String> krwBasedExchangeRateMap = convertListToMap(exchangeRateList);
+        return convertToUsdBasedExchageRateMap(krwBasedExchangeRateMap);
     }
 
-    private Map<String, String> convertListToMap(ExchangeRateRes[] exchangeRateList, String date) {
+    private Map<String, String> convertToUsdBasedExchageRateMap(Map<String, String> krwBasedExchangeRateMap) {
+        Map<String, String> usdBasedExchangeRateMap = new HashMap<>();
+        String krw2Usd = krwBasedExchangeRateMap.get("USD");
+
+        for (String currency : krwBasedExchangeRateMap.keySet()) {
+            String exchangeRate = krwBasedExchangeRateMap.get(currency);
+            String usdBasedExchangeRate = String.format("%.2f", Double.parseDouble(krw2Usd) / Double.parseDouble(exchangeRate));
+
+            usdBasedExchangeRateMap.put(currency, usdBasedExchangeRate);
+        }
+
+        return usdBasedExchangeRateMap;
+    }
+
+    private Map<String, String> convertListToMap(ExchangeRateRes[] exchangeRateList) {
         Map<String, String> exchangeRateMap = new HashMap<>();
         for (ExchangeRateRes exchangeRate : exchangeRateList) {
             String curUnit = exchangeRate.getCur_unit();  //통화코드
@@ -84,7 +99,6 @@ public class ExchangeRateService {
 
             exchangeRateMap.put(curUnit, dealBasR);
         }
-        exchangeRateMap.put("updateDateTime", String.format("%s %02d:%02d", date, updateHour, updateMin));  //일환율 업데이트 일시
 
         return exchangeRateMap;
     }
