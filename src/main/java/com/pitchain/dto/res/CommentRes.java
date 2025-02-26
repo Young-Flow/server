@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 public class CommentRes extends BaseCommentRes {
     private final Long writerId;
-    private final String writerName;
+    private final String writerNickname;
     private final String writerProfileImgURL;
     private final String content;
     private final LocalDateTime createdAt;
@@ -20,12 +20,12 @@ public class CommentRes extends BaseCommentRes {
     @Builder
     public CommentRes(
             Long commentId, boolean delYN, List<ReplyCommentRes> replyComments,
-            Long writerId, String writerName, String writerProfileImgURL, String content,
+            Long writerId, String writerNickname, String writerProfileImgURL, String content,
             LocalDateTime createdAt, LocalDateTime updatedAt
     ) {
         super(commentId, delYN, replyComments);
         this.writerId = writerId;
-        this.writerName = writerName;
+        this.writerNickname = writerNickname;
         this.writerProfileImgURL = writerProfileImgURL;
         this.content = content;
         this.createdAt = createdAt;
@@ -39,7 +39,7 @@ public class CommentRes extends BaseCommentRes {
                 .delYN(comment.isDelYN())
                 .replyComments(replyComments)
                 .writerId(member.getId())
-                .writerName(member.getName())
+                .writerNickname(member.getNickname())
                 .writerProfileImgURL(writerProfileImgURL)
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt())
