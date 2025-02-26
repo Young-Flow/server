@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public record ReplyCommentRes(
         Long commentId,
         Long writerId,
-        String writerName,
+        String writerNickname,
         String writerProfileImgURL,
         String content,
         boolean delYN,
@@ -23,7 +23,7 @@ public record ReplyCommentRes(
                 .commentId(comment.getId())
                 .writerId(member.getId())
                 .writerProfileImgURL(writerProfileImgURL)
-                .writerName(member.getName())
+                .writerNickname(member.getNickname())
                 .content(comment.getContent())
                 .delYN(comment.isDelYN())
                 .createdAt(comment.getCreatedAt())

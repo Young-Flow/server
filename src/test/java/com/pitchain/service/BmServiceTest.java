@@ -73,7 +73,7 @@ class BmServiceTest {
             "description", "description.png", "image/png", "test data 2".getBytes());
 
     private Member saveMember() {
-        return memberRepository.save(new Member("member_name", Country.ROK, Strings.EMPTY));
+        return memberRepository.save(new Member(Country.ROK, Strings.EMPTY));
     }
 
     private Bm saveBm(Member member) {

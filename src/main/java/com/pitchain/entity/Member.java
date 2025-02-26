@@ -24,15 +24,16 @@ public class Member extends BaseEntity {
     @Column(name = "member_id")
     private Long id;
 
-    @Column(nullable = false)
-    private String name;
-
     @Enumerated(EnumType.STRING)
     private Country country;
 
     private String profileImgKey;
 
     private String socialId;
+
+    private String email;
+
+    private String nickname;
 
     private OauthProvider oauthProvider;
 
@@ -48,14 +49,15 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CategoryPref> categoryPrefs = new ArrayList<>();
 
-    public Member(String name, Country country, String profileImgKey) {
-        this.name = name;
+    public Member(Country country, String profileImgKey) {
         this.country = country;
         this.profileImgKey = profileImgKey;
     }
 
     public Member(OauthMemberInfo request) {
         this.socialId = request.getSocialId();
+        this.email = request.getEmail();
+        this.nickname = request.getNickname();
         this.oauthProvider = request.getOauthProvider();
     }
 

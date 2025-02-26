@@ -109,7 +109,7 @@ class InvestmentServiceTest {
     }
 
     private Member saveMember() {
-        return memberRepository.save(new Member("name", Country.USA, "profileImg"));
+        return memberRepository.save(new Member(Country.USA, "profileImg"));
     }
 
     private Bm saveBm(Member member) {

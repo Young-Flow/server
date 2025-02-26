@@ -61,7 +61,7 @@ class BmPrefServiceTest {
     }
 
     private Member saveMember() {
-        return memberRepository.save(new Member("name", Country.USA, "profileImg.jpg"));
+        return memberRepository.save(new Member(Country.USA, "profileImg.jpg"));
     }
 
 }
