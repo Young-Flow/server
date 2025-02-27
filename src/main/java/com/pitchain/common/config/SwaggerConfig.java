@@ -6,8 +6,12 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 import static io.swagger.v3.oas.models.security.SecurityScheme.Type.HTTP;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -15,6 +19,9 @@ import static org.springframework.security.config.Elements.JWT;
 
 @Configuration
 public class SwaggerConfig {
+
+    @Value("${spring.application.server}")
+    private String serverUrl;
 
     @Bean
     public OpenAPI pitchainOpenAPI() {
@@ -32,6 +39,7 @@ public class SwaggerConfig {
                 .externalDocs(new ExternalDocumentation()
                         .description("Pitchain Server Github")
                         .url("https://github.com/Young-Flow/server"))
+                .servers(List.of(new Server().url(serverUrl)))
                 .info(apiInfo());
     }
 
