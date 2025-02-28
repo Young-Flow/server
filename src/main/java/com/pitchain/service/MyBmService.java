@@ -29,7 +29,9 @@ public class MyBmService {
 
         if (isLiked(member, bm)) {
             cancelLike(member, bm);
-        } else addLike(member, bm);
+        } else {
+            addLike(member, bm);
+        }
     }
 
     private boolean isLiked(Member member, Bm bm) {

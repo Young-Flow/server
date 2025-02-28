@@ -41,7 +41,7 @@ class SpServiceTest {
     @Autowired
     private BmRepository bmRepository;
     @Autowired
-    private MyBmRepository myBmRepository;
+    private MySpRepository mySpRepository;
     @Autowired
     private CategoryPrefRepository categoryPrefRepository;
 
@@ -135,8 +135,8 @@ class SpServiceTest {
         //given
         Member newMember = saveMember();
         Sp sp = saveSp(bm);
-        myBmRepository.save(new MyBm(member, bm));
-        myBmRepository.save(new MyBm(newMember, bm));
+        mySpRepository.save(new MySp(member, sp));
+        mySpRepository.save(new MySp(newMember, sp));
 
         bm.updateSubCategories(SUB_CATEGORIES);
         List<String> subCategories = bm.getKoreanSubCategories();
@@ -192,12 +192,12 @@ class SpServiceTest {
         Bm bm2 = saveBmWithMainCategory(member2, MainCategory.TECH_DIGITAL);
         Bm bm3 = saveBmWithMainCategory(member3, MainCategory.FOOD);
 
-        myBmRepository.save(new MyBm(member1, bm1));
-        myBmRepository.save(new MyBm(member2, bm1));
-
         Sp sp1 = saveSp(bm1);
         Sp sp2 = saveSp(bm2);
         Sp sp3 = saveSp(bm3);
+
+        mySpRepository.save(new MySp(member1, sp1));
+        mySpRepository.save(new MySp(member2, sp1));
 
         //when
         List<SpDetailRes> spDetails = spService.getSpDetailsFilteredCategory(member1.getId(), MainCategory.TECH_DIGITAL.getKoreanName());
