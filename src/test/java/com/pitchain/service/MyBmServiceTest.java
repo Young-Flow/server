@@ -3,9 +3,11 @@ package com.pitchain.service;
 import com.pitchain.common.constant.Country;
 import com.pitchain.common.constant.MainCategory;
 import com.pitchain.entity.Bm;
+import com.pitchain.entity.Company;
 import com.pitchain.entity.Member;
 import com.pitchain.entity.MyBm;
 import com.pitchain.repository.BmRepository;
+import com.pitchain.repository.CompanyRepository;
 import com.pitchain.repository.MemberRepository;
 import com.pitchain.repository.MyBmRepository;
 import org.junit.jupiter.api.Test;
@@ -28,6 +30,8 @@ class MyBmServiceTest {
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
+    private CompanyRepository companyRepository;
+    @Autowired
     private BmRepository bmRepository;
     @Autowired
     private MyBmRepository myBmRepository;
@@ -36,7 +40,8 @@ class MyBmServiceTest {
     void BM_관심_등록_성공() {
         //given
         Member member = saveMember();
-        Bm bm = saveBm(member);
+        Company company = saveCompany(member);
+        Bm bm = saveBm(member, company);
 
         //when
         myBmService.toggleLikeBm(bm.getId(), member.getId());
@@ -50,7 +55,8 @@ class MyBmServiceTest {
     void BM_관심_취소_성공() {
         //given
         Member member = saveMember();
-        Bm bm = saveBm(member);
+        Company company = saveCompany(member);
+        Bm bm = saveBm(member, company);
 
         MyBm myBm = new MyBm(member, bm);
         myBmRepository.save(myBm);
@@ -67,10 +73,12 @@ class MyBmServiceTest {
         return memberRepository.save(new Member(Country.USA, "profileImg"));
     }
 
-    private Bm saveBm(Member member) {
-        Bm bm = new Bm(member, "bmName", MainCategory.FOOD, "bmIntro", "bmDescription",
-                "bmDescriptionImg", "companyAddress", 100000L, 1000L, 1000, LocalDate.now(), "longPitchUrl");
-        return bmRepository.save(bm);
+    private Bm saveBm(Member member, Company company) {
+        return bmRepository.save(new Bm(member, company, "bmName", MainCategory.FOOD, "bmIntro", "bmDescription",
+                "bmDescriptionImg", "companyAddress", 100000L, 1000L, 1000, LocalDate.now(), "longPitchUrl"));
     }
 
+    private Company saveCompany(Member member) {
+        return companyRepository.save(new Company("company_name", "company_intro", "company_description", member));
+    }
 }

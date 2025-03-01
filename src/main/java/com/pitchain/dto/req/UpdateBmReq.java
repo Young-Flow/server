@@ -11,7 +11,6 @@ public record UpdateBmReq(
         String name,
         MainCategory mainCategory,
         List<SubCategory> subCategories,
-        String company,
         String intro,
         String description,
         String address,

@@ -10,14 +10,8 @@ import com.pitchain.dto.req.CreateBmReq;
 import com.pitchain.dto.req.UpdateBmReq;
 import com.pitchain.dto.res.BmDetailRes;
 import com.pitchain.dto.res.PtImgRes;
-import com.pitchain.entity.Bm;
-import com.pitchain.entity.Member;
-import com.pitchain.entity.MyBm;
-import com.pitchain.entity.PtImg;
-import com.pitchain.repository.BmRepository;
-import com.pitchain.repository.MemberRepository;
-import com.pitchain.repository.MyBmHistoryRepository;
-import com.pitchain.repository.MyBmRepository;
+import com.pitchain.entity.*;
+import com.pitchain.repository.*;
 import org.apache.logging.log4j.util.Strings;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +37,9 @@ class BmServiceTest {
     private S3Service s3Service;
     @Autowired
     private BmService bmService;
+
+    @Autowired
+    private CompanyRepository companyRepository;
     @Autowired
     private BmRepository bmRepository;
     @Autowired
@@ -55,11 +52,8 @@ class BmServiceTest {
     private static final String NAME = "bm_name";
     private static final MainCategory MAIN_CATEGORY = MainCategory.FOOD;
     private static final List<SubCategory> SUB_CATEGORIES = List.of(SubCategory.BEVERAGE_COFFEE, SubCategory.ALCOHOL);
-    private static final String COMPANY = "bm_company";
-    private static final String LOGO_IMG_KEY = "bm_logo_img_key";
     private static final String INTRO = "bm_intro";
     private static final String DESCRIPTION = "bm_description";
-    private static final String DESC_IMG_KEY = "bm_desc_img_key";
     private static final String ADDRESS = "bm_address";
     private static final Long VALUATION_CAP = 100000L;
     private static final Long GOAL_INVESTMENT = 200000L;
@@ -67,17 +61,20 @@ class BmServiceTest {
     private static final LocalDate DEADLINE = LocalDate.now();
     private static final String LONG_PITCH_URL = "bm_long_pitch_url";
 
-    private static final MockMultipartFile LOGO_IMG = new MockMultipartFile(
-            "logo", "logo.png", "image/png", "test data 1".getBytes());
     private static final MockMultipartFile DESC_IMG = new MockMultipartFile(
             "description", "description.png", "image/png", "test data 2".getBytes());
+    private static final String DESC_IMG_KEY = "bm_desc_img_key";
 
     private Member saveMember() {
         return memberRepository.save(new Member(Country.ROK, Strings.EMPTY));
     }
 
-    private Bm saveBm(Member member) {
-        return bmRepository.save(new Bm(member, NAME, MAIN_CATEGORY, COMPANY, LOGO_IMG_KEY,
+    private Company saveCompany(Member member) {
+        return companyRepository.save(new Company("company_name", "company_address", "company_logo_img_key", member));
+    }
+
+    private Bm saveBm(Member member, Company company) {
+        return bmRepository.save(new Bm(member, company, NAME, MAIN_CATEGORY,
                 INTRO, DESCRIPTION, DESC_IMG_KEY, ADDRESS, VALUATION_CAP,
                 GOAL_INVESTMENT, MAX_ISSUED_SHARE, DEADLINE, LONG_PITCH_URL));
     }
@@ -94,16 +91,16 @@ class BmServiceTest {
     void BM_생성_성공() {
         //given
         Member member = saveMember();
-        CreateBmReq createBmReq = new CreateBmReq(NAME, MAIN_CATEGORY, SUB_CATEGORIES, COMPANY,
-                INTRO, DESCRIPTION, ADDRESS, VALUATION_CAP, GOAL_INVESTMENT, MAX_ISSUED_SHARE, DEADLINE, LONG_PITCH_URL);
+        Company company = saveCompany(member);
 
-        when(s3Service.uploadFile(LOGO_IMG, S3UploadTarget.COMPANY_LOGO))
-                .thenReturn(LOGO_IMG_KEY);
+        CreateBmReq createBmReq = new CreateBmReq(company.getId(), NAME, MAIN_CATEGORY, SUB_CATEGORIES, INTRO,
+                DESCRIPTION, ADDRESS, VALUATION_CAP, GOAL_INVESTMENT, MAX_ISSUED_SHARE, DEADLINE, LONG_PITCH_URL);
+
         when(s3Service.uploadFile(DESC_IMG, S3UploadTarget.COMPANY_DESC))
                 .thenReturn(DESC_IMG_KEY);
 
         //when
-        bmService.createBm(member.getId(), createBmReq, LOGO_IMG, DESC_IMG);
+        bmService.createBm(member.getId(), createBmReq, DESC_IMG);
 
         //then
         List<Bm> all = bmRepository.findAll();
@@ -112,8 +109,6 @@ class BmServiceTest {
         assertThat(bm.getName()).isEqualTo(NAME);
         assertThat(bm.getMainCategory()).isEqualTo(MAIN_CATEGORY);
         assertThat(bm.getKoreanSubCategories()).isEqualTo(SUB_CATEGORIES.stream().map(SubCategory::getKoreanName).toList());
-        assertThat(bm.getCompany()).isEqualTo(COMPANY);
-        assertThat(bm.getLogoImgKey()).isEqualTo(LOGO_IMG_KEY);
         assertThat(bm.getIntro()).isEqualTo(INTRO);
         assertThat(bm.getDescription()).isEqualTo(DESCRIPTION);
         assertThat(bm.getDescImgKey()).isEqualTo(DESC_IMG_KEY);
@@ -129,7 +124,8 @@ class BmServiceTest {
     void BM_조회_성공_좋아요_없음() {
         //given
         Member member = saveMember();
-        Bm bm = saveBm(member);
+        Company company = saveCompany(member);
+        Bm bm = saveBm(member, company);
 
         bm.updateSubCategories(SUB_CATEGORIES);
         List<String> subCategories = bm.getKoreanSubCategories();
@@ -143,24 +139,25 @@ class BmServiceTest {
 
         //when
         BmDetailRes bmDetail = bmService.getBmDetail(member.getId(), bm.getId());
-
+//        List<String> spURLs,
         //then
         assertThat(bmDetail.id()).isEqualTo(bm.getId());
+        assertThat(bmDetail.companyLogoImgURL()).isEqualTo(s3Service.getFileURL(company.getLogoImgKey()));
+        assertThat(bmDetail.companyName()).isEqualTo(company.getName());
+        assertThat(bmDetail.companyAddress()).isEqualTo(company.getAddress());
         assertThat(bmDetail.name()).isEqualTo(bm.getName());
-        assertThat(bmDetail.company()).isEqualTo(bm.getCompany());
         assertThat(bmDetail.intro()).isEqualTo(bm.getIntro());
         assertThat(bmDetail.mainCategory()).isEqualTo(bm.getMainCategory().getKoreanName());
-        assertThat(bmDetail.logoImgURL()).isEqualTo(s3Service.getFileURL(bm.getLogoImgKey()));
+        assertThat(bmDetail.subCategories()).isEqualTo(subCategories);
         assertThat(bmDetail.description()).isEqualTo(bm.getDescription());
         assertThat(bmDetail.descImgURL()).isEqualTo(s3Service.getFileURL(bm.getDescImgKey()));
-        assertThat(bmDetail.address()).isEqualTo(bm.getAddress());
+        assertThat(bmDetail.bmAddress()).isEqualTo(bm.getAddress());
         assertThat(bmDetail.createdAt()).isEqualTo(bm.getCreatedAt());
         assertThat(bmDetail.longPitchURL()).isEqualTo(bm.getLongPitchURL());
-        assertThat(bmDetail.spURL()).isEqualTo(s3Service.getFileURL(bm.getSpKey()));
         assertThat(bmDetail.isLiked()).isFalse();
         assertThat(bmDetail.likeCnt()).isEqualTo(0);
+        // todo spURLs 검증 필요
         assertThat(bmDetail.ptImgResList()).isEqualTo(ptImgResList);
-        assertThat(bmDetail.subCategories()).isEqualTo(subCategories);
 
         assertThat(myBmHistoryRepository.findByMemberAndBm(member, bm).get()).isNotNull();
     }
@@ -170,7 +167,10 @@ class BmServiceTest {
         //given
         Member member_01 = saveMember();
         Member member_02 = saveMember();
-        Bm bm = saveBm(member_01);
+
+        Company company_1 = saveCompany(member_01);
+
+        Bm bm = saveBm(member_01, company_1);
         myBmRepository.save(new MyBm(member_01, bm));
         myBmRepository.save(new MyBm(member_02, bm));
 
@@ -189,20 +189,21 @@ class BmServiceTest {
 
         //then
         assertThat(bmDetail.id()).isEqualTo(bm.getId());
+        assertThat(bmDetail.companyName()).isEqualTo(company_1.getName());
+        assertThat(bmDetail.companyLogoImgURL()).isEqualTo(s3Service.getFileURL(company_1.getLogoImgKey()));
+        assertThat(bmDetail.companyAddress()).isEqualTo(company_1.getAddress());
         assertThat(bmDetail.name()).isEqualTo(bm.getName());
-        assertThat(bmDetail.company()).isEqualTo(bm.getCompany());
         assertThat(bmDetail.intro()).isEqualTo(bm.getIntro());
         assertThat(bmDetail.mainCategory()).isEqualTo(bm.getMainCategory().getKoreanName());
-        assertThat(bmDetail.logoImgURL()).isEqualTo(s3Service.getFileURL(bm.getLogoImgKey()));
         assertThat(bmDetail.description()).isEqualTo(bm.getDescription());
         assertThat(bmDetail.descImgURL()).isEqualTo(s3Service.getFileURL(bm.getDescImgKey()));
-        assertThat(bmDetail.address()).isEqualTo(bm.getAddress());
+        assertThat(bmDetail.bmAddress()).isEqualTo(bm.getAddress());
         assertThat(bmDetail.createdAt()).isEqualTo(bm.getCreatedAt());
         assertThat(bmDetail.longPitchURL()).isEqualTo(bm.getLongPitchURL());
-        assertThat(bmDetail.spURL()).isEqualTo(s3Service.getFileURL(bm.getSpKey()));
         assertThat(bmDetail.isLiked()).isTrue();
         assertThat(bmDetail.likeCnt()).isEqualTo(2);
         assertThat(bmDetail.ptImgResList()).isEqualTo(ptImgResList);
+        // todo spURLs 검증 필요
         assertThat(bmDetail.subCategories()).isEqualTo(subCategories);
 
         assertThat(myBmHistoryRepository.findByMemberAndBm(member_01, bm).get()).isNotNull();
@@ -227,13 +228,12 @@ class BmServiceTest {
     void BM_수정_성공() {
         //given
         Member member = saveMember();
-        Bm bm = saveBm(member);
+        Company company = saveCompany(member);
+        Bm bm = saveBm(member, company);
 
         final String updatedName = "updated_bm_name";
         final MainCategory updatedMainCategory = MainCategory.COMMUNICATION_SECURITY_DATA;
         final List<SubCategory> updatedSubCategories = List.of(SubCategory.DATA_ANALYTICS, SubCategory.CYBER_SECURITY);
-        final String updatedCompany = "updated_bm_company";
-        final String updatedLogoImgKey = "updated_bm_logo_img_key";
         final String updatedIntro = "updated_bm_intro";
         final String updatedDescription = "updated_bm_description";
         final String updatedDescImgKey = "updated_bm_desc_img_key";
@@ -245,26 +245,22 @@ class BmServiceTest {
         final String updatedLongPitchURL = "updated_bm_long_pitch_url";
 
         UpdateBmReq updateBmReq = new UpdateBmReq(updatedName, updatedMainCategory,
-                updatedSubCategories, updatedCompany, updatedIntro, updatedDescription,
+                updatedSubCategories, updatedIntro, updatedDescription,
                 updatedAddress, updatedValuationCap, updatedGoalInvestment,
                 updatedMaxIssuedShare, updatedDeadline, updatedLongPitchURL
         );
 
-        when(s3Service.uploadFile(LOGO_IMG, S3UploadTarget.COMPANY_LOGO))
-                .thenReturn(updatedLogoImgKey);
         when(s3Service.uploadFile(DESC_IMG, S3UploadTarget.COMPANY_DESC))
                 .thenReturn(updatedDescImgKey);
 
         //when
-        bmService.updateBm(member.getId(), bm.getId(), updateBmReq, LOGO_IMG, DESC_IMG);
+        bmService.updateBm(member.getId(), bm.getId(), updateBmReq, DESC_IMG);
 
         //then
         Bm updatedBm = bmRepository.findById(bm.getId()).orElseThrow();
         assertThat(updatedBm.getName()).isEqualTo(updatedName);
         assertThat(updatedBm.getMainCategory()).isEqualTo(updatedMainCategory);
         assertThat(updatedBm.getKoreanSubCategories()).isEqualTo(updatedSubCategories.stream().map(SubCategory::getKoreanName).toList());
-        assertThat(updatedBm.getCompany()).isEqualTo(updatedCompany);
-        assertThat(updatedBm.getLogoImgKey()).isEqualTo(updatedLogoImgKey);
         assertThat(updatedBm.getIntro()).isEqualTo(updatedIntro);
         assertThat(updatedBm.getDescription()).isEqualTo(updatedDescription);
         assertThat(updatedBm.getDescImgKey()).isEqualTo(updatedDescImgKey);
@@ -280,12 +276,12 @@ class BmServiceTest {
     void BM_수정_실패() {
         //given
         Member member_01 = saveMember();
-        Bm bm = saveBm(member_01);
+        Company company = saveCompany(member_01);
+        Bm bm = saveBm(member_01, company);
 
         final String UPDATED_NAME = "update_bm_name";
         final MainCategory UPDATED_MAIN_CATEGORY = MainCategory.COMMUNICATION_SECURITY_DATA;
         final List<SubCategory> UPDATED_SUB_CATEGORIES = List.of(SubCategory.DATA_ANALYTICS, SubCategory.CYBER_SECURITY);
-        final String UPDATED_COMPANY = "update_bm_company";
         final String UPDATED_INTRO = "update_bm_intro";
         final String UPDATED_DESCRIPTION = "update_bm_description";
         final String UPDATED_ADDRESS = "update_bm_address";
@@ -296,7 +292,7 @@ class BmServiceTest {
         final String UPDATED_LONG_PITCH_URL = "updated_bm_long_pitch_url";
 
         UpdateBmReq updateBmReq = new UpdateBmReq(UPDATED_NAME, UPDATED_MAIN_CATEGORY,
-                UPDATED_SUB_CATEGORIES, UPDATED_COMPANY, UPDATED_INTRO, UPDATED_DESCRIPTION,
+                UPDATED_SUB_CATEGORIES, UPDATED_INTRO, UPDATED_DESCRIPTION,
                 UPDATED_ADDRESS, UPDATED_VALUATION_CAP, UPDATED_GOAL_INVESTMENT,
                 UPDATED_MAX_ISSUED_SHARE, UPDATED_DEADLINE, UPDATED_LONG_PITCH_URL
         );
@@ -305,9 +301,9 @@ class BmServiceTest {
         Member member_02 = saveMember();
 
         //when
-        GeneralHandler e_1 = assertThrows(GeneralHandler.class, () -> bmService.updateBm(invalidId, bm.getId(), updateBmReq, null, null));
-        GeneralHandler e_2 = assertThrows(GeneralHandler.class, () -> bmService.updateBm(member_01.getId(), invalidId, updateBmReq, null, null));
-        GeneralHandler e_3 = assertThrows(GeneralHandler.class, () -> bmService.updateBm(member_02.getId(), bm.getId(), updateBmReq, null, null));
+        GeneralHandler e_1 = assertThrows(GeneralHandler.class, () -> bmService.updateBm(invalidId, bm.getId(), updateBmReq, null));
+        GeneralHandler e_2 = assertThrows(GeneralHandler.class, () -> bmService.updateBm(member_01.getId(), invalidId, updateBmReq, null));
+        GeneralHandler e_3 = assertThrows(GeneralHandler.class, () -> bmService.updateBm(member_02.getId(), bm.getId(), updateBmReq, null));
 
         //then
         assertThat(e_1.getErrorStatus()).isEqualTo(ErrorStatus.MEMBER_NOT_FOUND);
@@ -319,7 +315,8 @@ class BmServiceTest {
     void BM_PT_IMG_추가_성공() {
         //given
         Member member = saveMember();
-        Bm bm = saveBm(member);
+        Company company = saveCompany(member);
+        Bm bm = saveBm(member, company);
 
         List<MultipartFile> ptImgs = List.of(
                 new MockMultipartFile("img_1", "img_1.png", "image/png", "img1".getBytes()),
@@ -352,7 +349,8 @@ class BmServiceTest {
     void BM_PT_IMG_수정_성공() {
         //given
         Member member = saveMember();
-        Bm bm = saveBm(member);
+        Company company = saveCompany(member);
+        Bm bm = saveBm(member, company);
         bm.updatePtImgs(List.of(
                 new PtImg(bm, 0, "origin_img_0.png"),
                 new PtImg(bm, 1, "origin_img_1.png")
@@ -388,7 +386,8 @@ class BmServiceTest {
     void BM_PT_IMG_수정_실패() {
         //given
         Member member = saveMember();
-        Bm bm = saveBm(member);
+        Company company = saveCompany(member);
+        Bm bm = saveBm(member, company);
 
         Long invalidId = Long.MAX_VALUE;
         Member member_02 = saveMember();
@@ -409,7 +408,8 @@ class BmServiceTest {
     void BM_삭제_성공() {
         //given
         Member member = saveMember();
-        Bm bm = saveBm(member);
+        Company company = saveCompany(member);
+        Bm bm = saveBm(member, company);
 
         //when
         bmService.deleteBm(member.getId(), bm.getId());
@@ -423,7 +423,8 @@ class BmServiceTest {
     void BM_삭제_실패() {
         //given
         Member member_01 = saveMember();
-        Bm bm = saveBm(member_01);
+        Company company = saveCompany(member_01);
+        Bm bm = saveBm(member_01, company);
 
         Long invalidId = Long.MAX_VALUE;
         Member member_02 = saveMember();

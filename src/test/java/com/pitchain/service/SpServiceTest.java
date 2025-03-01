@@ -43,19 +43,23 @@ class SpServiceTest {
     @Autowired
     private MyBmRepository myBmRepository;
     @Autowired
-    private CategoryPrefRepository categoryPrefRepository;
+    private CompanyRepository companyRepository;
 
     private Member saveMember() {
         return memberRepository.save(new Member(Country.ROK, Strings.EMPTY));
     }
 
-    private Bm saveBm(Member member) {
-        return bmRepository.save(new Bm(member, "bm_name", MainCategory.FOOD, "bm_intro", "bm_description",
+    private Company saveCompany(Member member) {
+        return companyRepository.save(new Company("company_name", "company_intro", "company_description", member));
+    }
+
+    private Bm saveBm(Member member, Company company) {
+        return bmRepository.save(new Bm(member, company, "bm_name", MainCategory.FOOD, "bm_intro", "bm_description",
                 "bm_desc_img_key", "bm_address", 100000L, 1000L, 1000, LocalDate.now(), "bm_long_pitch_url"));
     }
 
-    private Bm saveBmWithMainCategory(Member member, MainCategory mainCategory) {
-        return bmRepository.save(new Bm(member, "bm_name", mainCategory, "bm_intro", "bm_description",
+    private Bm saveBmWithMainCategory(Member member, Company company, MainCategory mainCategory) {
+        return bmRepository.save(new Bm(member, company, "bm_name", mainCategory, "bm_intro", "bm_description",
                 "bm_desc_img_key", "bm_address", 100000L, 1000L, 1000, LocalDate.now(), "bm_long_pitch_url"));
     }
 
@@ -67,11 +71,13 @@ class SpServiceTest {
     @BeforeEach
     void setUp() {
         member = saveMember();
-        bm = saveBm(member);
+        company = saveCompany(member);
+        bm = saveBm(member, company);
     }
 
     private Member member;
     private Bm bm;
+    private Company company;
 
     private static final String SP_NAME = "sp_name";
     private static final String SP_KEY = "sp_vid.m3u8";
@@ -122,7 +128,6 @@ class SpServiceTest {
         assertThat(spDetail.name()).isEqualTo(sp.getName());
         assertThat(spDetail.mainCategory()).isEqualTo(sp.getBm().getMainCategory().getKoreanName());
         assertThat(spDetail.subCategories()).isEqualTo(subCategories);
-        assertThat(spDetail.company()).isEqualTo(sp.getBm().getCompany());
         assertThat(spDetail.isLiked()).isEqualTo(false);
         assertThat(spDetail.likeCnt()).isEqualTo(0L);
     }
@@ -149,7 +154,6 @@ class SpServiceTest {
         assertThat(spDetail.name()).isEqualTo(sp.getName());
         assertThat(spDetail.mainCategory()).isEqualTo(sp.getBm().getMainCategory().getKoreanName());
         assertThat(spDetail.subCategories()).isEqualTo(subCategories);
-        assertThat(spDetail.company()).isEqualTo(sp.getBm().getCompany());
         assertThat(spDetail.isLiked()).isEqualTo(true);
         assertThat(spDetail.likeCnt()).isEqualTo(2L);
     }
@@ -160,7 +164,8 @@ class SpServiceTest {
         Sp sp_1 = saveSp(bm);
 
         Member newMember = saveMember();
-        Bm newBm = saveBm(newMember);
+        Company newCompany = saveCompany(newMember);
+        Bm newBm = saveBm(newMember, newCompany);
         Sp sp_2 = saveSp(newBm);
 
         //when
@@ -184,9 +189,13 @@ class SpServiceTest {
         Member member2 = saveMember();
         Member member3 = saveMember();
 
-        Bm bm1 = saveBmWithMainCategory(member1, MainCategory.TECH_DIGITAL);
-        Bm bm2 = saveBmWithMainCategory(member2, MainCategory.TECH_DIGITAL);
-        Bm bm3 = saveBmWithMainCategory(member3, MainCategory.FOOD);
+        Company company1 = saveCompany(member1);
+        Company company2 = saveCompany(member2);
+        Company company3 = saveCompany(member3);
+
+        Bm bm1 = saveBmWithMainCategory(member1, company1, MainCategory.TECH_DIGITAL);
+        Bm bm2 = saveBmWithMainCategory(member2, company2, MainCategory.TECH_DIGITAL);
+        Bm bm3 = saveBmWithMainCategory(member3, company3, MainCategory.FOOD);
 
         myBmRepository.save(new MyBm(member1, bm1));
         myBmRepository.save(new MyBm(member2, bm1));
@@ -205,7 +214,6 @@ class SpServiceTest {
         assertThat(spDetails.get(0).mainCategory()).isEqualTo(bm1.getMainCategory().getKoreanName());
         assertThat(spDetails.get(0).name()).isEqualTo(sp1.getName());
         assertThat(spDetails.get(0).views()).isEqualTo(sp1.getViews());
-        assertThat(spDetails.get(0).company()).isEqualTo(bm1.getCompany());
         assertThat(spDetails.get(0).isLiked()).isTrue();
         assertThat(spDetails.get(0).likeCnt()).isEqualTo(2);
 
@@ -213,7 +221,6 @@ class SpServiceTest {
         assertThat(spDetails.get(1).mainCategory()).isEqualTo(bm2.getMainCategory().getKoreanName());
         assertThat(spDetails.get(1).name()).isEqualTo(sp2.getName());
         assertThat(spDetails.get(1).views()).isEqualTo(sp2.getViews());
-        assertThat(spDetails.get(1).company()).isEqualTo(bm2.getCompany());
         assertThat(spDetails.get(1).isLiked()).isFalse();
         assertThat(spDetails.get(1).likeCnt()).isEqualTo(0);
     }
@@ -225,9 +232,13 @@ class SpServiceTest {
         Member member2 = saveMember();
         Member member3 = saveMember();
 
-        Bm bm1 = saveBmWithMainCategory(member1, MainCategory.TECH_DIGITAL);
-        Bm bm2 = saveBmWithMainCategory(member2, MainCategory.TECH_DIGITAL);
-        Bm bm3 = saveBmWithMainCategory(member3, MainCategory.FOOD);
+        Company company1 = saveCompany(member1);
+        Company company2 = saveCompany(member2);
+        Company company3 = saveCompany(member3);
+
+        Bm bm1 = saveBmWithMainCategory(member1, company1, MainCategory.TECH_DIGITAL);
+        Bm bm2 = saveBmWithMainCategory(member2, company2, MainCategory.TECH_DIGITAL);
+        Bm bm3 = saveBmWithMainCategory(member3, company3, MainCategory.FOOD);
 
         Sp sp1 = saveSp(bm1);
         Sp sp2 = saveSp(bm2);

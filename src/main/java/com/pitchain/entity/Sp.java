@@ -16,7 +16,7 @@ public class Sp extends BaseEntity {
     @Column(name = "sp_id")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bm_id", nullable = false)
     private Bm bm;
 

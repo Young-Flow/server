@@ -6,7 +6,6 @@ import com.pitchain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
 import lombok.*;
-import org.apache.logging.log4j.util.Strings;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -48,14 +47,19 @@ public class Bm extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @ManyToOne
+    @JoinColumn(name = "company_id")
+    private Company company;
+
     @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BmSubCategory> subCategories = new ArrayList<>();
 
     @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY)
     private List<Investment> investments = new ArrayList<>();
 
-    @OneToOne(mappedBy = "bm", fetch = FetchType.LAZY)
-    private Sp sp;
+    @OrderBy("id ASC")
+    @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Sp> sps = new ArrayList<>();
 
     @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PtImg> ptImgs = new ArrayList<>();
@@ -68,11 +72,12 @@ public class Bm extends BaseEntity {
     }
 
     @Builder
-    public Bm(Member member, String name, MainCategory mainCategory,
+    public Bm(Member member, Company company, String name, MainCategory mainCategory,
               String intro, String description, String descImgKey, String address,
               Long valuationCap, Long goalInvestment, Integer maxIssuedShare,
               LocalDate deadline, String longPitchURL) {
         this.member = member;
+        this.company = company;
         this.name = name;
         this.mainCategory = mainCategory;
         this.intro = intro;
@@ -84,13 +89,6 @@ public class Bm extends BaseEntity {
         this.maxIssuedShare = maxIssuedShare;
         this.deadline = deadline;
         this.longPitchURL = longPitchURL;
-    }
-
-    public String getSpKey() {
-        if (sp == null) {
-            return Strings.EMPTY;
-        }
-        return sp.getSpKey();
     }
 
     public boolean isOwner(Long memberId) {

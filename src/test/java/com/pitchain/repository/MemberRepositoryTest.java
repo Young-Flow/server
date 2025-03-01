@@ -25,6 +25,8 @@ class MemberRepositoryTest {
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
+    private CompanyRepository companyRepository;
+    @Autowired
     private BmRepository bmRepository;
     @Autowired
     private SpRepository spRepository;
@@ -39,13 +41,17 @@ class MemberRepositoryTest {
         return memberRepository.save(new Member(Country.ROK, Strings.EMPTY));
     }
 
-    private Bm saveBm(Member member) {
-        return bmRepository.save(new Bm(member, "bm_name", MainCategory.FOOD, "bm_intro", "bm_description", "bm_desc_img_key",
+    private Company saveCompany(Member member) {
+        return companyRepository.save(new Company("company_name", "company_intro", "company_description", member));
+    }
+
+    private Bm saveBm(Member member, Company company) {
+        return bmRepository.save(new Bm(member, company, "bm_name", MainCategory.FOOD, "bm_intro", "bm_description", "bm_desc_img_key",
                 "bm_address", 100000L, 1000L, 1000, LocalDate.now(), "bm_long_pitch_url"));
     }
 
-    private Bm saveBmWithMainCategory(Member member, MainCategory mainCategory) {
-        return bmRepository.save(new Bm(member, "bm_name", mainCategory, "bm_intro", "bm_description", "bm_desc_img_key",
+    private Bm saveBmWithMainCategory(Member member, Company company, MainCategory mainCategory) {
+        return bmRepository.save(new Bm(member, company, "bm_name", mainCategory, "bm_intro", "bm_description", "bm_desc_img_key",
                 "bm_address", 100000L, 1000L, 1000, LocalDate.now(), "bm_long_pitch_url"));
     }
 
@@ -66,16 +72,21 @@ class MemberRepositoryTest {
         Member member_3 = saveMember();
         Member member_4 = saveMember();
 
-        Bm bm_1 = saveBmWithMainCategory(member_1, MainCategory.FOOD);
+        Company company_1 = saveCompany(member_1);
+        Company company_2 = saveCompany(member_1);
+        Company company_3 = saveCompany(member_1);
+        Company company_4 = saveCompany(member_1);
 
-        Bm bm_2 = saveBmWithMainCategory(member_2, MainCategory.FOOD);
+        Bm bm_1 = saveBmWithMainCategory(member_1, company_1, MainCategory.FOOD);
+
+        Bm bm_2 = saveBmWithMainCategory(member_2, company_2, MainCategory.FOOD);
         investmentRepository.save(new Investment(member_2, bm_2, 2000L));
 
-        Bm bm_3 = saveBmWithMainCategory(member_3, MainCategory.FOOD);
+        Bm bm_3 = saveBmWithMainCategory(member_3, company_3, MainCategory.FOOD);
         investmentRepository.save(new Investment(member_3, bm_3, 3000L));
         mySpHistoryRepository.save(new MySpHistory(member_3, bm_3, 98765));
 
-        Bm bm_4 = saveBmWithMainCategory(member_4, MainCategory.FOOD);
+        Bm bm_4 = saveBmWithMainCategory(member_4, company_4, MainCategory.FOOD);
         investmentRepository.save(new Investment(member_4, bm_4, 4000L));
         mySpHistoryRepository.save(new MySpHistory(member_4, bm_4, 123456));
         myBmHistoryRepository.save(new MyBmHistory(member_4, bm_4));

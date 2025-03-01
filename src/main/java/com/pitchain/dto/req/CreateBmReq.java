@@ -10,10 +10,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 public record CreateBmReq(
+        Long companyId,
         String name,
         MainCategory mainCategory,
         @NotNull List<SubCategory> subCategories,
-        String company,
         String intro,
         String description,
         String address,

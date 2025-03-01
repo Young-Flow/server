@@ -11,9 +11,11 @@ import com.pitchain.dto.res.DeletedCommentRes;
 import com.pitchain.dto.res.ReplyCommentRes;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.Comment;
+import com.pitchain.entity.Company;
 import com.pitchain.entity.Member;
 import com.pitchain.repository.BmRepository;
 import com.pitchain.repository.CommentRepository;
+import com.pitchain.repository.CompanyRepository;
 import com.pitchain.repository.MemberRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -38,6 +40,8 @@ class CommentServiceTest {
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
+    private CompanyRepository companyRepository;
+    @Autowired
     private BmRepository bmRepository;
     @Autowired
     private CommentService commentService;
@@ -50,6 +54,7 @@ class CommentServiceTest {
     void tearDown() {
         commentRepository.deleteAll();
         bmRepository.deleteAll();
+        companyRepository.deleteAll();
         memberRepository.deleteAll();
     }
 
@@ -57,7 +62,8 @@ class CommentServiceTest {
     void 댓글_등록_성공() {
         //given
         Member member = saveMember();
-        Bm bm = saveBm(member);
+        Company company = saveCompany(member);
+        Bm bm = saveBm(member, company);
 
         CommentReq.AddCommentReq addCommentReq = new CommentReq.AddCommentReq();
         String content = "댓글 내용";
@@ -81,7 +87,8 @@ class CommentServiceTest {
     void 답글_등록_성공() {
         //given
         Member member = saveMember();
-        Bm bm = saveBm(member);
+        Company company = saveCompany(member);
+        Bm bm = saveBm(member, company);
 
         Comment parentComment = saveComment(member, bm);
         Long parentCommentId = parentComment.getId();
@@ -110,7 +117,8 @@ class CommentServiceTest {
     void 댓글_존재_조회_성공() {
         //given
         Member member = saveMember();
-        Bm bm = saveBm(member);
+        Company company = saveCompany(member);
+        Bm bm = saveBm(member, company);
         Comment comment = saveComment(member, bm);
 
         //when
@@ -127,7 +135,8 @@ class CommentServiceTest {
     void 댓글_미존재_조회_성공() {
         //given
         Member member = saveMember();
-        Bm bm = saveBm(member);
+        Company company = saveCompany(member);
+        Bm bm = saveBm(member, company);
 
         //when
         List<? extends BaseCommentRes> comments = commentService.getComments(bm.getId());
@@ -141,7 +150,8 @@ class CommentServiceTest {
     void 답글_포함_댓글_조회_성공() {
         //given
         Member memberA = saveMember();
-        Bm bm = saveBm(memberA);
+        Company company = saveCompany(memberA);
+        Bm bm = saveBm(memberA, company);
 
         Comment parentComment = saveComment(memberA, bm);
 
@@ -171,7 +181,8 @@ class CommentServiceTest {
     void 삭제된_댓글_조회_성공() {
         //given
         Member memberA = saveMember();
-        Bm bm = saveBm(memberA);
+        Company company = saveCompany(memberA);
+        Bm bm = saveBm(memberA, company);
         Comment parentComment = new Comment(memberA, bm, null, "댓글 내용");
         parentComment.deleteParentComment();
         commentRepository.save(parentComment);
@@ -196,7 +207,8 @@ class CommentServiceTest {
     void 댓글_수정_성공() {
         //given
         Member member = saveMember();
-        Bm bm = saveBm(member);
+        Company company = saveCompany(member);
+        Bm bm = saveBm(member, company);
 
         Comment comment = saveComment(member, bm);
         Long commentId = comment.getId();
@@ -219,7 +231,8 @@ class CommentServiceTest {
     void 댓글_수정_실패() {
         //given
         Member member = saveMember();
-        Bm bm = saveBm(member);
+        Company company = saveCompany(member);
+        Bm bm = saveBm(member, company);
 
         Comment comment = saveComment(member, bm);
         Long commentId = comment.getId();
@@ -246,7 +259,8 @@ class CommentServiceTest {
     void 댓글_삭제_성공() {
         //given
         Member member = saveMember();
-        Bm bm = saveBm(member);
+        Company company = saveCompany(member);
+        Bm bm = saveBm(member, company);
 
         Comment comment = saveComment(member, bm);
         Long commentId = comment.getId();
@@ -264,7 +278,8 @@ class CommentServiceTest {
     void 답글_있는_댓글_삭제_성공() {
         //given
         Member memberA = saveMember();
-        Bm bm = saveBm(memberA);
+        Company company = saveCompany(memberA);
+        Bm bm = saveBm(memberA, company);
         Comment parentComment = saveComment(memberA, bm);
 
         Member memberB = saveMember();
@@ -282,7 +297,8 @@ class CommentServiceTest {
     void 댓글_삭제_실패() {
         //given
         Member member = saveMember();
-        Bm bm = saveBm(member);
+        Company company = saveCompany(member);
+        Bm bm = saveBm(member, company);
 
         Comment comment = saveComment(member, bm);
         Long commentId = comment.getId();
@@ -305,8 +321,12 @@ class CommentServiceTest {
         return memberRepository.save(new Member(Country.USA, "profileImg.jpg"));
     }
 
-    private Bm saveBm(Member member) {
-        return bmRepository.save(new Bm(member, "bmName", MainCategory.FOOD, "bmIntro", "bmDescription",
+    private Company saveCompany(Member member) {
+        return companyRepository.save(new Company("company_name", "company_intro", "company_description", member));
+    }
+
+    private Bm saveBm(Member member, Company company) {
+        return bmRepository.save(new Bm(member, company, "bmName", MainCategory.FOOD, "bmIntro", "bmDescription",
                 "bmDescriptionImg", "companyAddress", 100000L, 1000L, 1000, LocalDate.now(), "longPitchUrl"));
     }
 

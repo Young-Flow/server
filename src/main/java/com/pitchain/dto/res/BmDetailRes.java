@@ -2,6 +2,7 @@ package com.pitchain.dto.res;
 
 import com.pitchain.dto.BmWithLikeDto;
 import com.pitchain.entity.Bm;
+import com.pitchain.entity.Company;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -10,41 +11,44 @@ import java.util.List;
 @Builder
 public record BmDetailRes(
         Long id,
+        String companyLogoImgURL,
+        String companyName,
+        String companyAddress,
         String name,
-        String company,
         String intro,
         String mainCategory,
         List<String> subCategories,
-        String logoImgURL,
         String description,
         String descImgURL,
-        String address,
+        String bmAddress,
         LocalDateTime createdAt,
         String longPitchURL,
-        String spURL,
         boolean isLiked,
         long likeCnt,
+        List<String> spURLs,
         List<PtImgRes> ptImgResList
 ) {
-    public static BmDetailRes createRes(BmWithLikeDto bmWithLikeDto, long likeCnt, List<PtImgRes> ptImgResList, List<String> subCategories,
-                                        String spURL, String logoImgURL, String descImgURL) {
+    public static BmDetailRes createRes(Company company, String companyLogoImgURL, BmWithLikeDto bmWithLikeDto,
+                                        String descImgURL, long likeCnt,
+                                        List<String> subCategories, List<String> spURLs, List<PtImgRes> ptImgResList) {
         Bm bm = bmWithLikeDto.getBm();
         return BmDetailRes.builder()
                 .id(bm.getId())
+                .companyLogoImgURL(companyLogoImgURL)
+                .companyName(company.getName())
+                .companyAddress(company.getAddress())
                 .name(bm.getName())
-                .company(bm.getCompany())
                 .intro(bm.getIntro())
                 .mainCategory(bm.getMainCategory().getKoreanName())
                 .subCategories(subCategories)
-                .logoImgURL(logoImgURL)
                 .description(bm.getDescription())
                 .descImgURL(descImgURL)
-                .address(bm.getAddress())
+                .bmAddress(bm.getAddress())
                 .createdAt(bm.getCreatedAt())
                 .longPitchURL(bm.getLongPitchURL())
-                .spURL(spURL)
                 .isLiked(bmWithLikeDto.isLiked())
                 .likeCnt(likeCnt)
+                .spURLs(spURLs)
                 .ptImgResList(ptImgResList)
                 .build();
     }

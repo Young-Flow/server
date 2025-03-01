@@ -8,10 +8,7 @@ import com.pitchain.dto.req.CreateBmReq;
 import com.pitchain.dto.req.UpdateBmReq;
 import com.pitchain.dto.res.BmDetailRes;
 import com.pitchain.dto.res.PtImgRes;
-import com.pitchain.entity.Bm;
-import com.pitchain.entity.Member;
-import com.pitchain.entity.MyBmHistory;
-import com.pitchain.entity.PtImg;
+import com.pitchain.entity.*;
 import com.pitchain.repository.BmRepository;
 import com.pitchain.repository.EntityFacade;
 import com.pitchain.repository.MyBmHistoryRepository;
@@ -50,19 +47,21 @@ public class BmService {
         BmWithLikeDto bmWithLikeDto = bmRepository.getBmWithLikeDto(member.getId(), bmId)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
         Bm bm = bmWithLikeDto.getBm();
+        String descImgURL = s3Service.getFileURL(bm.getDescImgKey());
 
         long likeCnt = myBmRepository.countByBm(bm);
         List<PtImgRes> ptImgResList = getPtImgResList(bmId);
         List<String> subCategories = bm.getKoreanSubCategories();
 
-        String spURL = s3Service.getFileURL(bm.getSpKey());
-        String logoImgURL = s3Service.getFileURL(bm.getLogoImgKey());
-        String descImgURL = s3Service.getFileURL(bm.getDescImgKey());
+        List<String> spURLs = bm.getSps().stream().map(sp -> s3Service.getFileURL(sp.getSpKey())).toList();
+
+        Company company = bm.getCompany();
+        String companyLogoImg = s3Service.getFileURL(company.getLogoImgKey());
 
         myBmHistoryRepository.findByMemberAndBm(member, bm)
                 .orElseGet(() -> myBmHistoryRepository.save(new MyBmHistory(member, bm)));
 
-        return BmDetailRes.createRes(bmWithLikeDto, likeCnt, ptImgResList, subCategories, spURL, logoImgURL, descImgURL);
+        return BmDetailRes.createRes(company, companyLogoImg, bmWithLikeDto, descImgURL, likeCnt, subCategories, spURLs, ptImgResList);
     }
 
     public void updateBm(Long memberId, Long bmId, UpdateBmReq updateBmReq, MultipartFile descImg) {

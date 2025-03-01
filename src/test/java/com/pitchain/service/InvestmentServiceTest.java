@@ -6,9 +6,11 @@ import com.pitchain.common.constant.MainCategory;
 import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.dto.res.InvestmentStatusRes;
 import com.pitchain.entity.Bm;
+import com.pitchain.entity.Company;
 import com.pitchain.entity.Investment;
 import com.pitchain.entity.Member;
 import com.pitchain.repository.BmRepository;
+import com.pitchain.repository.CompanyRepository;
 import com.pitchain.repository.InvestmentRepository;
 import com.pitchain.repository.MemberRepository;
 import org.junit.jupiter.api.Assertions;
@@ -33,6 +35,8 @@ class InvestmentServiceTest {
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
+    private CompanyRepository companyRepository;
+    @Autowired
     private BmRepository bmRepository;
     @Autowired
     private InvestmentRepository investmentRepository;
@@ -41,7 +45,8 @@ class InvestmentServiceTest {
     void 투자_등록_성공() {
         //given
         Member member = saveMember();
-        Bm bm = saveBm(member);
+        Company company = saveCompany(member);
+        Bm bm = saveBm(member, company);
         long amount = 1000L;
 
         //when
@@ -59,7 +64,8 @@ class InvestmentServiceTest {
     void 투자_등록_실패() {
         //given
         Member member = saveMember();
-        Bm bm = saveBm(member);
+        Company company = saveCompany(member);
+        Bm bm = saveBm(member, company);
         long amount = 1000L;
 
         Long invalidId = Long.MAX_VALUE;
@@ -77,7 +83,8 @@ class InvestmentServiceTest {
     void BM_투자_정보_조회_성공() {
         //given
         Member member = saveMember();
-        Long bmId = saveBm(member).getId();
+        Company company = saveCompany(member);
+        Long bmId = saveBm(member, company).getId();
 
         Member investorA = saveMember();
         long amountA = 1000L;
@@ -112,8 +119,12 @@ class InvestmentServiceTest {
         return memberRepository.save(new Member(Country.USA, "profileImg"));
     }
 
-    private Bm saveBm(Member member) {
-        return bmRepository.save(new Bm(member, "bmName", MainCategory.FOOD, "bmIntro", "bmDescription",
+    private Bm saveBm(Member member, Company company) {
+        return bmRepository.save(new Bm(member, company, "bmName", MainCategory.FOOD, "bmIntro", "bmDescription",
                 "bmDescriptionImg", "companyAddress", 100000L, 1000L, 1000, LocalDate.now(), "longPitchUrl"));
+    }
+
+    private Company saveCompany(Member member) {
+        return companyRepository.save(new Company("company_name", "company_intro", "company_description", member));
     }
 }
