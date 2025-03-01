@@ -23,13 +23,11 @@ public record CreateBmReq(
         LocalDate deadline,
         String longPitchURL
 ) {
-    public Bm createBm(Member member, String logoImgKey, String descImgKey) {
+    public Bm createBm(Member member, String descImgKey) {
         return Bm.builder()
                 .member(member)
                 .name(name)
                 .mainCategory(mainCategory)
-                .company(company)
-                .logoImgKey(logoImgKey)
                 .intro(intro)
                 .description(description)
                 .descImgKey(descImgKey)

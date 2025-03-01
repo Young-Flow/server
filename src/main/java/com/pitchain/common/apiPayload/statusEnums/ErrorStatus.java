@@ -26,6 +26,9 @@ public enum ErrorStatus implements ResponseStatus {
 
     MEMBER_FORBIDDEN(HttpStatus.FORBIDDEN, "MEMBER4031", "사용자에게 권한이 없습니다."),
 
+    // companyName
+    COMPANY_NOT_FOUND(HttpStatus.NOT_FOUND, "COMPANY4041", "존재하지 않는 회사입니다."),
+
     // bm
     BM_NOT_FOUND(HttpStatus.NOT_FOUND, "BM4041", "존재하지 않는 BM입니다."),
 

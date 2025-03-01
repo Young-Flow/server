@@ -21,12 +21,10 @@ public record UpdateBmReq(
         LocalDate deadline,
         String longPitchURL
 ) {
-    public Bm createBm(String logoImgKey, String descImgKey) {
+    public Bm createBm(String descImgKey) {
         return Bm.builder()
                 .name(name)
                 .mainCategory(mainCategory)
-                .company(company)
-                .logoImgKey(logoImgKey)
                 .intro(intro)
                 .description(description)
                 .descImgKey(descImgKey)
