@@ -1,3 +1,6 @@
+[![CI](https://github.com/Young-Flow/server/actions/workflows/CI.yml/badge.svg)](https://github.com/Young-Flow/server/actions/workflows/CI.yml)
+[![CD](https://github.com/Young-Flow/server/actions/workflows/CD.yml/badge.svg)](https://github.com/Young-Flow/server/actions/workflows/CD.yml)
+
 # 숏폼 중심 스타트업 크라우드펀딩 웹 Pitchain BE
 ![메인](https://github.com/user-attachments/assets/4f288f4f-4bea-4133-b8b9-a3e9395ed1d1)
 
