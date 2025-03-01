@@ -120,42 +120,6 @@ public class SpService {
                 .toList();
     }
 
-    public List<SpDetailRes> getRecommendationByPref(Long memberId) {
-        List<CategoryPref> categoryPrefs = categoryPrefRepository.findAllByMemberId(memberId)
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.CATEGORY_PREF_NOT_FOUND));
-        List<SubCategory> subCategoryPrefs = categoryPrefs.stream().map(CategoryPref::getSubCategory).toList();
-
-//        List<Bm> bms = bmRepository.findAll().stream()
-//                .filter(bm -> bm.getSubCategories().stream()
-//                        .map(BmSubCategory::getSubCategory)
-//                        .anyMatch(subCategoryPrefs::contains)
-//                )
-//                .toList();
-//
-//        bms.forEach(bm -> System.out.println(bm));
-//
-//        List<SpWithLikeDto> spWithLikeDtos = bms.stream().map(bm -> new SpWithLikeDto(bm.getSp(), false)).toList();
-//
-//        spWithLikeDtos.forEach(spWithLikeDto -> System.out.println(spWithLikeDto));
-
-        List<SpWithLikeDto> spWithLikeDtos = spRepository.getSpWithLikeDtoByPref(memberId, subCategoryPrefs);
-
-        return spWithLikeDtos.stream()
-                .map(spWithLikeDto -> {
-                    Sp sp = spWithLikeDto.getSp();
-                    String spURL = s3Service.getFileURL(sp.getSpKey());
-                    String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
-
-                    Bm bm = sp.getBm();
-                    long likeCnt = myBmRepository.countByBm(bm);
-                    List<String> subCategories = bm.getKoreanSubCategories();
-                    String logoImgURL = s3Service.getFileURL(bm.getLogoImgKey());
-
-                    return SpDetailRes.createRes(spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories, logoImgURL);
-                })
-                .toList();
-    }
-
     public void updateSp(Long memberId, Long spId, String name, MultipartFile spVid, MultipartFile thumbnailImg) {
         Member member = entityFacade.getMember(memberId);
         Sp sp = entityFacade.getSp(spId);
