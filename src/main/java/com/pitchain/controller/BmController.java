@@ -22,9 +22,8 @@ public class BmController {
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public CustomApiResponse createBm(@AuthenticationPrincipal Long memberId,
                                       @RequestPart CreateBmReq createBmReq,
-                                      @RequestPart(required = false) MultipartFile logoImg,
-                                      @RequestPart(required = false) MultipartFile descImg) {
-        bmService.createBm(memberId, createBmReq, logoImg, descImg);
+                                      @RequestPart(required = false) MultipartFile descImg) { // todo 텍스트 에디터 도입 시 수정 필요
+        bmService.createBm(memberId, createBmReq, descImg);
         return CustomApiResponse.onSuccess();
     }
 
@@ -39,9 +38,8 @@ public class BmController {
     public CustomApiResponse<BmDetailRes> updateBm(@AuthenticationPrincipal Long memberId,
                                                    @PathVariable("bmId") Long bmId,
                                                    @RequestPart UpdateBmReq updateBmReq,
-                                                   @RequestPart(required = false) MultipartFile logoImg,
                                                    @RequestPart(required = false) MultipartFile descImg) {
-        bmService.updateBm(memberId, bmId, updateBmReq, logoImg, descImg);
+        bmService.updateBm(memberId, bmId, updateBmReq, descImg);
         return CustomApiResponse.onSuccess();
     }
 

@@ -34,12 +34,11 @@ public class BmService {
     private final MyBmHistoryRepository myBmHistoryRepository;
     private final S3Service s3Service;
 
-    public void createBm(Long memberId, CreateBmReq createBmReq, MultipartFile logoImg, MultipartFile descImg) {
+    public void createBm(Long memberId, CreateBmReq createBmReq, MultipartFile descImg) {
         Member member = entityFacade.getMember(memberId);
-        String logoImgKey = s3Service.uploadFile(logoImg, S3UploadTarget.COMPANY_LOGO);
         String descImgKey = s3Service.uploadFile(descImg, S3UploadTarget.COMPANY_DESC);
 
-        Bm newBm = createBmReq.createBm(member, logoImgKey, descImgKey);
+        Bm newBm = createBmReq.createBm(member, descImgKey);
         newBm.addSubCategories(createBmReq.subCategories());
 
         bmRepository.save(newBm);
@@ -66,17 +65,16 @@ public class BmService {
         return BmDetailRes.createRes(bmWithLikeDto, likeCnt, ptImgResList, subCategories, spURL, logoImgURL, descImgURL);
     }
 
-    public void updateBm(Long memberId, Long bmId, UpdateBmReq updateBmReq, MultipartFile logoImg, MultipartFile descImg) {
+    public void updateBm(Long memberId, Long bmId, UpdateBmReq updateBmReq, MultipartFile descImg) {
         Member member = entityFacade.getMember(memberId);
         Bm bm = entityFacade.getBm(bmId);
 
         validateBmOwner(bm, member);
 
-        String logoImgKey = s3Service.uploadFile(logoImg, S3UploadTarget.COMPANY_LOGO);
         String descImgKey = s3Service.uploadFile(descImg, S3UploadTarget.COMPANY_DESC);
 
         bm.updateSubCategories(updateBmReq.subCategories());
-        Bm updateBm = updateBmReq.createBm(logoImgKey, descImgKey);
+        Bm updateBm = updateBmReq.createBm(descImgKey);
         bm.update(updateBm);
     }
 

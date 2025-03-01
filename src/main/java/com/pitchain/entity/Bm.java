@@ -28,13 +28,10 @@ public class Bm extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private MainCategory mainCategory;
-    private String company;
-    private String logoImgKey;
     @Column(length = 100)
     private String intro;
     @Column(length = 10000)
     private String description;
-
     private String descImgKey;
     private String address;
     @Positive
@@ -71,15 +68,13 @@ public class Bm extends BaseEntity {
     }
 
     @Builder
-    public Bm(Member member, String name, MainCategory mainCategory, String company, String logoImgKey,
+    public Bm(Member member, String name, MainCategory mainCategory,
               String intro, String description, String descImgKey, String address,
               Long valuationCap, Long goalInvestment, Integer maxIssuedShare,
               LocalDate deadline, String longPitchURL) {
         this.member = member;
         this.name = name;
         this.mainCategory = mainCategory;
-        this.company = company;
-        this.logoImgKey = logoImgKey;
         this.intro = intro;
         this.description = description;
         this.descImgKey = descImgKey;
@@ -124,8 +119,6 @@ public class Bm extends BaseEntity {
     public void update(Bm updateBm) {
         this.name = updateBm.getName();
         this.mainCategory = updateBm.getMainCategory();
-        this.company = updateBm.getCompany();
-        this.logoImgKey = updateBm.getLogoImgKey();
         this.intro = updateBm.getIntro();
         this.description = updateBm.getDescription();
         this.descImgKey = updateBm.getDescImgKey();

@@ -40,15 +40,13 @@ class MemberRepositoryTest {
     }
 
     private Bm saveBm(Member member) {
-        return bmRepository.save(new Bm(member, "bm_name", MainCategory.FOOD, "bm_company", "bm_logo_img_key",
-                "bm_intro", "bm_description", "bm_desc_img_key", "bm_address", 100000L,
-                1000L, 1000, LocalDate.now(), "bm_long_pitch_url"));
+        return bmRepository.save(new Bm(member, "bm_name", MainCategory.FOOD, "bm_intro", "bm_description", "bm_desc_img_key",
+                "bm_address", 100000L, 1000L, 1000, LocalDate.now(), "bm_long_pitch_url"));
     }
 
     private Bm saveBmWithMainCategory(Member member, MainCategory mainCategory) {
-        return bmRepository.save(new Bm(member, "bm_name", mainCategory, "bm_company", "bm_logo_img_key",
-                "bm_intro", "bm_description", "bm_desc_img_key", "bm_address", 100000L,
-                1000L, 1000, LocalDate.now(), "bm_long_pitch_url"));
+        return bmRepository.save(new Bm(member, "bm_name", mainCategory, "bm_intro", "bm_description", "bm_desc_img_key",
+                "bm_address", 100000L, 1000L, 1000, LocalDate.now(), "bm_long_pitch_url"));
     }
 
     private Sp saveSp(Bm bm) {

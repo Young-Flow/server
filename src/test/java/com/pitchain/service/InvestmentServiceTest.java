@@ -113,8 +113,7 @@ class InvestmentServiceTest {
     }
 
     private Bm saveBm(Member member) {
-        return bmRepository.save(new Bm(member, "bmName", MainCategory.FOOD, "bmCompany", "logoImg",
-                "bmIntro", "bmDescription", "bmDescriptionImg", "companyAddress", 100000L,
-                1000L, 1000, LocalDate.now(), "longPitchUrl"));
+        return bmRepository.save(new Bm(member, "bmName", MainCategory.FOOD, "bmIntro", "bmDescription",
+                "bmDescriptionImg", "companyAddress", 100000L, 1000L, 1000, LocalDate.now(), "longPitchUrl"));
     }
 }

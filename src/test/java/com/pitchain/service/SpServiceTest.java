@@ -50,15 +50,13 @@ class SpServiceTest {
     }
 
     private Bm saveBm(Member member) {
-        return bmRepository.save(new Bm(member, "bm_name", MainCategory.FOOD, "bm_company", "bm_logo_img_key",
-                "bm_intro", "bm_description", "bm_desc_img_key", "bm_address", 100000L,
-                1000L, 1000, LocalDate.now(), "bm_long_pitch_url"));
+        return bmRepository.save(new Bm(member, "bm_name", MainCategory.FOOD, "bm_intro", "bm_description",
+                "bm_desc_img_key", "bm_address", 100000L, 1000L, 1000, LocalDate.now(), "bm_long_pitch_url"));
     }
 
     private Bm saveBmWithMainCategory(Member member, MainCategory mainCategory) {
-        return bmRepository.save(new Bm(member, "bm_name", mainCategory, "bm_company", "bm_logo_img_key",
-                "bm_intro", "bm_description", "bm_desc_img_key", "bm_address", 100000L,
-                1000L, 1000, LocalDate.now(), "bm_long_pitch_url"));
+        return bmRepository.save(new Bm(member, "bm_name", mainCategory, "bm_intro", "bm_description",
+                "bm_desc_img_key", "bm_address", 100000L, 1000L, 1000, LocalDate.now(), "bm_long_pitch_url"));
     }
 
     private Sp saveSp(Bm bm) {
@@ -122,7 +120,6 @@ class SpServiceTest {
         assertThat(spDetail.thumbnailImgURL()).isEqualTo(s3Service.getFileURL(sp.getThumbnailImgKey()));
         assertThat(spDetail.views()).isEqualTo(sp.getViews());
         assertThat(spDetail.name()).isEqualTo(sp.getName());
-        assertThat(spDetail.logoImgURL()).isEqualTo(s3Service.getFileURL(sp.getBm().getLogoImgKey()));
         assertThat(spDetail.mainCategory()).isEqualTo(sp.getBm().getMainCategory().getKoreanName());
         assertThat(spDetail.subCategories()).isEqualTo(subCategories);
         assertThat(spDetail.company()).isEqualTo(sp.getBm().getCompany());
@@ -150,7 +147,6 @@ class SpServiceTest {
         assertThat(spDetail.thumbnailImgURL()).isEqualTo(s3Service.getFileURL(sp.getThumbnailImgKey()));
         assertThat(spDetail.views()).isEqualTo(sp.getViews());
         assertThat(spDetail.name()).isEqualTo(sp.getName());
-        assertThat(spDetail.logoImgURL()).isEqualTo(s3Service.getFileURL(sp.getBm().getLogoImgKey()));
         assertThat(spDetail.mainCategory()).isEqualTo(sp.getBm().getMainCategory().getKoreanName());
         assertThat(spDetail.subCategories()).isEqualTo(subCategories);
         assertThat(spDetail.company()).isEqualTo(sp.getBm().getCompany());
@@ -246,38 +242,6 @@ class SpServiceTest {
                 .map(SpDetailRes::bmId)
                 .toList())
                 .containsExactlyInAnyOrder(bm1.getId(), bm2.getId(), bm3.getId());
-    }
-
-    @Test
-    void 나의_선호_카테고리로_SP_조회() {
-        //given
-        Member member = saveMember();
-        categoryPrefRepository.save(new CategoryPref(member, SubCategory.AI_ML));
-        categoryPrefRepository.save(new CategoryPref(member, SubCategory.DATA_ANALYTICS));
-
-        Member member1 = saveMember();
-        Member member2 = saveMember();
-        Member member3 = saveMember();
-
-        Bm bm1 = saveBm(member1);
-        bm1.addSubCategories(List.of(SubCategory.AI_ML, SubCategory.APP_DEVELOPMENT));
-        Bm bm2 = saveBm(member2);
-        bm2.addSubCategories(List.of(SubCategory.BLOCKCHAIN_WEB3, SubCategory.DATA_ANALYTICS));
-        Bm bm3 = saveBm(member3);
-        bm3.addSubCategories(List.of(SubCategory.BEVERAGE_COFFEE, SubCategory.ALCOHOL));
-
-        saveSp(bm);
-        Sp sp1 = saveSp(bm1);
-        Sp sp2 = saveSp(bm2);
-        Sp sp3 = saveSp(bm3);
-
-        //when
-        List<SpDetailRes> spDetails = spService.getRecommendationByPref(member.getId());
-
-        //then
-        // 검증 생략
-        System.out.println("spDetails = " + spDetails.size());
-        spDetails.forEach(System.out::println);
     }
 
     @Test
