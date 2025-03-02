@@ -1,11 +1,11 @@
 package com.pitchain.repository;
 
 import com.pitchain.entity.Member;
-import com.pitchain.entity.MySp;
 import com.pitchain.entity.Sp;
+import com.pitchain.entity.SpLike;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface MySpRepository extends JpaRepository<MySp, Long> {
+public interface SpLikeRepository extends JpaRepository<SpLike, Long> {
 
     long countBySp(Sp sp);
 

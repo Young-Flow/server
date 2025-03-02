@@ -3,8 +3,8 @@ package com.pitchain.service;
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.entity.Member;
-import com.pitchain.entity.MySp;
 import com.pitchain.entity.Sp;
+import com.pitchain.entity.SpLike;
 import com.pitchain.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,9 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class MySpService {
+public class SpLikeService {
 
-    private final MySpRepository mySpRepository;
+    private final SpLikeRepository spLikeRepository;
     private final MemberRepository memberRepository;
     private final SpRepository spRepository;
 
@@ -33,16 +33,16 @@ public class MySpService {
     }
 
     private boolean isLiked(Member member, Sp sp) {
-        return mySpRepository.existsByMemberAndSp(member, sp);
+        return spLikeRepository.existsByMemberAndSp(member, sp);
     }
 
     private void addLike(Member member, Sp sp) {
-        MySp mySp = new MySp(member, sp);
-        mySpRepository.save(mySp);
+        SpLike mySp = new SpLike(member, sp);
+        spLikeRepository.save(mySp);
     }
 
     private void cancelLike(Member member, Sp sp) {
-        mySpRepository.deleteByMemberAndSp(member, sp);
+        spLikeRepository.deleteByMemberAndSp(member, sp);
     }
 
 }

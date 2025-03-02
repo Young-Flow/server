@@ -2,11 +2,12 @@ package com.pitchain.service;
 
 import com.pitchain.common.constant.Country;
 import com.pitchain.common.constant.MainCategory;
-import com.pitchain.entity.*;
+import com.pitchain.entity.Bm;
+import com.pitchain.entity.BmScrap;
+import com.pitchain.entity.Member;
 import com.pitchain.repository.BmRepository;
 import com.pitchain.repository.MemberRepository;
-import com.pitchain.repository.MySpRepository;
-import com.pitchain.repository.SpRepository;
+import com.pitchain.repository.BmScrapRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,50 +21,46 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 @SpringBootTest
 @ActiveProfiles("test")
-public class MySpServiceTest {
+class BmScrapServiceTest {
 
     @Autowired
-    private MySpService mySpService;
+    private BmScrapService bmScrapService;
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
     private BmRepository bmRepository;
     @Autowired
-    private SpRepository spRepository;
-    @Autowired
-    private MySpRepository mySpRepository;
+    private BmScrapRepository bmScrapRepository;
 
     @Test
-    void SP_좋아요_등록_성공() {
+    void BM_스크랩_등록_성공() {
         //given
         Member member = saveMember();
         Bm bm = saveBm(member);
-        Sp sp = saveSp(bm);
 
         //when
-        mySpService.toggleLikeSp(sp.getId(), member.getId());
+        bmScrapService.toggleScrapBm(bm.getId(), member.getId());
 
         //then
-        boolean isLiked = mySpRepository.existsByMemberAndSp(member, sp);
-        assertThat(isLiked).isTrue();
+        boolean isScraped = bmScrapRepository.existsByMemberAndBm(member, bm);
+        assertThat(isScraped).isTrue();
     }
 
     @Test
-    void SP_좋아요_취소_성공() {
+    void BM_스크랩_취소_성공() {
         //given
         Member member = saveMember();
         Bm bm = saveBm(member);
-        Sp sp = saveSp(bm);
 
-        MySp mySp = new MySp(member, sp);
-        mySpRepository.save(mySp);
+        BmScrap bmScrap = new BmScrap(member, bm);
+        bmScrapRepository.save(bmScrap);
 
         //when
-        mySpService.toggleLikeSp(sp.getId(), member.getId());
+        bmScrapService.toggleScrapBm(bm.getId(), member.getId());
 
         //then
-        boolean isLiked = mySpRepository.existsByMemberAndSp(member, sp);
-        assertThat(isLiked).isFalse();
+        boolean isScraped = bmScrapRepository.existsByMemberAndBm(member, bm);
+        assertThat(isScraped).isFalse();
     }
 
     private Member saveMember() {
@@ -75,11 +72,6 @@ public class MySpServiceTest {
                 "bmIntro", "bmDescription", "bmDescriptionImg", "companyAddress", 100000L,
                 1000L, 1000, LocalDate.now(), "longPitchUrl");
         return bmRepository.save(bm);
-    }
-
-    private Sp saveSp(Bm bm) {
-        return spRepository.save(
-                new Sp(bm, "spKey", "thumbnailImgKey", "spName"));
     }
 
 }

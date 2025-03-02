@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class BmWithLikeDto {
+public class BmWithScrapDto {
     Bm bm;
-    boolean isLiked;
+    boolean isScraped;
 }

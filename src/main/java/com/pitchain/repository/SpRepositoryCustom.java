@@ -11,8 +11,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static com.pitchain.entity.QBm.bm;
-import static com.pitchain.entity.QMySp.mySp;
 import static com.pitchain.entity.QSp.sp;
+import static com.pitchain.entity.QSpLike.spLike;
 
 @RequiredArgsConstructor
 @Repository
@@ -24,11 +24,11 @@ public class SpRepositoryCustom {
         return queryFactory
                 .select(new QSpWithLikeDto(
                         sp,
-                        mySp.isNotNull()
+                        spLike.isNotNull()
                 ))
                 .from(sp)
                 .leftJoin(sp.bm, bm)
-                .leftJoin(mySp).on(mySp.sp.id.eq(sp.id).and(mySp.member.id.eq(memberId)))
+                .leftJoin(spLike).on(spLike.sp.id.eq(sp.id).and(spLike.member.id.eq(memberId)))
                 .where(eqMainCategory(category))
                 .distinct()
                 .fetch();

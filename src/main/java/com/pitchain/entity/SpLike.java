@@ -8,11 +8,11 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MySp {
+public class SpLike {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "my_sp_id")
+    @Column(name = "sp_like_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -23,7 +23,7 @@ public class MySp {
     @JoinColumn(name = "sp_id", nullable = false)
     private Sp sp;
 
-    public MySp(Member member, Sp sp) {
+    public SpLike(Member member, Sp sp) {
         this.member = member;
         this.sp = sp;
     }

@@ -8,11 +8,11 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MyBm {
+public class BmScrap {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "my_bm_id")
+    @Column(name = "bm_scrap_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -23,7 +23,7 @@ public class MyBm {
     @JoinColumn(name = "bm_id", nullable = false)
     private Bm bm;
 
-    public MyBm(Member member, Bm bm) {
+    public BmScrap(Member member, Bm bm) {
         this.member = member;
         this.bm = bm;
     }

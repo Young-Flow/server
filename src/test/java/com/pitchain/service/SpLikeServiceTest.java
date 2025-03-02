@@ -2,12 +2,11 @@ package com.pitchain.service;
 
 import com.pitchain.common.constant.Country;
 import com.pitchain.common.constant.MainCategory;
-import com.pitchain.entity.Bm;
-import com.pitchain.entity.Member;
-import com.pitchain.entity.MyBm;
+import com.pitchain.entity.*;
 import com.pitchain.repository.BmRepository;
 import com.pitchain.repository.MemberRepository;
-import com.pitchain.repository.MyBmRepository;
+import com.pitchain.repository.SpLikeRepository;
+import com.pitchain.repository.SpRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,45 +20,49 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 @SpringBootTest
 @ActiveProfiles("test")
-class MyBmServiceTest {
+public class SpLikeServiceTest {
 
     @Autowired
-    private MyBmService myBmService;
+    private SpLikeService spLikeService;
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
     private BmRepository bmRepository;
     @Autowired
-    private MyBmRepository myBmRepository;
+    private SpRepository spRepository;
+    @Autowired
+    private SpLikeRepository spLikeRepository;
 
     @Test
-    void BM_스크랩_등록_성공() {
+    void SP_좋아요_등록_성공() {
         //given
         Member member = saveMember();
         Bm bm = saveBm(member);
+        Sp sp = saveSp(bm);
 
         //when
-        myBmService.toggleLikeBm(bm.getId(), member.getId());
+        spLikeService.toggleLikeSp(sp.getId(), member.getId());
 
         //then
-        boolean isLiked = myBmRepository.existsByMemberAndBm(member, bm);
+        boolean isLiked = spLikeRepository.existsByMemberAndSp(member, sp);
         assertThat(isLiked).isTrue();
     }
 
     @Test
-    void BM_스크랩_취소_성공() {
+    void SP_좋아요_취소_성공() {
         //given
         Member member = saveMember();
         Bm bm = saveBm(member);
+        Sp sp = saveSp(bm);
 
-        MyBm myBm = new MyBm(member, bm);
-        myBmRepository.save(myBm);
+        SpLike mySp = new SpLike(member, sp);
+        spLikeRepository.save(mySp);
 
         //when
-        myBmService.toggleLikeBm(bm.getId(), member.getId());
+        spLikeService.toggleLikeSp(sp.getId(), member.getId());
 
         //then
-        boolean isLiked = myBmRepository.existsByMemberAndBm(member, bm);
+        boolean isLiked = spLikeRepository.existsByMemberAndSp(member, sp);
         assertThat(isLiked).isFalse();
     }
 
@@ -72,6 +75,11 @@ class MyBmServiceTest {
                 "bmIntro", "bmDescription", "bmDescriptionImg", "companyAddress", 100000L,
                 1000L, 1000, LocalDate.now(), "longPitchUrl");
         return bmRepository.save(bm);
+    }
+
+    private Sp saveSp(Bm bm) {
+        return spRepository.save(
+                new Sp(bm, "spKey", "thumbnailImgKey", "spName"));
     }
 
 }
