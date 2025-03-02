@@ -3,7 +3,7 @@ package com.pitchain.service;
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.constant.S3UploadTarget;
 import com.pitchain.common.exception.GeneralHandler;
-import com.pitchain.dto.BmWithLikeDto;
+import com.pitchain.dto.BmWithScrapDto;
 import com.pitchain.dto.req.CreateBmReq;
 import com.pitchain.dto.req.UpdateBmReq;
 import com.pitchain.dto.res.BmDetailRes;
@@ -15,7 +15,7 @@ import com.pitchain.entity.PtImg;
 import com.pitchain.repository.BmRepository;
 import com.pitchain.repository.EntityFacade;
 import com.pitchain.repository.MyBmHistoryRepository;
-import com.pitchain.repository.MyBmRepository;
+import com.pitchain.repository.BmScrapRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +30,7 @@ import java.util.List;
 public class BmService {
     private final EntityFacade entityFacade;
     private final BmRepository bmRepository;
-    private final MyBmRepository myBmRepository;
+    private final BmScrapRepository bmScrapRepository;
     private final MyBmHistoryRepository myBmHistoryRepository;
     private final S3Service s3Service;
 
@@ -48,11 +48,11 @@ public class BmService {
     public BmDetailRes getBmDetail(Long memberId, Long bmId) {
         Member member = entityFacade.getMember(memberId);
 
-        BmWithLikeDto bmWithLikeDto = bmRepository.getBmWithLikeDto(member.getId(), bmId)
+        BmWithScrapDto bmWithScrapDto = bmRepository.getBmWithScrapDto(member.getId(), bmId)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
-        Bm bm = bmWithLikeDto.getBm();
+        Bm bm = bmWithScrapDto.getBm();
 
-        long likeCnt = myBmRepository.countByBm(bm);
+        long scrapCnt = bmScrapRepository.countByBm(bm);
         List<PtImgRes> ptImgResList = getPtImgResList(bmId);
         List<String> subCategories = bm.getKoreanSubCategories();
 
@@ -63,7 +63,7 @@ public class BmService {
         myBmHistoryRepository.findByMemberAndBm(member, bm)
                 .orElseGet(() -> myBmHistoryRepository.save(new MyBmHistory(member, bm)));
 
-        return BmDetailRes.createRes(bmWithLikeDto, likeCnt, ptImgResList, subCategories, spURL, logoImgURL, descImgURL);
+        return BmDetailRes.createRes(bmWithScrapDto, scrapCnt, ptImgResList, subCategories, spURL, logoImgURL, descImgURL);
     }
 
     public void updateBm(Long memberId, Long bmId, UpdateBmReq updateBmReq, MultipartFile logoImg, MultipartFile descImg) {

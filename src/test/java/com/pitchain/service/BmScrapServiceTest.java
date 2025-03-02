@@ -3,11 +3,11 @@ package com.pitchain.service;
 import com.pitchain.common.constant.Country;
 import com.pitchain.common.constant.MainCategory;
 import com.pitchain.entity.Bm;
+import com.pitchain.entity.BmScrap;
 import com.pitchain.entity.Member;
-import com.pitchain.entity.MyBm;
 import com.pitchain.repository.BmRepository;
 import com.pitchain.repository.MemberRepository;
-import com.pitchain.repository.MyBmRepository;
+import com.pitchain.repository.BmScrapRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,46 +21,46 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 @SpringBootTest
 @ActiveProfiles("test")
-class MyBmServiceTest {
+class BmScrapServiceTest {
 
     @Autowired
-    private MyBmService myBmService;
+    private BmScrapService bmScrapService;
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
     private BmRepository bmRepository;
     @Autowired
-    private MyBmRepository myBmRepository;
+    private BmScrapRepository bmScrapRepository;
 
     @Test
-    void BM_관심_등록_성공() {
+    void BM_스크랩_등록_성공() {
         //given
         Member member = saveMember();
         Bm bm = saveBm(member);
 
         //when
-        myBmService.toggleLikeBm(bm.getId(), member.getId());
+        bmScrapService.toggleScrapBm(bm.getId(), member.getId());
 
         //then
-        boolean isLiked = myBmRepository.existsByMemberAndBm(member, bm);
-        assertThat(isLiked).isTrue();
+        boolean isScraped = bmScrapRepository.existsByMemberAndBm(member, bm);
+        assertThat(isScraped).isTrue();
     }
 
     @Test
-    void BM_관심_취소_성공() {
+    void BM_스크랩_취소_성공() {
         //given
         Member member = saveMember();
         Bm bm = saveBm(member);
 
-        MyBm myBm = new MyBm(member, bm);
-        myBmRepository.save(myBm);
+        BmScrap bmScrap = new BmScrap(member, bm);
+        bmScrapRepository.save(bmScrap);
 
         //when
-        myBmService.toggleLikeBm(bm.getId(), member.getId());
+        bmScrapService.toggleScrapBm(bm.getId(), member.getId());
 
         //then
-        boolean isLiked = myBmRepository.existsByMemberAndBm(member, bm);
-        assertThat(isLiked).isFalse();
+        boolean isScraped = bmScrapRepository.existsByMemberAndBm(member, bm);
+        assertThat(isScraped).isFalse();
     }
 
     private Member saveMember() {

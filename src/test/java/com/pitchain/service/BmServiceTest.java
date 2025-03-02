@@ -11,13 +11,13 @@ import com.pitchain.dto.req.UpdateBmReq;
 import com.pitchain.dto.res.BmDetailRes;
 import com.pitchain.dto.res.PtImgRes;
 import com.pitchain.entity.Bm;
+import com.pitchain.entity.BmScrap;
 import com.pitchain.entity.Member;
-import com.pitchain.entity.MyBm;
 import com.pitchain.entity.PtImg;
 import com.pitchain.repository.BmRepository;
 import com.pitchain.repository.MemberRepository;
 import com.pitchain.repository.MyBmHistoryRepository;
-import com.pitchain.repository.MyBmRepository;
+import com.pitchain.repository.BmScrapRepository;
 import org.apache.logging.log4j.util.Strings;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +48,7 @@ class BmServiceTest {
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
-    private MyBmRepository myBmRepository;
+    private BmScrapRepository bmScrapRepository;
     @Autowired
     private MyBmHistoryRepository myBmHistoryRepository;
 
@@ -157,8 +157,8 @@ class BmServiceTest {
         assertThat(bmDetail.createdAt()).isEqualTo(bm.getCreatedAt());
         assertThat(bmDetail.longPitchURL()).isEqualTo(bm.getLongPitchURL());
         assertThat(bmDetail.spURL()).isEqualTo(s3Service.getFileURL(bm.getSpKey()));
-        assertThat(bmDetail.isLiked()).isFalse();
-        assertThat(bmDetail.likeCnt()).isEqualTo(0);
+        assertThat(bmDetail.isScraped()).isFalse();
+        assertThat(bmDetail.scrapCnt()).isEqualTo(0);
         assertThat(bmDetail.ptImgResList()).isEqualTo(ptImgResList);
         assertThat(bmDetail.subCategories()).isEqualTo(subCategories);
 
@@ -171,8 +171,8 @@ class BmServiceTest {
         Member member_01 = saveMember();
         Member member_02 = saveMember();
         Bm bm = saveBm(member_01);
-        myBmRepository.save(new MyBm(member_01, bm));
-        myBmRepository.save(new MyBm(member_02, bm));
+        bmScrapRepository.save(new BmScrap(member_01, bm));
+        bmScrapRepository.save(new BmScrap(member_02, bm));
 
         bm.updateSubCategories(SUB_CATEGORIES);
         List<String> subCategories = bm.getKoreanSubCategories();
@@ -200,8 +200,8 @@ class BmServiceTest {
         assertThat(bmDetail.createdAt()).isEqualTo(bm.getCreatedAt());
         assertThat(bmDetail.longPitchURL()).isEqualTo(bm.getLongPitchURL());
         assertThat(bmDetail.spURL()).isEqualTo(s3Service.getFileURL(bm.getSpKey()));
-        assertThat(bmDetail.isLiked()).isTrue();
-        assertThat(bmDetail.likeCnt()).isEqualTo(2);
+        assertThat(bmDetail.isScraped()).isTrue();
+        assertThat(bmDetail.scrapCnt()).isEqualTo(2);
         assertThat(bmDetail.ptImgResList()).isEqualTo(ptImgResList);
         assertThat(bmDetail.subCategories()).isEqualTo(subCategories);
 

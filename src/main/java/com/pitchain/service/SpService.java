@@ -24,7 +24,7 @@ public class SpService {
     private final EntityFacade entityFacade;
     private final SpRepository spRepository;
     private final SpRepositoryCustom spRepositoryCustom;
-    private final MyBmRepository myBmRepository;
+    private final SpLikeRepository spLikeRepository;
     private final S3Service s3Service;
     private final CategoryPrefRepository categoryPrefRepository;
     private final BmRepository bmRepository;
@@ -55,7 +55,7 @@ public class SpService {
                     String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
 
                     Bm bm = sp.getBm();
-                    long likeCnt = myBmRepository.countByBm(bm);
+                    long likeCnt = spLikeRepository.countBySp(sp);
                     List<String> subCategories = bm.getKoreanSubCategories();
 
                     String logoImgURL = s3Service.getFileURL(bm.getLogoImgKey());
@@ -76,7 +76,7 @@ public class SpService {
                     String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
 
                     Bm bm = sp.getBm();
-                    long likeCnt = myBmRepository.countByBm(bm);
+                    long likeCnt = spLikeRepository.countBySp(sp);
                     List<String> subCategories = bm.getKoreanSubCategories();
                     String logoImgURL = s3Service.getFileURL(bm.getLogoImgKey());
 
@@ -94,7 +94,7 @@ public class SpService {
         String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
 
         Bm bm = sp.getBm();
-        long likeCnt = myBmRepository.countByBm(bm);
+        long likeCnt = spLikeRepository.countBySp(sp);
         List<String> subCategories = bm.getKoreanSubCategories();
         String logoImgURL = s3Service.getFileURL(bm.getLogoImgKey());
 
@@ -111,7 +111,7 @@ public class SpService {
                     String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
 
                     Bm bm = sp.getBm();
-                    long likeCnt = myBmRepository.countByBm(bm);
+                    long likeCnt = spLikeRepository.countBySp(sp);
                     List<String> subCategories = bm.getKoreanSubCategories();
                     String logoImgURL = s3Service.getFileURL(bm.getLogoImgKey());
 
@@ -147,7 +147,7 @@ public class SpService {
                     String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
 
                     Bm bm = sp.getBm();
-                    long likeCnt = myBmRepository.countByBm(bm);
+                    long likeCnt = spLikeRepository.countBySp(sp);
                     List<String> subCategories = bm.getKoreanSubCategories();
                     String logoImgURL = s3Service.getFileURL(bm.getLogoImgKey());
 

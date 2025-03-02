@@ -1,6 +1,6 @@
 package com.pitchain.dto.res;
 
-import com.pitchain.dto.BmWithLikeDto;
+import com.pitchain.dto.BmWithScrapDto;
 import com.pitchain.entity.Bm;
 import lombok.Builder;
 
@@ -22,13 +22,13 @@ public record BmDetailRes(
         LocalDateTime createdAt,
         String longPitchURL,
         String spURL,
-        boolean isLiked,
-        long likeCnt,
+        boolean isScraped,
+        long scrapCnt,
         List<PtImgRes> ptImgResList
 ) {
-    public static BmDetailRes createRes(BmWithLikeDto bmWithLikeDto, long likeCnt, List<PtImgRes> ptImgResList, List<String> subCategories,
+    public static BmDetailRes createRes(BmWithScrapDto bmWithScrapDto, long scrapCnt, List<PtImgRes> ptImgResList, List<String> subCategories,
                                         String spURL, String logoImgURL, String descImgURL) {
-        Bm bm = bmWithLikeDto.getBm();
+        Bm bm = bmWithScrapDto.getBm();
         return BmDetailRes.builder()
                 .id(bm.getId())
                 .name(bm.getName())
@@ -43,8 +43,8 @@ public record BmDetailRes(
                 .createdAt(bm.getCreatedAt())
                 .longPitchURL(bm.getLongPitchURL())
                 .spURL(spURL)
-                .isLiked(bmWithLikeDto.isLiked())
-                .likeCnt(likeCnt)
+                .isScraped(bmWithScrapDto.isScraped())
+                .scrapCnt(scrapCnt)
                 .ptImgResList(ptImgResList)
                 .build();
     }

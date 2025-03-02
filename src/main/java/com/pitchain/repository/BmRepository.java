@@ -1,7 +1,7 @@
 package com.pitchain.repository;
 
 import com.pitchain.common.constant.SubCategory;
-import com.pitchain.dto.BmWithLikeDto;
+import com.pitchain.dto.BmWithScrapDto;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.PtImg;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,16 +12,16 @@ import java.util.Optional;
 
 public interface BmRepository extends JpaRepository<Bm, Long> {
     @Query("""
-                SELECT DISTINCT new com.pitchain.dto.BmWithLikeDto(
+                SELECT DISTINCT new com.pitchain.dto.BmWithScrapDto(
                     b,
-                    CASE WHEN mb.member.id IS NOT NULL THEN true ELSE false END
+                    CASE WHEN bs.member.id IS NOT NULL THEN true ELSE false END
                 )
                 FROM Bm b
-                LEFT JOIN MyBm mb ON mb.bm.id = b.id AND mb.member.id = :memberId
+                LEFT JOIN BmScrap bs ON bs.bm.id = b.id AND bs.member.id = :memberId
                 WHERE b.id = :bmId
-                GROUP BY b, mb.member.id
+                GROUP BY b, bs.member.id
             """)
-    Optional<BmWithLikeDto> getBmWithLikeDto(Long memberId, Long bmId);
+    Optional<BmWithScrapDto> getBmWithScrapDto(Long memberId, Long bmId);
 
     @Query("""
                 SELECT bsc.subCategory
