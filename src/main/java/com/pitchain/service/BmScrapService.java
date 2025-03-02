@@ -3,46 +3,48 @@ package com.pitchain.service;
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.entity.Bm;
+import com.pitchain.entity.BmScrap;
 import com.pitchain.entity.Member;
-import com.pitchain.entity.MyBm;
 import com.pitchain.repository.BmRepository;
 import com.pitchain.repository.MemberRepository;
-import com.pitchain.repository.MyBmRepository;
+import com.pitchain.repository.BmScrapRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class MyBmService {
+public class BmScrapService {
 
-    private final MyBmRepository myBmRepository;
+    private final BmScrapRepository bmScrapRepository;
     private final MemberRepository memberRepository;
     private final BmRepository bmRepository;
 
     @Transactional
-    public void toggleLikeBm(Long bmId, Long memberId) {
+    public void toggleScrapBm(Long bmId, Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
         Bm bm = bmRepository.findById(bmId)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
 
-        if (isLiked(member, bm)) {
-            cancelLike(member, bm);
-        } else addLike(member, bm);
+        if (isScraped(member, bm)) {
+            cancelScrap(member, bm);
+        } else {
+            addScrap(member, bm);
+        }
     }
 
-    private boolean isLiked(Member member, Bm bm) {
-        return myBmRepository.existsByMemberAndBm(member, bm);
+    private boolean isScraped(Member member, Bm bm) {
+        return bmScrapRepository.existsByMemberAndBm(member, bm);
     }
 
-    private void addLike(Member member, Bm bm) {
-        MyBm myBm = new MyBm(member, bm);
-        myBmRepository.save(myBm);
+    private void addScrap(Member member, Bm bm) {
+        BmScrap bmScrap = new BmScrap(member, bm);
+        bmScrapRepository.save(bmScrap);
     }
 
-    private void cancelLike(Member member, Bm bm) {
-        myBmRepository.deleteByMemberAndBm(member, bm);
+    private void cancelScrap(Member member, Bm bm) {
+        bmScrapRepository.deleteByMemberAndBm(member, bm);
     }
 
 

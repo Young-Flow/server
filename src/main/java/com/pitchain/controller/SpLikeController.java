@@ -1,7 +1,7 @@
 package com.pitchain.controller;
 
 import com.pitchain.common.apiPayload.dto.CustomApiResponse;
-import com.pitchain.service.MyBmService;
+import com.pitchain.service.SpLikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,16 +10,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/bms")
+@RequestMapping("/sps")
 @RequiredArgsConstructor
-public class MyBmController {
+public class SpLikeController {
 
-    private final MyBmService myBmService;
+    private final SpLikeService spLikeService;
 
-    @PostMapping("/{bmId}/like")
-    public CustomApiResponse toggleLikeBm(@PathVariable("bmId") Long bmId,
+    @PostMapping("/{spId}/like")
+    public CustomApiResponse toggleLikeSp(@PathVariable("spId") Long spId,
                                           @AuthenticationPrincipal Long memberId) {
-        myBmService.toggleLikeBm(bmId, memberId);
+        spLikeService.toggleLikeSp(spId, memberId);
         return CustomApiResponse.onSuccess();
     }
 }

@@ -3,18 +3,13 @@ package com.pitchain.service;
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.constant.MainCategory;
 import com.pitchain.common.constant.S3UploadTarget;
+import com.pitchain.common.constant.SubCategory;
 import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.dto.SpWithLikeDto;
 import com.pitchain.dto.req.CreateSpReq;
 import com.pitchain.dto.res.SpDetailRes;
-import com.pitchain.entity.Bm;
-import com.pitchain.entity.Company;
-import com.pitchain.entity.Member;
-import com.pitchain.entity.Sp;
-import com.pitchain.repository.EntityFacade;
-import com.pitchain.repository.MyBmRepository;
-import com.pitchain.repository.SpRepository;
-import com.pitchain.repository.SpRepositoryCustom;
+import com.pitchain.entity.*;
+import com.pitchain.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,8 +24,10 @@ public class SpService {
     private final EntityFacade entityFacade;
     private final SpRepository spRepository;
     private final SpRepositoryCustom spRepositoryCustom;
-    private final MyBmRepository myBmRepository;
+    private final SpLikeRepository spLikeRepository;
     private final S3Service s3Service;
+    private final CategoryPrefRepository categoryPrefRepository;
+    private final BmRepository bmRepository;
 
     public void createSp(Long memberId, CreateSpReq createSpReq, MultipartFile spVid, MultipartFile thumbnailImg) {
         Member member = entityFacade.getMember(memberId);
@@ -58,12 +55,11 @@ public class SpService {
                     String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
 
                     Bm bm = sp.getBm();
-                    long likeCnt = myBmRepository.countByBm(bm); // todo SpLike로 변경 필요
+                    long likeCnt = spLikeRepository.countBySp(sp);
                     List<String> subCategories = bm.getKoreanSubCategories();
 
-                    Company company = bm.getCompany();
-                    String logoImgURL = s3Service.getFileURL(company.getLogoImgKey());
-                    return SpDetailRes.createRes(company, logoImgURL, spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories);
+                    String logoImgURL = s3Service.getFileURL(bm.getLogoImgKey());
+                    return SpDetailRes.createRes(spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories, logoImgURL);
                 })
                 .toList();
     }
@@ -80,13 +76,11 @@ public class SpService {
                     String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
 
                     Bm bm = sp.getBm();
-                    long likeCnt = myBmRepository.countByBm(bm);
+                    long likeCnt = spLikeRepository.countBySp(sp);
                     List<String> subCategories = bm.getKoreanSubCategories();
+                    String logoImgURL = s3Service.getFileURL(bm.getLogoImgKey());
 
-                    Company company = bm.getCompany();
-                    String logoImgURL = s3Service.getFileURL(company.getLogoImgKey());
-
-                    return SpDetailRes.createRes(company, logoImgURL, spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories);
+                    return SpDetailRes.createRes(spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories, logoImgURL);
                 })
                 .toList();
     }
@@ -100,13 +94,11 @@ public class SpService {
         String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
 
         Bm bm = sp.getBm();
-        long likeCnt = myBmRepository.countByBm(bm);
+        long likeCnt = spLikeRepository.countBySp(sp);
         List<String> subCategories = bm.getKoreanSubCategories();
+        String logoImgURL = s3Service.getFileURL(bm.getLogoImgKey());
 
-        Company company = bm.getCompany();
-        String logoImgURL = s3Service.getFileURL(company.getLogoImgKey());
-
-        return SpDetailRes.createRes(company, logoImgURL, spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories);
+        return SpDetailRes.createRes(spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories, logoImgURL);
     }
 
     public List<SpDetailRes> getSpDetailsRecommendedFromAi(Long memberId, List<Long> bmIds) {
@@ -119,13 +111,47 @@ public class SpService {
                     String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
 
                     Bm bm = sp.getBm();
-                    long likeCnt = myBmRepository.countByBm(bm);
+                    long likeCnt = spLikeRepository.countBySp(sp);
                     List<String> subCategories = bm.getKoreanSubCategories();
+                    String logoImgURL = s3Service.getFileURL(bm.getLogoImgKey());
 
-                    Company company = bm.getCompany();
-                    String logoImgURL = s3Service.getFileURL(company.getLogoImgKey());
+                    return SpDetailRes.createRes(spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories, logoImgURL);
+                })
+                .toList();
+    }
 
-                    return SpDetailRes.createRes(company, logoImgURL, spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories);
+    public List<SpDetailRes> getRecommendationByPref(Long memberId) {
+        List<CategoryPref> categoryPrefs = categoryPrefRepository.findAllByMemberId(memberId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.CATEGORY_PREF_NOT_FOUND));
+        List<SubCategory> subCategoryPrefs = categoryPrefs.stream().map(CategoryPref::getSubCategory).toList();
+
+//        List<Bm> bms = bmRepository.findAll().stream()
+//                .filter(bm -> bm.getSubCategories().stream()
+//                        .map(BmSubCategory::getSubCategory)
+//                        .anyMatch(subCategoryPrefs::contains)
+//                )
+//                .toList();
+//
+//        bms.forEach(bm -> System.out.println(bm));
+//
+//        List<SpWithLikeDto> spWithLikeDtos = bms.stream().map(bm -> new SpWithLikeDto(bm.getSp(), false)).toList();
+//
+//        spWithLikeDtos.forEach(spWithLikeDto -> System.out.println(spWithLikeDto));
+
+        List<SpWithLikeDto> spWithLikeDtos = spRepository.getSpWithLikeDtoByPref(memberId, subCategoryPrefs);
+
+        return spWithLikeDtos.stream()
+                .map(spWithLikeDto -> {
+                    Sp sp = spWithLikeDto.getSp();
+                    String spURL = s3Service.getFileURL(sp.getSpKey());
+                    String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
+
+                    Bm bm = sp.getBm();
+                    long likeCnt = spLikeRepository.countBySp(sp);
+                    List<String> subCategories = bm.getKoreanSubCategories();
+                    String logoImgURL = s3Service.getFileURL(bm.getLogoImgKey());
+
+                    return SpDetailRes.createRes(spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories, logoImgURL);
                 })
                 .toList();
     }

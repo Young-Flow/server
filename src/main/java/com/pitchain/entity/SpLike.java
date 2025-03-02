@@ -8,11 +8,11 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MyBm {
+public class SpLike {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "my_bm_id")
+    @Column(name = "sp_like_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -20,12 +20,11 @@ public class MyBm {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bm_id", nullable = false)
-    private Bm bm;
+    @JoinColumn(name = "sp_id", nullable = false)
+    private Sp sp;
 
-    public MyBm(Member member, Bm bm) {
+    public SpLike(Member member, Sp sp) {
         this.member = member;
-        this.bm = bm;
+        this.sp = sp;
     }
-
 }
