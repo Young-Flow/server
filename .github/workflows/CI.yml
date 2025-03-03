@@ -13,10 +13,6 @@ permissions:
 jobs:
   CI:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [ 18.x, 20.x ]
-        redis-version: [ 6, 7 ]
 
     steps:
     - name: checkout
@@ -25,7 +21,7 @@ jobs:
     - name: Start Redis
       uses: supercharge/redis-github-action@1.7.0
       with:
-        redis-version: ${{ matrix.redis-version }}
+        redis-version: 6
         redis-port: 6379
 
     - name: Set up JDK 17
