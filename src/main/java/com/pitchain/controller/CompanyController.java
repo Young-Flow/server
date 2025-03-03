@@ -29,7 +29,7 @@ public class CompanyController {
     }
 
     @Operation(summary = "회사 로그인")
-    @GetMapping("/login")
+    @PostMapping("/login")
     public CustomApiResponse<LoginRes> loginCompany(@RequestBody LoginCompanyReq req) {
         LoginRes loginRes = companyService.loginCompany(req);
         return CustomApiResponse.onSuccess(loginRes);
