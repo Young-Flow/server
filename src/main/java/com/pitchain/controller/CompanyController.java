@@ -21,7 +21,7 @@ public class CompanyController {
 
     private final CompanyService companyService;
 
-    @Operation(summary = "회사 생성")
+    @Operation(summary = "회사 회원가입")
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public CustomApiResponse<Void> createCompany(@RequestPart CreateCompanyReq req) {
         companyService.createCompany(req);
@@ -78,7 +78,7 @@ public class CompanyController {
         return CustomApiResponse.onSuccess();
     }
 
-    @Operation(summary = "회사 삭제")
+    @Operation(summary = "회사 탈퇴")
     @DeleteMapping("{companyId}")
     public CustomApiResponse<Void> deleteCompany(@AuthenticationPrincipal Long companyId) {
         companyService.deleteCompany(companyId);
