@@ -55,7 +55,7 @@ public class Company {
     }
 
     public boolean hasLogoImg() {
-        return logoImgKey != null || !logoImgKey.isEmpty();
+        return logoImgKey != null && !logoImgKey.isEmpty();
     }
 
     public void updateEmail(String email) {
