@@ -3,9 +3,11 @@ package com.pitchain.service;
 import com.pitchain.common.constant.Country;
 import com.pitchain.common.constant.MainCategory;
 import com.pitchain.entity.Bm;
+import com.pitchain.entity.Company;
 import com.pitchain.entity.Member;
 import com.pitchain.entity.MySpHistory;
 import com.pitchain.repository.BmRepository;
+import com.pitchain.repository.CompanyRepository;
 import com.pitchain.repository.MemberRepository;
 import com.pitchain.repository.MySpHistoryRepository;
 import org.assertj.core.api.Assertions;
@@ -30,12 +32,14 @@ class MySpHistoryServiceTest {
     private BmRepository bmRepository;
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private CompanyRepository companyRepository;
 
     @Test
     void SP_시청시간_최초_저장_성공() {
         //given
-        Member bmOwner = saveMember();
-        Bm bm = saveBm(bmOwner);
+        Company company = saveCompany();
+        Bm bm = saveBm(company);
 
         Member member = saveMember();
         int viewTime = 10000;
@@ -53,8 +57,8 @@ class MySpHistoryServiceTest {
     @Test
     void SP_업데이트_성공() {
         //given
-        Member bmOwner = saveMember();
-        Bm bm = saveBm(bmOwner);
+        Company company = saveCompany();
+        Bm bm = saveBm(company);
 
         Member member = saveMember();
         int viewTime = 10000;
@@ -77,9 +81,14 @@ class MySpHistoryServiceTest {
         return memberRepository.save(new Member(Country.USA, "profileImg.jpg"));
     }
 
-    private Bm saveBm(Member member) {
-        return bmRepository.save(new Bm(member, "bmName", MainCategory.FOOD, "bmCompany", "logoImg",
-                "bmIntro", "bmDescription", "bmDescriptionImg", "companyAddress", 100000L,
-                1000L, 1000, LocalDate.now(), "longPitchUrl"));
+    private Bm saveBm(Company company) {
+        return bmRepository.save(new Bm(company, "bmName", MainCategory.FOOD, "bmIntro", "bmDescription",
+                "bmDescriptionImg", "companyAddress", 100000L, 1000L, 1000, LocalDate.now(), "longPitchUrl"));
+    }
+
+    private Company saveCompany() {
+        return companyRepository.save(new Company("companyEmail", "companyPassword",
+                true, "companyName", "companyAddress", "bm_logo_img_key"
+        ));
     }
 }

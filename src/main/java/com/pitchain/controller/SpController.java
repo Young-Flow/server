@@ -19,11 +19,11 @@ public class SpController {
     private final SpService spService;
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public CustomApiResponse createSp(@AuthenticationPrincipal Long memberId,
+    public CustomApiResponse createSp(@AuthenticationPrincipal Long companyId,
                                       @RequestPart CreateSpReq createSpReq,
                                       @RequestPart(required = false) MultipartFile spVideo,
                                       @RequestPart(required = false) MultipartFile thumbnailImg) {
-        spService.createSp(memberId, createSpReq, spVideo, thumbnailImg);
+        spService.createSp(companyId, createSpReq, spVideo, thumbnailImg);
         return CustomApiResponse.onSuccess();
     }
 
@@ -55,19 +55,19 @@ public class SpController {
     }
 
     @PutMapping(value = "/{spId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public CustomApiResponse updateSp(@AuthenticationPrincipal Long memberId,
+    public CustomApiResponse updateSp(@AuthenticationPrincipal Long companyId,
                                       @PathVariable Long spId,
                                       @RequestPart String name,
                                       @RequestPart(required = false) MultipartFile spVideo,
                                       @RequestPart(required = false) MultipartFile thumbnailImg) {
-        spService.updateSp(memberId, spId, name, spVideo, thumbnailImg);
+        spService.updateSp(companyId, spId, name, spVideo, thumbnailImg);
         return CustomApiResponse.onSuccess();
     }
 
     @DeleteMapping("/{spId}")
-    public CustomApiResponse deleteSp(@AuthenticationPrincipal Long memberId,
+    public CustomApiResponse deleteSp(@AuthenticationPrincipal Long companyId,
                                       @PathVariable Long spId) {
-        spService.deleteSp(memberId, spId);
+        spService.deleteSp(companyId, spId);
         return CustomApiResponse.onSuccess();
     }
 }

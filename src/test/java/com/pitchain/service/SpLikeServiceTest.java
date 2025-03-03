@@ -3,10 +3,7 @@ package com.pitchain.service;
 import com.pitchain.common.constant.Country;
 import com.pitchain.common.constant.MainCategory;
 import com.pitchain.entity.*;
-import com.pitchain.repository.BmRepository;
-import com.pitchain.repository.MemberRepository;
-import com.pitchain.repository.SpLikeRepository;
-import com.pitchain.repository.SpRepository;
+import com.pitchain.repository.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,12 +29,15 @@ public class SpLikeServiceTest {
     private SpRepository spRepository;
     @Autowired
     private SpLikeRepository spLikeRepository;
+    @Autowired
+    private CompanyRepository companyRepository;
 
     @Test
     void SP_좋아요_등록_성공() {
         //given
         Member member = saveMember();
-        Bm bm = saveBm(member);
+        Company company = saveCompany();
+        Bm bm = saveBm(company);
         Sp sp = saveSp(bm);
 
         //when
@@ -52,7 +52,8 @@ public class SpLikeServiceTest {
     void SP_좋아요_취소_성공() {
         //given
         Member member = saveMember();
-        Bm bm = saveBm(member);
+        Company company = saveCompany();
+        Bm bm = saveBm(company);
         Sp sp = saveSp(bm);
 
         SpLike mySp = new SpLike(member, sp);
@@ -70,16 +71,20 @@ public class SpLikeServiceTest {
         return memberRepository.save(new Member(Country.USA, "profileImg"));
     }
 
-    private Bm saveBm(Member member) {
-        Bm bm = new Bm(member, "bmName", MainCategory.FOOD, "bmCompany", "logoImg",
-                "bmIntro", "bmDescription", "bmDescriptionImg", "companyAddress", 100000L,
-                1000L, 1000, LocalDate.now(), "longPitchUrl");
-        return bmRepository.save(bm);
+    private Company saveCompany() {
+        return companyRepository.save(new Company("companyEmail", "companyPassword",
+                true, "companyName", "companyAddress", "bm_logo_img_key"
+        ));
+    }
+
+    private Bm saveBm(Company company) {
+        return bmRepository.save(new Bm(company, "bmName", MainCategory.FOOD, "bmIntro", "bmDescription",
+                "bmDescriptionImg", "companyAddress", 100000L, 1000L, 1000, LocalDate.now(), "longPitchUrl"));
     }
 
     private Sp saveSp(Bm bm) {
         return spRepository.save(
                 new Sp(bm, "spKey", "thumbnailImgKey", "spName"));
-    }
 
+    }
 }

@@ -16,7 +16,7 @@ public class Sp extends BaseEntity {
     @Column(name = "sp_id")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bm_id", nullable = false)
     private Bm bm;
 
@@ -39,8 +39,8 @@ public class Sp extends BaseEntity {
         this.views = 0;
     }
 
-    public boolean isOwner(Long memberId) {
-        return bm.getMember().getId().equals(memberId);
+    public boolean isOwner(Long companyId) {
+        return bm.getCompany().getId().equals(companyId);
     }
 
     public void update(Sp updateSp) {

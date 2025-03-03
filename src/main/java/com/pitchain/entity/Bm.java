@@ -6,7 +6,6 @@ import com.pitchain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
 import lombok.*;
-import org.apache.logging.log4j.util.Strings;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -28,13 +27,10 @@ public class Bm extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private MainCategory mainCategory;
-    private String company;
-    private String logoImgKey;
     @Column(length = 100)
     private String intro;
     @Column(length = 10000)
     private String description;
-
     private String descImgKey;
     private String address;
     @Positive
@@ -47,9 +43,9 @@ public class Bm extends BaseEntity {
     @Column(name = "long_pitch_url")
     private String longPitchURL;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @ManyToOne
+    @JoinColumn(name = "company_id")
+    private Company company;
 
     @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BmSubCategory> subCategories = new ArrayList<>();
@@ -57,8 +53,9 @@ public class Bm extends BaseEntity {
     @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY)
     private List<Investment> investments = new ArrayList<>();
 
-    @OneToOne(mappedBy = "bm", fetch = FetchType.LAZY)
-    private Sp sp;
+    @OrderBy("id ASC")
+    @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Sp> sps = new ArrayList<>();
 
     @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PtImg> ptImgs = new ArrayList<>();
@@ -71,15 +68,13 @@ public class Bm extends BaseEntity {
     }
 
     @Builder
-    public Bm(Member member, String name, MainCategory mainCategory, String company, String logoImgKey,
+    public Bm(Company company, String name, MainCategory mainCategory,
               String intro, String description, String descImgKey, String address,
               Long valuationCap, Long goalInvestment, Integer maxIssuedShare,
               LocalDate deadline, String longPitchURL) {
-        this.member = member;
+        this.company = company;
         this.name = name;
         this.mainCategory = mainCategory;
-        this.company = company;
-        this.logoImgKey = logoImgKey;
         this.intro = intro;
         this.description = description;
         this.descImgKey = descImgKey;
@@ -91,15 +86,8 @@ public class Bm extends BaseEntity {
         this.longPitchURL = longPitchURL;
     }
 
-    public String getSpKey() {
-        if (sp == null) {
-            return Strings.EMPTY;
-        }
-        return sp.getSpKey();
-    }
-
-    public boolean isOwner(Long memberId) {
-        return memberId.equals(member.getId());
+    public boolean isOwner(Long companyId) {
+        return this.company.getId().equals(companyId);
     }
 
     public void updatePtImgs(List<PtImg> ptImgs) {
@@ -124,8 +112,6 @@ public class Bm extends BaseEntity {
     public void update(Bm updateBm) {
         this.name = updateBm.getName();
         this.mainCategory = updateBm.getMainCategory();
-        this.company = updateBm.getCompany();
-        this.logoImgKey = updateBm.getLogoImgKey();
         this.intro = updateBm.getIntro();
         this.description = updateBm.getDescription();
         this.descImgKey = updateBm.getDescImgKey();

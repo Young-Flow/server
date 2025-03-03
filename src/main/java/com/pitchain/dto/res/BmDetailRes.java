@@ -2,6 +2,7 @@ package com.pitchain.dto.res;
 
 import com.pitchain.dto.BmWithScrapDto;
 import com.pitchain.entity.Bm;
+import com.pitchain.entity.Company;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -9,42 +10,53 @@ import java.util.List;
 
 @Builder
 public record BmDetailRes(
-        Long id,
-        String name,
-        String company,
+        Long companyId,
+        String companyLogoImgURL,
+        String companyName,
+        String companyAddress,
+
+        Long bmId,
+        String bmName,
         String intro,
         String mainCategory,
         List<String> subCategories,
-        String logoImgURL,
         String description,
         String descImgURL,
-        String address,
+        String bmAddress,
         LocalDateTime createdAt,
         String longPitchURL,
-        String spURL,
         boolean isScraped,
         long scrapCnt,
+        List<String> spURLs,
+
         List<PtImgRes> ptImgResList
 ) {
-    public static BmDetailRes createRes(BmWithScrapDto bmWithScrapDto, long scrapCnt, List<PtImgRes> ptImgResList, List<String> subCategories,
-                                        String spURL, String logoImgURL, String descImgURL) {
+    public static BmDetailRes createRes(
+            BmWithScrapDto bmWithScrapDto, long scrapCnt, List<PtImgRes> ptImgResList, List<String> subCategories, String descImgURL, String companyLogoImgURL, List<String> spURLs
+    ) {
         Bm bm = bmWithScrapDto.getBm();
+        Company company = bm.getCompany();
+
         return BmDetailRes.builder()
-                .id(bm.getId())
-                .name(bm.getName())
-                .company(bm.getCompany())
+                .companyId(company.getId())
+                .companyLogoImgURL(companyLogoImgURL)
+                .companyName(company.getName())
+                .companyAddress(company.getAddress())
+
+                .bmId(bm.getId())
+                .bmName(bm.getName())
                 .intro(bm.getIntro())
                 .mainCategory(bm.getMainCategory().getKoreanName())
                 .subCategories(subCategories)
-                .logoImgURL(logoImgURL)
                 .description(bm.getDescription())
                 .descImgURL(descImgURL)
-                .address(bm.getAddress())
+                .bmAddress(bm.getAddress())
                 .createdAt(bm.getCreatedAt())
                 .longPitchURL(bm.getLongPitchURL())
-                .spURL(spURL)
                 .isScraped(bmWithScrapDto.isScraped())
                 .scrapCnt(scrapCnt)
+                .spURLs(spURLs)
+
                 .ptImgResList(ptImgResList)
                 .build();
     }

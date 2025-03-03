@@ -1,13 +1,9 @@
 package com.pitchain.controller;
 
-import com.pitchain.common.apiPayload.dto.CustomApiResponse;
 import com.pitchain.dto.res.MemberPreferenceInfoRes;
 import com.pitchain.dto.res.PreferenceInfoRes;
-import com.pitchain.dto.res.SpDetailRes;
-import com.pitchain.service.SpService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -17,8 +13,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class AIController {
-
-    private final SpService spService;
 
     @Operation(summary = "AI 서버로 유저 선호도 정보 전송 / 개발용")
     @GetMapping("/dev-model")
@@ -38,10 +32,4 @@ public class AIController {
         return "ok";
     }
 
-    @Operation(summary = "AI 추천 SP 조회")
-    @GetMapping("/dev-recommendation")
-    public CustomApiResponse<List<SpDetailRes>> getRecommendation(@AuthenticationPrincipal Long memberId) {
-        List<SpDetailRes> spDetailResList = spService.getRecommendationByPref(memberId);
-        return CustomApiResponse.onSuccess(spDetailResList);
-    }
 }

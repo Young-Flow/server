@@ -3,6 +3,7 @@ package com.pitchain.repository;
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.entity.Bm;
+import com.pitchain.entity.Company;
 import com.pitchain.entity.Member;
 import com.pitchain.entity.Sp;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ public class EntityFacade {
     private final MemberRepository memberRepository;
     private final BmRepository bmRepository;
     private final SpRepository spRepository;
+    private final CompanyRepository companyRepository;
 
     public Member getMember(Long memberId) {
         return memberRepository.findById(memberId)
@@ -28,5 +30,10 @@ public class EntityFacade {
     public Sp getSp(Long spId) {
         return spRepository.findById(spId)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.SP_NOT_FOUND));
+    }
+
+    public Company getCompany(Long companyId) {
+        return companyRepository.findById(companyId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.COMPANY_NOT_FOUND));
     }
 }
