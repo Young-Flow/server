@@ -30,7 +30,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/resources/**", "/favicon.ico", // resource
             "/swagger-ui/**", "/api-docs/**", "/v3/api-docs**", "/v3/api-docs/**", // swagger
             "/health-check", // health check
-            "/dev**" // 개발용
+            "/dev**", // 개발용,
+            "/companies", "/companies/login", "/companies/emails"// 회사 관련 로직
     };
 
     @Override

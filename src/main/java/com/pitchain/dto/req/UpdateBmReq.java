@@ -11,7 +11,6 @@ public record UpdateBmReq(
         String name,
         MainCategory mainCategory,
         List<SubCategory> subCategories,
-        String company,
         String intro,
         String description,
         String address,
@@ -21,12 +20,10 @@ public record UpdateBmReq(
         LocalDate deadline,
         String longPitchURL
 ) {
-    public Bm createBm(String logoImgKey, String descImgKey) {
+    public Bm createBm(String descImgKey) {
         return Bm.builder()
                 .name(name)
                 .mainCategory(mainCategory)
-                .company(company)
-                .logoImgKey(logoImgKey)
                 .intro(intro)
                 .description(description)
                 .descImgKey(descImgKey)

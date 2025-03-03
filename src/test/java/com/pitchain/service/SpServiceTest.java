@@ -43,22 +43,26 @@ class SpServiceTest {
     @Autowired
     private SpLikeRepository spLikeRepository;
     @Autowired
-    private CategoryPrefRepository categoryPrefRepository;
+    private CompanyRepository companyRepository;
 
     private Member saveMember() {
         return memberRepository.save(new Member(Country.ROK, Strings.EMPTY));
     }
 
-    private Bm saveBm(Member member) {
-        return bmRepository.save(new Bm(member, "bm_name", MainCategory.FOOD, "bm_company", "bm_logo_img_key",
-                "bm_intro", "bm_description", "bm_desc_img_key", "bm_address", 100000L,
-                1000L, 1000, LocalDate.now(), "bm_long_pitch_url"));
+    private Company saveCompany() {
+        return companyRepository.save(new Company("companyEmail", "companyPassword",
+                true, "companyName", "companyAddress", "bm_logo_img_key"
+        ));
     }
 
-    private Bm saveBmWithMainCategory(Member member, MainCategory mainCategory) {
-        return bmRepository.save(new Bm(member, "bm_name", mainCategory, "bm_company", "bm_logo_img_key",
-                "bm_intro", "bm_description", "bm_desc_img_key", "bm_address", 100000L,
-                1000L, 1000, LocalDate.now(), "bm_long_pitch_url"));
+    private Bm saveBm(Company company) {
+        return bmRepository.save(new Bm(company, "bmName", MainCategory.FOOD, "bmIntro", "bmDescription",
+                "bmDescriptionImg", "companyAddress", 100000L, 1000L, 1000, LocalDate.now(), "longPitchUrl"));
+    }
+
+    private Bm saveBmWithMainCategory(Company company, MainCategory mainCategory) {
+        return bmRepository.save(new Bm(company, "bm_name", mainCategory, "bm_intro", "bm_description",
+                "bm_desc_img_key", "bm_address", 100000L, 1000L, 1000, LocalDate.now(), "bm_long_pitch_url"));
     }
 
     private Sp saveSp(Bm bm) {
@@ -69,11 +73,13 @@ class SpServiceTest {
     @BeforeEach
     void setUp() {
         member = saveMember();
-        bm = saveBm(member);
+        company = saveCompany();
+        bm = saveBm(company);
     }
 
     private Member member;
     private Bm bm;
+    private Company company;
 
     private static final String SP_NAME = "sp_name";
     private static final String SP_KEY = "sp_vid.m3u8";
@@ -94,7 +100,7 @@ class SpServiceTest {
                 .thenReturn(THUMBNAIL_IMG.getOriginalFilename());
 
         //when
-        spService.createSp(member.getId(), createSpReq, SP_VID, THUMBNAIL_IMG);
+        spService.createSp(company.getId(), createSpReq, SP_VID, THUMBNAIL_IMG);
 
         //then
         List<Sp> all = spRepository.findAll();
@@ -122,10 +128,8 @@ class SpServiceTest {
         assertThat(spDetail.thumbnailImgURL()).isEqualTo(s3Service.getFileURL(sp.getThumbnailImgKey()));
         assertThat(spDetail.views()).isEqualTo(sp.getViews());
         assertThat(spDetail.name()).isEqualTo(sp.getName());
-        assertThat(spDetail.logoImgURL()).isEqualTo(s3Service.getFileURL(sp.getBm().getLogoImgKey()));
         assertThat(spDetail.mainCategory()).isEqualTo(sp.getBm().getMainCategory().getKoreanName());
         assertThat(spDetail.subCategories()).isEqualTo(subCategories);
-        assertThat(spDetail.company()).isEqualTo(sp.getBm().getCompany());
         assertThat(spDetail.isLiked()).isEqualTo(false);
         assertThat(spDetail.likeCnt()).isEqualTo(0L);
     }
@@ -150,10 +154,8 @@ class SpServiceTest {
         assertThat(spDetail.thumbnailImgURL()).isEqualTo(s3Service.getFileURL(sp.getThumbnailImgKey()));
         assertThat(spDetail.views()).isEqualTo(sp.getViews());
         assertThat(spDetail.name()).isEqualTo(sp.getName());
-        assertThat(spDetail.logoImgURL()).isEqualTo(s3Service.getFileURL(sp.getBm().getLogoImgKey()));
         assertThat(spDetail.mainCategory()).isEqualTo(sp.getBm().getMainCategory().getKoreanName());
         assertThat(spDetail.subCategories()).isEqualTo(subCategories);
-        assertThat(spDetail.company()).isEqualTo(sp.getBm().getCompany());
         assertThat(spDetail.isLiked()).isEqualTo(true);
         assertThat(spDetail.likeCnt()).isEqualTo(2L);
     }
@@ -163,8 +165,8 @@ class SpServiceTest {
         //given
         Sp sp_1 = saveSp(bm);
 
-        Member newMember = saveMember();
-        Bm newBm = saveBm(newMember);
+        Company newCompany = saveCompany();
+        Bm newBm = saveBm(newCompany);
         Sp sp_2 = saveSp(newBm);
 
         //when
@@ -188,9 +190,13 @@ class SpServiceTest {
         Member member2 = saveMember();
         Member member3 = saveMember();
 
-        Bm bm1 = saveBmWithMainCategory(member1, MainCategory.TECH_DIGITAL);
-        Bm bm2 = saveBmWithMainCategory(member2, MainCategory.TECH_DIGITAL);
-        Bm bm3 = saveBmWithMainCategory(member3, MainCategory.FOOD);
+        Company company1 = saveCompany();
+        Company company2 = saveCompany();
+        Company company3 = saveCompany();
+
+        Bm bm1 = saveBmWithMainCategory(company1, MainCategory.TECH_DIGITAL);
+        Bm bm2 = saveBmWithMainCategory(company2, MainCategory.TECH_DIGITAL);
+        Bm bm3 = saveBmWithMainCategory(company3, MainCategory.FOOD);
 
         Sp sp1 = saveSp(bm1);
         Sp sp2 = saveSp(bm2);
@@ -209,7 +215,6 @@ class SpServiceTest {
         assertThat(spDetails.get(0).mainCategory()).isEqualTo(bm1.getMainCategory().getKoreanName());
         assertThat(spDetails.get(0).name()).isEqualTo(sp1.getName());
         assertThat(spDetails.get(0).views()).isEqualTo(sp1.getViews());
-        assertThat(spDetails.get(0).company()).isEqualTo(bm1.getCompany());
         assertThat(spDetails.get(0).isLiked()).isTrue();
         assertThat(spDetails.get(0).likeCnt()).isEqualTo(2);
 
@@ -217,67 +222,8 @@ class SpServiceTest {
         assertThat(spDetails.get(1).mainCategory()).isEqualTo(bm2.getMainCategory().getKoreanName());
         assertThat(spDetails.get(1).name()).isEqualTo(sp2.getName());
         assertThat(spDetails.get(1).views()).isEqualTo(sp2.getViews());
-        assertThat(spDetails.get(1).company()).isEqualTo(bm2.getCompany());
         assertThat(spDetails.get(1).isLiked()).isFalse();
         assertThat(spDetails.get(1).likeCnt()).isEqualTo(0);
-    }
-
-    @Test
-    void AI로_추천받은_SP_조회() {
-        //given
-        Member member1 = saveMember();
-        Member member2 = saveMember();
-        Member member3 = saveMember();
-
-        Bm bm1 = saveBmWithMainCategory(member1, MainCategory.TECH_DIGITAL);
-        Bm bm2 = saveBmWithMainCategory(member2, MainCategory.TECH_DIGITAL);
-        Bm bm3 = saveBmWithMainCategory(member3, MainCategory.FOOD);
-
-        Sp sp1 = saveSp(bm1);
-        Sp sp2 = saveSp(bm2);
-        Sp sp3 = saveSp(bm3);
-
-        //when
-        List<SpDetailRes> spDetails = spService.getSpDetailsRecommendedFromAi(member1.getId(), List.of(bm1.getId(), bm2.getId(), bm3.getId()));
-
-        //then
-        assertThat(spDetails).hasSize(3);
-        assertThat(spDetails.stream()
-                .map(SpDetailRes::bmId)
-                .toList())
-                .containsExactlyInAnyOrder(bm1.getId(), bm2.getId(), bm3.getId());
-    }
-
-    @Test
-    void 나의_선호_카테고리로_SP_조회() {
-        //given
-        Member member = saveMember();
-        categoryPrefRepository.save(new CategoryPref(member, SubCategory.AI_ML));
-        categoryPrefRepository.save(new CategoryPref(member, SubCategory.DATA_ANALYTICS));
-
-        Member member1 = saveMember();
-        Member member2 = saveMember();
-        Member member3 = saveMember();
-
-        Bm bm1 = saveBm(member1);
-        bm1.addSubCategories(List.of(SubCategory.AI_ML, SubCategory.APP_DEVELOPMENT));
-        Bm bm2 = saveBm(member2);
-        bm2.addSubCategories(List.of(SubCategory.BLOCKCHAIN_WEB3, SubCategory.DATA_ANALYTICS));
-        Bm bm3 = saveBm(member3);
-        bm3.addSubCategories(List.of(SubCategory.BEVERAGE_COFFEE, SubCategory.ALCOHOL));
-
-        saveSp(bm);
-        Sp sp1 = saveSp(bm1);
-        Sp sp2 = saveSp(bm2);
-        Sp sp3 = saveSp(bm3);
-
-        //when
-        List<SpDetailRes> spDetails = spService.getRecommendationByPref(member.getId());
-
-        //then
-        // 검증 생략
-        System.out.println("spDetails = " + spDetails.size());
-        spDetails.forEach(System.out::println);
     }
 
     @Test
@@ -297,7 +243,7 @@ class SpServiceTest {
                 .thenReturn(newThumbnailImg.getOriginalFilename());
 
         //when
-        spService.updateSp(member.getId(), sp.getId(), newName, newSpVid, newThumbnailImg);
+        spService.updateSp(company.getId(), sp.getId(), newName, newSpVid, newThumbnailImg);
 
         //then
         List<Sp> all = spRepository.findAll();
@@ -314,7 +260,7 @@ class SpServiceTest {
         Sp sp = saveSp(bm);
 
         //when
-        spService.deleteSp(member.getId(), sp.getId());
+        spService.deleteSp(company.getId(), sp.getId());
 
         //then
         List<Sp> all = spRepository.findAll();
