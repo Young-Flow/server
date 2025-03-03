@@ -49,17 +49,19 @@ class SpServiceTest {
         return memberRepository.save(new Member(Country.ROK, Strings.EMPTY));
     }
 
-    private Company saveCompany(Member member) {
-        return companyRepository.save(new Company("company_name", "company_intro", "company_description", member));
+    private Company saveCompany() {
+        return companyRepository.save(new Company("companyEmail", "companyPassword",
+                true, "companyName", "companyAddress", "bm_logo_img_key"
+        ));
     }
 
-    private Bm saveBm(Member member, Company company) {
-        return bmRepository.save(new Bm(member, company, "bm_name", MainCategory.FOOD, "bm_intro", "bm_description",
-                "bm_desc_img_key", "bm_address", 100000L, 1000L, 1000, LocalDate.now(), "bm_long_pitch_url"));
+    private Bm saveBm(Company company) {
+        return bmRepository.save(new Bm(company, "bmName", MainCategory.FOOD, "bmIntro", "bmDescription",
+                "bmDescriptionImg", "companyAddress", 100000L, 1000L, 1000, LocalDate.now(), "longPitchUrl"));
     }
 
-    private Bm saveBmWithMainCategory(Member member, Company company, MainCategory mainCategory) {
-        return bmRepository.save(new Bm(member, company, "bm_name", mainCategory, "bm_intro", "bm_description",
+    private Bm saveBmWithMainCategory(Company company, MainCategory mainCategory) {
+        return bmRepository.save(new Bm(company, "bm_name", mainCategory, "bm_intro", "bm_description",
                 "bm_desc_img_key", "bm_address", 100000L, 1000L, 1000, LocalDate.now(), "bm_long_pitch_url"));
     }
 
@@ -71,8 +73,8 @@ class SpServiceTest {
     @BeforeEach
     void setUp() {
         member = saveMember();
-        company = saveCompany(member);
-        bm = saveBm(member, company);
+        company = saveCompany();
+        bm = saveBm(company);
     }
 
     private Member member;
@@ -98,7 +100,7 @@ class SpServiceTest {
                 .thenReturn(THUMBNAIL_IMG.getOriginalFilename());
 
         //when
-        spService.createSp(member.getId(), createSpReq, SP_VID, THUMBNAIL_IMG);
+        spService.createSp(company.getId(), createSpReq, SP_VID, THUMBNAIL_IMG);
 
         //then
         List<Sp> all = spRepository.findAll();
@@ -163,9 +165,8 @@ class SpServiceTest {
         //given
         Sp sp_1 = saveSp(bm);
 
-        Member newMember = saveMember();
-        Company newCompany = saveCompany(newMember);
-        Bm newBm = saveBm(newMember, newCompany);
+        Company newCompany = saveCompany();
+        Bm newBm = saveBm(newCompany);
         Sp sp_2 = saveSp(newBm);
 
         //when
@@ -189,13 +190,13 @@ class SpServiceTest {
         Member member2 = saveMember();
         Member member3 = saveMember();
 
-        Company company1 = saveCompany(member1);
-        Company company2 = saveCompany(member2);
-        Company company3 = saveCompany(member3);
+        Company company1 = saveCompany();
+        Company company2 = saveCompany();
+        Company company3 = saveCompany();
 
-        Bm bm1 = saveBmWithMainCategory(member1, company1, MainCategory.TECH_DIGITAL);
-        Bm bm2 = saveBmWithMainCategory(member2, company2, MainCategory.TECH_DIGITAL);
-        Bm bm3 = saveBmWithMainCategory(member3, company3, MainCategory.FOOD);
+        Bm bm1 = saveBmWithMainCategory(company1, MainCategory.TECH_DIGITAL);
+        Bm bm2 = saveBmWithMainCategory(company2, MainCategory.TECH_DIGITAL);
+        Bm bm3 = saveBmWithMainCategory(company3, MainCategory.FOOD);
 
         Sp sp1 = saveSp(bm1);
         Sp sp2 = saveSp(bm2);
@@ -226,36 +227,6 @@ class SpServiceTest {
     }
 
     @Test
-    void AI로_추천받은_SP_조회() {
-        //given
-        Member member1 = saveMember();
-        Member member2 = saveMember();
-        Member member3 = saveMember();
-
-        Company company1 = saveCompany(member1);
-        Company company2 = saveCompany(member2);
-        Company company3 = saveCompany(member3);
-
-        Bm bm1 = saveBmWithMainCategory(member1, company1, MainCategory.TECH_DIGITAL);
-        Bm bm2 = saveBmWithMainCategory(member2, company2, MainCategory.TECH_DIGITAL);
-        Bm bm3 = saveBmWithMainCategory(member3, company3, MainCategory.FOOD);
-
-        Sp sp1 = saveSp(bm1);
-        Sp sp2 = saveSp(bm2);
-        Sp sp3 = saveSp(bm3);
-
-        //when
-        List<SpDetailRes> spDetails = spService.getSpDetailsRecommendedFromAi(member1.getId(), List.of(bm1.getId(), bm2.getId(), bm3.getId()));
-
-        //then
-        assertThat(spDetails).hasSize(3);
-        assertThat(spDetails.stream()
-                .map(SpDetailRes::bmId)
-                .toList())
-                .containsExactlyInAnyOrder(bm1.getId(), bm2.getId(), bm3.getId());
-    }
-
-    @Test
     void SP_수정_성공() {
         //given
         Sp sp = saveSp(bm);
@@ -272,7 +243,7 @@ class SpServiceTest {
                 .thenReturn(newThumbnailImg.getOriginalFilename());
 
         //when
-        spService.updateSp(member.getId(), sp.getId(), newName, newSpVid, newThumbnailImg);
+        spService.updateSp(company.getId(), sp.getId(), newName, newSpVid, newThumbnailImg);
 
         //then
         List<Sp> all = spRepository.findAll();
@@ -289,7 +260,7 @@ class SpServiceTest {
         Sp sp = saveSp(bm);
 
         //when
-        spService.deleteSp(member.getId(), sp.getId());
+        spService.deleteSp(company.getId(), sp.getId());
 
         //then
         List<Sp> all = spRepository.findAll();

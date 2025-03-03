@@ -38,9 +38,8 @@ class MySpHistoryServiceTest {
     @Test
     void SP_시청시간_최초_저장_성공() {
         //given
-        Member bmOwner = saveMember();
-        Company company = saveCompany(bmOwner);
-        Bm bm = saveBm(bmOwner, company);
+        Company company = saveCompany();
+        Bm bm = saveBm(company);
 
         Member member = saveMember();
         int viewTime = 10000;
@@ -58,9 +57,8 @@ class MySpHistoryServiceTest {
     @Test
     void SP_업데이트_성공() {
         //given
-        Member bmOwner = saveMember();
-        Company company = saveCompany(bmOwner);
-        Bm bm = saveBm(bmOwner, company);
+        Company company = saveCompany();
+        Bm bm = saveBm(company);
 
         Member member = saveMember();
         int viewTime = 10000;
@@ -83,12 +81,14 @@ class MySpHistoryServiceTest {
         return memberRepository.save(new Member(Country.USA, "profileImg.jpg"));
     }
 
-    private Bm saveBm(Member member, Company company) {
-        return bmRepository.save(new Bm(member, company, "bmName", MainCategory.FOOD, "bmIntro", "bmDescription",
+    private Bm saveBm(Company company) {
+        return bmRepository.save(new Bm(company, "bmName", MainCategory.FOOD, "bmIntro", "bmDescription",
                 "bmDescriptionImg", "companyAddress", 100000L, 1000L, 1000, LocalDate.now(), "longPitchUrl"));
     }
 
-    private Company saveCompany(Member member) {
-        return companyRepository.save(new Company("company_name", "company_intro", "company_description", member));
+    private Company saveCompany() {
+        return companyRepository.save(new Company("companyEmail", "companyPassword",
+                true, "companyName", "companyAddress", "bm_logo_img_key"
+        ));
     }
 }

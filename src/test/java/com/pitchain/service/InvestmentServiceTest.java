@@ -45,8 +45,8 @@ class InvestmentServiceTest {
     void 투자_등록_성공() {
         //given
         Member member = saveMember();
-        Company company = saveCompany(member);
-        Bm bm = saveBm(member, company);
+        Company company = saveCompany();
+        Bm bm = saveBm(company);
         long amount = 1000L;
 
         //when
@@ -64,8 +64,8 @@ class InvestmentServiceTest {
     void 투자_등록_실패() {
         //given
         Member member = saveMember();
-        Company company = saveCompany(member);
-        Bm bm = saveBm(member, company);
+        Company company = saveCompany();
+        Bm bm = saveBm(company);
         long amount = 1000L;
 
         Long invalidId = Long.MAX_VALUE;
@@ -82,9 +82,8 @@ class InvestmentServiceTest {
     @Test
     void BM_투자_정보_조회_성공() {
         //given
-        Member member = saveMember();
-        Company company = saveCompany(member);
-        Long bmId = saveBm(member, company).getId();
+        Company company = saveCompany();
+        Long bmId = saveBm(company).getId();
 
         Member investorA = saveMember();
         long amountA = 1000L;
@@ -119,12 +118,14 @@ class InvestmentServiceTest {
         return memberRepository.save(new Member(Country.USA, "profileImg"));
     }
 
-    private Bm saveBm(Member member, Company company) {
-        return bmRepository.save(new Bm(member, company, "bmName", MainCategory.FOOD, "bmIntro", "bmDescription",
+    private Bm saveBm(Company company) {
+        return bmRepository.save(new Bm(company, "bmName", MainCategory.FOOD, "bmIntro", "bmDescription",
                 "bmDescriptionImg", "companyAddress", 100000L, 1000L, 1000, LocalDate.now(), "longPitchUrl"));
     }
 
-    private Company saveCompany(Member member) {
-        return companyRepository.save(new Company("company_name", "company_intro", "company_description", member));
+    private Company saveCompany() {
+        return companyRepository.save(new Company("companyEmail", "companyPassword",
+                true, "companyName", "companyAddress", "bm_logo_img_key"
+        ));
     }
 }
