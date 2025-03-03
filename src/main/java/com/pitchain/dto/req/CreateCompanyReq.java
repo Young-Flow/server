@@ -1,14 +1,13 @@
 package com.pitchain.dto.req;
 
 import com.pitchain.entity.Company;
-import com.pitchain.entity.Member;
 
 public record CreateCompanyReq(
-        String name,
-        String address
+        String email,
+        String password
 ) {
 
-    public Company createCompany(String logoImgKey, Member member) {
-        return new Company(name, address, logoImgKey, member);
+    public Company createUnverifiedCompany() {
+        return Company.createUnverifiedCompany(email, password);
     }
 }

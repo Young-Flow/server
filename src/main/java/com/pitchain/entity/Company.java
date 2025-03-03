@@ -11,10 +11,17 @@ import lombok.ToString;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Company {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "company_id")
     private Long id;
+
+    private String email;
+
+    private String password;
+
+    private Boolean isVerified; //todo 추후 사업지 등록증을 통한 인증으로 변경 예정
 
     private String name;
 
@@ -22,28 +29,41 @@ public class Company {
 
     private String logoImgKey;
 
-    @ManyToOne
-    @JoinColumn(name = "member_id")
-    private Member member;
+    public static Company createUnverifiedCompany(String email, String password) {
+        return new Company(email, password);
+    }
 
-    public Company(String name, String address, String logoImgKey, Member member) {
+    public Company(String email, String password) {
+        this.email = email;
+        this.password = password;
+        this.isVerified = false;
+    }
+
+    public Company(String email, String password, Boolean isVerified, String name, String address, String logoImgKey) {
+        this.email = email;
+        this.password = password;
+        this.isVerified = isVerified;
         this.name = name;
         this.address = address;
         this.logoImgKey = logoImgKey;
-        this.member = member;
     }
 
     public void updateCompanyInfo(String name, String address) {
         this.name = name;
         this.address = address;
-    }
-
-    public boolean isOwner(Member member) {
-        return this.member.equals(member);
+        this.isVerified = true;
     }
 
     public boolean hasLogoImg() {
         return logoImgKey != null || !logoImgKey.isEmpty();
+    }
+
+    public void updateEmail(String email) {
+        this.email = email;
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
     }
 
     public void updateLogoImgKey(String logoImgKey) {

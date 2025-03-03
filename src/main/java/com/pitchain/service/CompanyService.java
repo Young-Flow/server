@@ -3,72 +3,85 @@ package com.pitchain.service;
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.constant.S3UploadTarget;
 import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.controller.UpdatePasswordReq;
 import com.pitchain.dto.req.CreateCompanyReq;
+import com.pitchain.dto.req.LoginCompanyReq;
 import com.pitchain.dto.req.UpdateCompanyReq;
 import com.pitchain.dto.res.CompanyDetailRes;
+import com.pitchain.dto.res.LoginRes;
 import com.pitchain.entity.Company;
-import com.pitchain.entity.Member;
+import com.pitchain.jwt.TokenUtil;
 import com.pitchain.repository.CompanyRepository;
 import com.pitchain.repository.EntityFacade;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Transactional
 @Service
 public class CompanyService {
-
-    private final EntityFacade entityFacade;
     private final S3Service s3Service;
+    private final EntityFacade entityFacade;
     private final CompanyRepository companyRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final TokenUtil tokenUtil;
 
-    public void createCompany(Long memberId, CreateCompanyReq req, MultipartFile logoImg) {
-        Member member = entityFacade.getMember(memberId);
+    public void createCompany(CreateCompanyReq req) {
+        Optional<Company> optionalCompany = companyRepository.findByEmail(req.email());
+        verifyEmailConflict(optionalCompany);
 
-        String logoImgKey = s3Service.uploadFile(logoImg, S3UploadTarget.COMPANY_LOGO);
-
-        Company company = req.createCompany(logoImgKey, member);
-
+        Company company = req.createUnverifiedCompany();
         companyRepository.save(company);
     }
 
-    @Transactional(readOnly = true)
-    public CompanyDetailRes getCompanyDetail(Long memberId, Long companyId) {
-        Member member = entityFacade.getMember(memberId);
+    public LoginRes loginCompany(LoginCompanyReq req) {
+        Company company = companyRepository.findByEmail(req.email())
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.COMPANY_NOT_FOUND));
 
+        verifyPassword(req.password(), company.getPassword());
+
+        String accessToken = tokenUtil.issueAccessToken(company.getId());
+        String refreshToken = tokenUtil.issueRefreshToken(company.getId());
+
+        return LoginRes.createRes(accessToken, refreshToken);
+    }
+
+    @Transactional(readOnly = true)
+    public CompanyDetailRes getCompanyDetail(Long companyId) {
         Company company = entityFacade.getCompany(companyId);
 
         return CompanyDetailRes.createRes(company);
     }
 
     @Transactional(readOnly = true)
-    public List<CompanyDetailRes> getMyCompanyDetails(Long memberId) {
-        Member member = entityFacade.getMember(memberId);
-
-        List<Company> companies = companyRepository.findByMemberId(member.getId())
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.COMPANY_NOT_FOUND));
-
-        return companies.stream().map(CompanyDetailRes::createRes).toList();
+    public boolean isDuplicatedEmail(String email) {
+        return companyRepository.findByEmail(email).isPresent();
     }
 
-    public void updateCompanyInfo(Long memberId, Long companyId, UpdateCompanyReq req) {
-        Member member = entityFacade.getMember(memberId);
+    public void updateEmail(Long companyId, String email) {
         Company company = entityFacade.getCompany(companyId);
 
-        validateCompanyOwner(company, member);
+        Optional<Company> optionalCompany = companyRepository.findByEmail(email);
+        verifyEmailConflict(optionalCompany);
 
-        company.updateCompanyInfo(req.name(), req.address());
+        company.updateEmail(email);
     }
 
-    public void updateCompanyLogoImg(Long memberId, Long companyId, MultipartFile logoImg) {
-        Member member = entityFacade.getMember(memberId);
+    public void updatePassword(Long companyId, UpdatePasswordReq req) {
         Company company = entityFacade.getCompany(companyId);
 
-        validateCompanyOwner(company, member);
+        verifyPassword(req.originPassword(), company.getPassword());
+
+        company.updatePassword(req.newPassword());
+    }
+
+    public void updateLogoImg(Long companyId, MultipartFile logoImg) {
+        Company company = entityFacade.getCompany(companyId);
 
         if (company.hasLogoImg())
             s3Service.deleteImg(company.getLogoImgKey());
@@ -77,11 +90,14 @@ public class CompanyService {
         company.updateLogoImgKey(logoImgKey);
     }
 
-    public void deleteCompany(Long memberId, Long companyId) {
-        Member member = entityFacade.getMember(memberId);
+    public void updateCompanyInfo(Long companyId, UpdateCompanyReq req) {
         Company company = entityFacade.getCompany(companyId);
 
-        validateCompanyOwner(company, member);
+        company.updateCompanyInfo(req.name(), req.address());
+    }
+
+    public void deleteCompany(Long companyId) {
+        Company company = entityFacade.getCompany(companyId);
 
         if (company.hasLogoImg())
             s3Service.deleteImg(company.getLogoImgKey());
@@ -89,9 +105,13 @@ public class CompanyService {
         companyRepository.delete(company);
     }
 
-    private static void validateCompanyOwner(Company company, Member member) {
-        if (!company.isOwner(member)) {
-            throw new GeneralHandler(ErrorStatus.MEMBER_FORBIDDEN);
-        }
+    private static void verifyEmailConflict(Optional<Company> optionalCompany) {
+        if (optionalCompany.isPresent())
+            throw new GeneralHandler(ErrorStatus.COMPANY_EMAIL_CONFLICT);
+    }
+
+    private void verifyPassword(String inputPassword, String encodedPassword) {
+        if (!passwordEncoder.matches(inputPassword, encodedPassword))
+            throw new GeneralHandler(ErrorStatus.COMPANY_PASSWORD_NOT_MATCHED);
     }
 }

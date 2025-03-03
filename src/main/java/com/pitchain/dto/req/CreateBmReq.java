@@ -3,6 +3,7 @@ package com.pitchain.dto.req;
 import com.pitchain.common.constant.MainCategory;
 import com.pitchain.common.constant.SubCategory;
 import com.pitchain.entity.Bm;
+import com.pitchain.entity.Company;
 import com.pitchain.entity.Member;
 import jakarta.validation.constraints.NotNull;
 
@@ -23,9 +24,9 @@ public record CreateBmReq(
         LocalDate deadline,
         String longPitchURL
 ) {
-    public Bm createBm(Member member, String descImgKey) {
+    public Bm createBm(Company company, String descImgKey) {
         return Bm.builder()
-                .member(member)
+                .company(company)
                 .name(name)
                 .mainCategory(mainCategory)
                 .intro(intro)
