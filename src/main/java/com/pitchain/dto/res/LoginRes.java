@@ -5,11 +5,11 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class OauthLoginRes {
+public class LoginRes {
     private String accessToken;
     private String refreshToken;
 
-    public static OauthLoginRes createRes(String accessToken, String refreshToken) {
-        return new OauthLoginRes(accessToken, refreshToken);
+    public static LoginRes createRes(String accessToken, String refreshToken) {
+        return new LoginRes(accessToken, refreshToken);
     }
 }

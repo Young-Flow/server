@@ -2,7 +2,7 @@ package com.pitchain.controller;
 
 import com.pitchain.common.apiPayload.dto.CustomApiResponse;
 import com.pitchain.dto.req.OauthLoginReq;
-import com.pitchain.dto.res.OauthLoginRes;
+import com.pitchain.dto.res.LoginRes;
 import com.pitchain.service.OauthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -28,8 +28,8 @@ public class OauthController {
             @ApiResponse(responseCode = "COMMON400", description = "처리할 수 없는 소셜 로그인")}
     )
     @PostMapping("/login")
-    public CustomApiResponse<OauthLoginRes> socialLogin(@Valid @RequestBody OauthLoginReq req) {
-        OauthLoginRes memberByOauthLogin = oauthService.getMemberByOauthLogin(req);
+    public CustomApiResponse<LoginRes> socialLogin(@Valid @RequestBody OauthLoginReq req) {
+        LoginRes memberByOauthLogin = oauthService.getMemberByOauthLogin(req);
         return CustomApiResponse.onSuccess(memberByOauthLogin);
     }
 }

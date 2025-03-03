@@ -2,7 +2,7 @@ package com.pitchain.service;
 
 import com.pitchain.common.constant.OauthProvider;
 import com.pitchain.dto.req.OauthLoginReq;
-import com.pitchain.dto.res.OauthLoginRes;
+import com.pitchain.dto.res.LoginRes;
 import com.pitchain.entity.Member;
 import com.pitchain.jwt.TokenUtil;
 import com.pitchain.oauth2.member.OauthMemberInfo;
@@ -24,7 +24,7 @@ public class OauthService {
     private final TokenUtil tokenUtil;
     private final MemberRepository memberRepository;
 
-    public OauthLoginRes getMemberByOauthLogin(OauthLoginReq req) {
+    public LoginRes getMemberByOauthLogin(OauthLoginReq req) {
         OauthParams oauthParam = createOauthParams(req);
 
         OauthMemberInfo oauthMemberInfo = requestOauthInfoService.request(oauthParam);
@@ -35,7 +35,7 @@ public class OauthService {
         String accessToken = tokenUtil.issueAccessToken(member.getId());
         String refreshToken = tokenUtil.issueRefreshToken(member.getId());
 
-        return OauthLoginRes.createRes(accessToken, refreshToken);
+        return LoginRes.createRes(accessToken, refreshToken);
     }
 
     private static OauthParams createOauthParams(OauthLoginReq req) {
