@@ -179,7 +179,7 @@ public class SpService {
 
     private static void validateSpOwner(Sp sp, Company company) {
         if (!sp.isOwner(company.getId())) {
-            throw new GeneralHandler(ErrorStatus.MEMBER_FORBIDDEN);
+            throw new GeneralHandler(ErrorStatus.COMPANY_FORBIDDEN);
         }
     }
 
