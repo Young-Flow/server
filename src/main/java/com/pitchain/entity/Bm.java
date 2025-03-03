@@ -43,10 +43,6 @@ public class Bm extends BaseEntity {
     @Column(name = "long_pitch_url")
     private String longPitchURL;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
-
     @ManyToOne
     @JoinColumn(name = "company_id")
     private Company company;
@@ -72,11 +68,10 @@ public class Bm extends BaseEntity {
     }
 
     @Builder
-    public Bm(Member member, Company company, String name, MainCategory mainCategory,
+    public Bm(Company company, String name, MainCategory mainCategory,
               String intro, String description, String descImgKey, String address,
               Long valuationCap, Long goalInvestment, Integer maxIssuedShare,
               LocalDate deadline, String longPitchURL) {
-        this.member = member;
         this.company = company;
         this.name = name;
         this.mainCategory = mainCategory;
@@ -91,8 +86,8 @@ public class Bm extends BaseEntity {
         this.longPitchURL = longPitchURL;
     }
 
-    public boolean isOwner(Long memberId) {
-        return memberId.equals(member.getId());
+    public boolean isOwner(Long companyId) {
+        return this.company.getId().equals(companyId);
     }
 
     public void updatePtImgs(List<PtImg> ptImgs) {

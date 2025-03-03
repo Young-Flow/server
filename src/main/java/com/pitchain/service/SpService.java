@@ -27,15 +27,14 @@ public class SpService {
     private final SpLikeRepository spLikeRepository;
     private final S3Service s3Service;
     private final CategoryPrefRepository categoryPrefRepository;
-    private final BmRepository bmRepository;
 
-    public void createSp(Long memberId, CreateSpReq createSpReq, MultipartFile spVid, MultipartFile thumbnailImg) {
-        Member member = entityFacade.getMember(memberId);
+    public void createSp(Long companyId, CreateSpReq createSpReq, MultipartFile spVid, MultipartFile thumbnailImg) {
+        Company company = entityFacade.getCompany(companyId);
         Bm bm = entityFacade.getBm(createSpReq.bmId());
 
         String spOriginKey = s3Service.uploadFile(spVid, S3UploadTarget.COMPANY_VIDEO);
 
-        //TO DO - AWS Lambda에서 정상적으로 트랜스코딩 완료됐으면 여기로 알려주기
+        //todo AWS Lambda에서 정상적으로 트랜스코딩 완료됐으면 여기로 알려주기
 
         String spKey = createSpM3U8Key(spOriginKey);
         String thumbnailImgKey = s3Service.uploadFile(thumbnailImg, S3UploadTarget.COMPANY_THUMBNAIL);
@@ -58,8 +57,10 @@ public class SpService {
                     long likeCnt = spLikeRepository.countBySp(sp);
                     List<String> subCategories = bm.getKoreanSubCategories();
 
-                    String logoImgURL = s3Service.getFileURL(bm.getLogoImgKey());
-                    return SpDetailRes.createRes(spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories, logoImgURL);
+                    Company company = bm.getCompany();
+                    String logoImgURL = s3Service.getFileURL(company.getLogoImgKey());
+
+                    return SpDetailRes.createRes(company, logoImgURL, spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories);
                 })
                 .toList();
     }
@@ -78,9 +79,11 @@ public class SpService {
                     Bm bm = sp.getBm();
                     long likeCnt = spLikeRepository.countBySp(sp);
                     List<String> subCategories = bm.getKoreanSubCategories();
-                    String logoImgURL = s3Service.getFileURL(bm.getLogoImgKey());
 
-                    return SpDetailRes.createRes(spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories, logoImgURL);
+                    Company company = bm.getCompany();
+                    String logoImgURL = s3Service.getFileURL(company.getLogoImgKey());
+
+                    return SpDetailRes.createRes(company, logoImgURL, spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories);
                 })
                 .toList();
     }
@@ -96,9 +99,11 @@ public class SpService {
         Bm bm = sp.getBm();
         long likeCnt = spLikeRepository.countBySp(sp);
         List<String> subCategories = bm.getKoreanSubCategories();
-        String logoImgURL = s3Service.getFileURL(bm.getLogoImgKey());
 
-        return SpDetailRes.createRes(spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories, logoImgURL);
+        Company company = bm.getCompany();
+        String logoImgURL = s3Service.getFileURL(company.getLogoImgKey());
+
+        return SpDetailRes.createRes(company, logoImgURL, spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories);
     }
 
     public List<SpDetailRes> getSpDetailsRecommendedFromAi(Long memberId, List<Long> bmIds) {
@@ -113,9 +118,11 @@ public class SpService {
                     Bm bm = sp.getBm();
                     long likeCnt = spLikeRepository.countBySp(sp);
                     List<String> subCategories = bm.getKoreanSubCategories();
-                    String logoImgURL = s3Service.getFileURL(bm.getLogoImgKey());
 
-                    return SpDetailRes.createRes(spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories, logoImgURL);
+                    Company company = bm.getCompany();
+                    String logoImgURL = s3Service.getFileURL(company.getLogoImgKey());
+
+                    return SpDetailRes.createRes(company, logoImgURL, spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories);
                 })
                 .toList();
     }
@@ -124,19 +131,6 @@ public class SpService {
         List<CategoryPref> categoryPrefs = categoryPrefRepository.findAllByMemberId(memberId)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.CATEGORY_PREF_NOT_FOUND));
         List<SubCategory> subCategoryPrefs = categoryPrefs.stream().map(CategoryPref::getSubCategory).toList();
-
-//        List<Bm> bms = bmRepository.findAll().stream()
-//                .filter(bm -> bm.getSubCategories().stream()
-//                        .map(BmSubCategory::getSubCategory)
-//                        .anyMatch(subCategoryPrefs::contains)
-//                )
-//                .toList();
-//
-//        bms.forEach(bm -> System.out.println(bm));
-//
-//        List<SpWithLikeDto> spWithLikeDtos = bms.stream().map(bm -> new SpWithLikeDto(bm.getSp(), false)).toList();
-//
-//        spWithLikeDtos.forEach(spWithLikeDto -> System.out.println(spWithLikeDto));
 
         List<SpWithLikeDto> spWithLikeDtos = spRepository.getSpWithLikeDtoByPref(memberId, subCategoryPrefs);
 
@@ -149,18 +143,20 @@ public class SpService {
                     Bm bm = sp.getBm();
                     long likeCnt = spLikeRepository.countBySp(sp);
                     List<String> subCategories = bm.getKoreanSubCategories();
-                    String logoImgURL = s3Service.getFileURL(bm.getLogoImgKey());
 
-                    return SpDetailRes.createRes(spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories, logoImgURL);
+                    Company company = bm.getCompany();
+                    String logoImgURL = s3Service.getFileURL(company.getLogoImgKey());
+
+                    return SpDetailRes.createRes(company, logoImgURL, spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories);
                 })
                 .toList();
     }
 
-    public void updateSp(Long memberId, Long spId, String name, MultipartFile spVid, MultipartFile thumbnailImg) {
-        Member member = entityFacade.getMember(memberId);
+    public void updateSp(Long companyId, Long spId, String name, MultipartFile spVid, MultipartFile thumbnailImg) {
+        Company company = entityFacade.getCompany(companyId);
         Sp sp = entityFacade.getSp(spId);
 
-        validateSpOwner(sp, member);
+        validateSpOwner(sp, company);
 
         s3Service.deleteVid(sp.getSpKey());
         s3Service.deleteImg(sp.getThumbnailImgKey());
@@ -172,17 +168,17 @@ public class SpService {
         sp.update(updateSp);
     }
 
-    public void deleteSp(Long memberId, Long spId) {
-        Member member = entityFacade.getMember(memberId);
+    public void deleteSp(Long companyId, Long spId) {
+        Company company = entityFacade.getCompany(companyId);
         Sp sp = entityFacade.getSp(spId);
 
-        validateSpOwner(sp, member);
+        validateSpOwner(sp, company);
 
         spRepository.delete(sp);
     }
 
-    private static void validateSpOwner(Sp sp, Member member) {
-        if (!sp.isOwner(member.getId())) {
+    private static void validateSpOwner(Sp sp, Company company) {
+        if (!sp.isOwner(company.getId())) {
             throw new GeneralHandler(ErrorStatus.MEMBER_FORBIDDEN);
         }
     }

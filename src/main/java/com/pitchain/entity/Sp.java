@@ -39,8 +39,8 @@ public class Sp extends BaseEntity {
         this.views = 0;
     }
 
-    public boolean isOwner(Long memberId) {
-        return bm.getMember().getId().equals(memberId);
+    public boolean isOwner(Long companyId) {
+        return bm.getCompany().getId().equals(companyId);
     }
 
     public void update(Sp updateSp) {
