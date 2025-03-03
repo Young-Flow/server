@@ -40,7 +40,7 @@ public class OauthService {
 
     private static OauthParams createOauthParams(OauthLoginReq req) {
         OauthProvider oauthProvider = req.getOauthProvider();
-        OauthParams oauthParam = oauthProvider.getOauthParams(req.getCode());
+        OauthParams oauthParam = oauthProvider.getOauthParams(req.getCode(), req.getState());
         return oauthParam;
     }
 

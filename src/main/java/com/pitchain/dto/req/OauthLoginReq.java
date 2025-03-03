@@ -2,6 +2,7 @@ package com.pitchain.dto.req;
 
 import com.pitchain.common.constant.OauthProvider;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -13,10 +14,14 @@ import lombok.Setter;
 @NoArgsConstructor
 public class OauthLoginReq {
     @NotNull
-    @Schema(description = "소셜 로그인 제공자", examples = {"KAKAO", "GOOGLE", "APPLE"})
+    @Schema(description = "소셜 로그인 제공자", examples = {"KAKAO", "GOOGLE", "NAVER"})
     private OauthProvider oauthProvider;
 
     @NotBlank
     @Schema(description = "OAuth Provider Server로 부터 받은 인증 코드")
     private String code;
+
+    @Nullable
+    @Schema(description = "애플리케이션에서 생성한 임의의 상태 토큰값, NAVER에만 쓰임", example = "STATE_STRING", nullable = true)
+    private String state;
 }
