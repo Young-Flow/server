@@ -9,17 +9,11 @@ import com.pitchain.oauth2.param.OauthParams;
 public enum OauthProvider {
     KAKAO, GOOGLE, NAVER;
 
-    public OauthParams getOauthParams(OauthLoginReq req) {
-        String code = req.getCode();
-        String state = req.getState();
-
+    public OauthParams getOauthParams(String code) {
         return switch (this) {
             case KAKAO -> new KakaoParams(code);
             case GOOGLE -> new GoogleParams(code);
-            case NAVER -> {
-                assert state != null : "state should not be null";
-                yield new NaverParams(code, state);
-            }
+            case NAVER -> new NaverParams(code);
         };
     }
 }
