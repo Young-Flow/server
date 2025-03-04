@@ -29,7 +29,7 @@ public class NaverParams implements OauthParams {
     public MultiValueMap<String, String> makeBody() {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("code", authorizationCode);
-        body.add("sate", state);
+        body.add("state", state);
         return body;
     }
 }

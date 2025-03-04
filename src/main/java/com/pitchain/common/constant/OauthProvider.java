@@ -16,7 +16,10 @@ public enum OauthProvider {
         return switch (this) {
             case KAKAO -> new KakaoParams(code);
             case GOOGLE -> new GoogleParams(code);
-            case NAVER -> new NaverParams(code, state);
+            case NAVER -> {
+                assert state != null : "state should not be null";
+                yield new NaverParams(code, state);
+            }
         };
     }
 }
