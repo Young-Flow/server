@@ -10,10 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "소셜 로그인")
 @RequiredArgsConstructor
@@ -22,7 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class OauthController {
     private final OauthService oauthService;
 
-    @Operation(summary = "소셜 로그인", description = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=47fe7aff98cf882892387fe4b65d3279&redirect_uri={redirectURL}을 통해 code값 받아오기")
+    @Operation(summary = "소셜 로그인", description = "KAKAO: https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=891063e7c569324189a0353dfb18c534&redirect_uri={redirectURL}을 통해 code값 받아오기, " +
+                                                    "NAVER: https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=T4z00JRW0P38KpqrIc6w&redirect_uri={redirectURL}을 통해 code값 받아오기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "COMMON200", description = "로그인 성공"),
             @ApiResponse(responseCode = "COMMON400", description = "처리할 수 없는 소셜 로그인")}
