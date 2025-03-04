@@ -22,6 +22,6 @@ public class OauthLoginReq {
     private String code;
 
     @Nullable
-    @Schema(description = "애플리케이션에서 생성한 임의의 상태 토큰값, NAVER에만 쓰임", example = "STATE_STRING", nullable = true)
+    @Schema(description = "code 값 받아올 때 입력한 임의의 state 값, NAVER에만 쓰임", example = "STATE_STRING", nullable = true)
     private String state;
 }
