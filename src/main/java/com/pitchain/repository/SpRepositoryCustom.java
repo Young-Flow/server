@@ -20,7 +20,7 @@ public class SpRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<SpWithLikeDto> getSpWithLikeDtoFilteredCategory(Long memberId, MainCategory category) {
+    public List<SpWithLikeDto> getSpWithLikeDtoFilteredCategory(Long memberId, MainCategory category, Long lastSpId, int size) {
         return queryFactory
                 .select(new QSpWithLikeDto(
                         sp,
@@ -29,12 +29,21 @@ public class SpRepositoryCustom {
                 .from(sp)
                 .leftJoin(sp.bm, bm)
                 .leftJoin(spLike).on(spLike.sp.id.eq(sp.id).and(spLike.member.id.eq(memberId)))
-                .where(eqMainCategory(category))
+                .where(
+                        eqMainCategory(category),
+                        ltSpId(lastSpId)
+                )
+                .orderBy(sp.id.desc())
+                .limit(size + 1)
                 .distinct()
                 .fetch();
     }
 
     private static BooleanExpression eqMainCategory(MainCategory category) {
         return bm.mainCategory.eq(category);
+    }
+
+    private BooleanExpression ltSpId(Long lastSpId) {
+        return lastSpId == null ? null : sp.id.lt(lastSpId);
     }
 }

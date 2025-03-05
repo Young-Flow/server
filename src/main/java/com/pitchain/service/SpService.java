@@ -4,11 +4,16 @@ import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.constant.MainCategory;
 import com.pitchain.common.constant.S3UploadTarget;
 import com.pitchain.common.constant.SubCategory;
+import com.pitchain.common.entity.InfinityScrollRes;
 import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.common.util.InfinityScrollUtil;
 import com.pitchain.dto.SpWithLikeDto;
 import com.pitchain.dto.req.CreateSpReq;
 import com.pitchain.dto.res.SpDetailRes;
-import com.pitchain.entity.*;
+import com.pitchain.entity.Bm;
+import com.pitchain.entity.CategoryPref;
+import com.pitchain.entity.Company;
+import com.pitchain.entity.Sp;
 import com.pitchain.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 @Transactional
 @RequiredArgsConstructor
@@ -66,11 +72,18 @@ public class SpService {
     }
 
     @Transactional(readOnly = true)
-    public List<SpDetailRes> getSpDetailsFilteredCategory(Long memberId, String mainCategoryInKorean) {
+    public InfinityScrollRes<SpDetailRes> getSpDetailsFilteredCategory(Long memberId, String mainCategoryInKorean, Long lastSpId, int size) {
         MainCategory mainCategory = MainCategory.from(mainCategoryInKorean);
-        List<SpWithLikeDto> spWithLikeDtos = spRepositoryCustom.getSpWithLikeDtoFilteredCategory(memberId, mainCategory);
 
-        return spWithLikeDtos.stream()
+        List<SpWithLikeDto> spWithLikeDtos = spRepositoryCustom.getSpWithLikeDtoFilteredCategory(memberId, mainCategory, lastSpId, size);
+
+        boolean hasNext = InfinityScrollUtil.hasNext(spWithLikeDtos.size(), size);
+        if (hasNext)
+            spWithLikeDtos.remove(spWithLikeDtos.size() - 1);
+        Optional<SpWithLikeDto> lastElement = InfinityScrollUtil.getLastElement(spWithLikeDtos);
+        Long lastElementId = lastElement.map(spWithLikeDto -> spWithLikeDto.getSp().getId()).orElse(null);
+
+        List<SpDetailRes> content = spWithLikeDtos.stream()
                 .map(spWithLikeDto -> {
                     Sp sp = spWithLikeDto.getSp();
                     String spURL = s3Service.getFileURL(sp.getSpKey());
@@ -86,6 +99,8 @@ public class SpService {
                     return SpDetailRes.createRes(company, logoImgURL, spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories);
                 })
                 .toList();
+
+        return InfinityScrollRes.createRes(content, lastElementId, hasNext);
     }
 
     @Transactional(readOnly = true)

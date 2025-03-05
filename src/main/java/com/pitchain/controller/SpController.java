@@ -1,6 +1,7 @@
 package com.pitchain.controller;
 
 import com.pitchain.common.apiPayload.dto.CustomApiResponse;
+import com.pitchain.common.entity.InfinityScrollRes;
 import com.pitchain.dto.req.CreateSpReq;
 import com.pitchain.dto.res.SpDetailRes;
 import com.pitchain.service.SpService;
@@ -36,11 +37,13 @@ public class SpController {
         return CustomApiResponse.onSuccess(spDetailResList);
     }
 
-    @Operation(summary = "카테고리별 SP 리스트 조회")
+    @Operation(summary = "카테고리별 SP 리스트 조회", description = "첫 조회 시 쿼리 파라미터에 lastSpId를 포함시키지 않습니다.")
     @GetMapping("/category")
-    public CustomApiResponse<List<SpDetailRes>> getSpDetailsFilteredCategory(@AuthenticationPrincipal Long memberId,
-                                                                             @RequestParam String mainCategoryInKorean) {
-        List<SpDetailRes> spDetailResList = spService.getSpDetailsFilteredCategory(memberId, mainCategoryInKorean);
+    public CustomApiResponse<InfinityScrollRes<SpDetailRes>> getSpDetailsFilteredCategory(@AuthenticationPrincipal Long memberId,
+                                                                                          @RequestParam String mainCategoryInKorean,
+                                                                                          @RequestParam(required = false) Long lastSpId,
+                                                                                          @RequestParam(defaultValue = "10") int size) {
+        InfinityScrollRes<SpDetailRes> spDetailResList = spService.getSpDetailsFilteredCategory(memberId, mainCategoryInKorean, lastSpId, size);
         return CustomApiResponse.onSuccess(spDetailResList);
     }
 
