@@ -4,6 +4,7 @@ import com.pitchain.common.apiPayload.dto.CustomApiResponse;
 import com.pitchain.dto.req.CreateSpReq;
 import com.pitchain.dto.res.SpDetailRes;
 import com.pitchain.service.SpService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,6 +19,7 @@ import java.util.List;
 public class SpController {
     private final SpService spService;
 
+    @Operation(summary = "SP 생성")
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public CustomApiResponse createSp(@AuthenticationPrincipal Long companyId,
                                       @RequestPart CreateSpReq createSpReq,
@@ -27,12 +29,14 @@ public class SpController {
         return CustomApiResponse.onSuccess();
     }
 
+    @Operation(summary = "SP 리스트 조회")
     @GetMapping
     public CustomApiResponse<List<SpDetailRes>> getSpDetails(@AuthenticationPrincipal Long memberId) {
         List<SpDetailRes> spDetailResList = spService.getSpDetails(memberId);
         return CustomApiResponse.onSuccess(spDetailResList);
     }
 
+    @Operation(summary = "카테고리별 SP 리스트 조회")
     @GetMapping("/category")
     public CustomApiResponse<List<SpDetailRes>> getSpDetailsFilteredCategory(@AuthenticationPrincipal Long memberId,
                                                                              @RequestParam String mainCategoryInKorean) {
@@ -40,6 +44,7 @@ public class SpController {
         return CustomApiResponse.onSuccess(spDetailResList);
     }
 
+    @Operation(summary = "SP 상세 조회")
     @GetMapping("/{spId}")
     public CustomApiResponse<SpDetailRes> getSpDetail(@AuthenticationPrincipal Long memberId,
                                                       @PathVariable Long spId) {
@@ -58,6 +63,7 @@ public class SpController {
         return CustomApiResponse.onSuccess();
     }
 
+    @Operation(summary = "SP 삭제")
     @DeleteMapping("/{spId}")
     public CustomApiResponse deleteSp(@AuthenticationPrincipal Long companyId,
                                       @PathVariable Long spId) {
