@@ -47,13 +47,7 @@ public class SpController {
         return CustomApiResponse.onSuccess(spDetailRes);
     }
 
-    @GetMapping("/recommendation")
-    public CustomApiResponse<List<SpDetailRes>> getSpDetailsRecommendedFromAi(@AuthenticationPrincipal Long memberId,
-                                                                              @RequestParam List<Long> bmIds) {
-        List<SpDetailRes> spDetailResList = spService.getSpDetailsRecommendedFromAi(memberId, bmIds);
-        return CustomApiResponse.onSuccess(spDetailResList);
-    }
-
+    @Operation(summary = "SP 수정")
     @PutMapping(value = "/{spId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public CustomApiResponse updateSp(@AuthenticationPrincipal Long companyId,
                                       @PathVariable Long spId,
