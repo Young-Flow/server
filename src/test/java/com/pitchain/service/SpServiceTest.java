@@ -4,6 +4,7 @@ import com.pitchain.common.constant.Country;
 import com.pitchain.common.constant.MainCategory;
 import com.pitchain.common.constant.S3UploadTarget;
 import com.pitchain.common.constant.SubCategory;
+import com.pitchain.common.entity.InfinityScrollRes;
 import com.pitchain.dto.req.CreateSpReq;
 import com.pitchain.dto.res.SpDetailRes;
 import com.pitchain.entity.*;
@@ -206,24 +207,33 @@ class SpServiceTest {
         spLikeRepository.save(new SpLike(member2, sp1));
 
         //when
-        List<SpDetailRes> spDetails = spService.getSpDetailsFilteredCategory(member1.getId(), MainCategory.TECH_DIGITAL.getKoreanName());
+        InfinityScrollRes<SpDetailRes> spDetailRes_1 = spService.getSpDetailsFilteredCategory(
+                member1.getId(), MainCategory.TECH_DIGITAL.getKoreanName(), null, 1);
+        InfinityScrollRes<SpDetailRes> spDetailRes_2 = spService.getSpDetailsFilteredCategory(
+                member1.getId(), MainCategory.TECH_DIGITAL.getKoreanName(), spDetailRes_1.getLastElementId(), 1);
 
         // then
-        assertThat(spDetails).hasSize(2);
+        List<SpDetailRes> content_1 = spDetailRes_1.getContent();
+        SpDetailRes spDetailRes = content_1.get(0); // sp2 조회 결과
+        assertThat(spDetailRes.bmId()).isEqualTo(sp2.getBm().getId());
+        assertThat(content_1.get(0).mainCategory()).isEqualTo(bm1.getMainCategory().getKoreanName());
+        assertThat(content_1.get(0).name()).isEqualTo(sp1.getName());
+        assertThat(content_1.get(0).views()).isEqualTo(sp1.getViews());
+        assertThat(content_1.get(0).isLiked()).isFalse();
+        assertThat(content_1.get(0).likeCnt()).isEqualTo(0);
+        assertThat(spDetailRes_1.hasNext()).isTrue();
+        assertThat(spDetailRes_1.getLastElementId()).isEqualTo(sp2.getId());
 
-        assertThat(spDetails.get(0).bmId()).isEqualTo(bm1.getId());
-        assertThat(spDetails.get(0).mainCategory()).isEqualTo(bm1.getMainCategory().getKoreanName());
-        assertThat(spDetails.get(0).name()).isEqualTo(sp1.getName());
-        assertThat(spDetails.get(0).views()).isEqualTo(sp1.getViews());
-        assertThat(spDetails.get(0).isLiked()).isTrue();
-        assertThat(spDetails.get(0).likeCnt()).isEqualTo(2);
-
-        assertThat(spDetails.get(1).bmId()).isEqualTo(bm2.getId());
-        assertThat(spDetails.get(1).mainCategory()).isEqualTo(bm2.getMainCategory().getKoreanName());
-        assertThat(spDetails.get(1).name()).isEqualTo(sp2.getName());
-        assertThat(spDetails.get(1).views()).isEqualTo(sp2.getViews());
-        assertThat(spDetails.get(1).isLiked()).isFalse();
-        assertThat(spDetails.get(1).likeCnt()).isEqualTo(0);
+        List<SpDetailRes> content_2 = spDetailRes_2.getContent();
+        spDetailRes = content_2.get(0); // sp1 조회 결과
+        assertThat(spDetailRes.bmId()).isEqualTo(sp1.getBm().getId());
+        assertThat(spDetailRes.mainCategory()).isEqualTo(bm1.getMainCategory().getKoreanName());
+        assertThat(spDetailRes.name()).isEqualTo(sp1.getName());
+        assertThat(spDetailRes.views()).isEqualTo(sp1.getViews());
+        assertThat(spDetailRes.isLiked()).isTrue();
+        assertThat(spDetailRes.likeCnt()).isEqualTo(2);
+        assertThat(spDetailRes_2.hasNext()).isFalse();
+        assertThat(spDetailRes_2.getLastElementId()).isEqualTo(sp1.getId());
     }
 
     @Test

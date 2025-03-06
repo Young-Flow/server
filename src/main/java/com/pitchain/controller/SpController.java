@@ -1,9 +1,11 @@
 package com.pitchain.controller;
 
 import com.pitchain.common.apiPayload.dto.CustomApiResponse;
+import com.pitchain.common.entity.InfinityScrollRes;
 import com.pitchain.dto.req.CreateSpReq;
 import com.pitchain.dto.res.SpDetailRes;
 import com.pitchain.service.SpService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,6 +20,7 @@ import java.util.List;
 public class SpController {
     private final SpService spService;
 
+    @Operation(summary = "SP 생성")
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public CustomApiResponse createSp(@AuthenticationPrincipal Long companyId,
                                       @RequestPart CreateSpReq createSpReq,
@@ -27,19 +30,24 @@ public class SpController {
         return CustomApiResponse.onSuccess();
     }
 
+    @Operation(summary = "SP 리스트 조회")
     @GetMapping
     public CustomApiResponse<List<SpDetailRes>> getSpDetails(@AuthenticationPrincipal Long memberId) {
         List<SpDetailRes> spDetailResList = spService.getSpDetails(memberId);
         return CustomApiResponse.onSuccess(spDetailResList);
     }
 
+    @Operation(summary = "카테고리별 SP 리스트 조회", description = "첫 조회 시 쿼리 파라미터에 lastSpId를 포함시키지 않습니다.")
     @GetMapping("/category")
-    public CustomApiResponse<List<SpDetailRes>> getSpDetailsFilteredCategory(@AuthenticationPrincipal Long memberId,
-                                                                             @RequestParam String mainCategoryInKorean) {
-        List<SpDetailRes> spDetailResList = spService.getSpDetailsFilteredCategory(memberId, mainCategoryInKorean);
+    public CustomApiResponse<InfinityScrollRes<SpDetailRes>> getSpDetailsFilteredCategory(@AuthenticationPrincipal Long memberId,
+                                                                                          @RequestParam String mainCategoryInKorean,
+                                                                                          @RequestParam(required = false) Long lastSpId,
+                                                                                          @RequestParam(defaultValue = "10") int size) {
+        InfinityScrollRes<SpDetailRes> spDetailResList = spService.getSpDetailsFilteredCategory(memberId, mainCategoryInKorean, lastSpId, size);
         return CustomApiResponse.onSuccess(spDetailResList);
     }
 
+    @Operation(summary = "SP 상세 조회")
     @GetMapping("/{spId}")
     public CustomApiResponse<SpDetailRes> getSpDetail(@AuthenticationPrincipal Long memberId,
                                                       @PathVariable Long spId) {
@@ -47,13 +55,7 @@ public class SpController {
         return CustomApiResponse.onSuccess(spDetailRes);
     }
 
-    @GetMapping("/recommendation")
-    public CustomApiResponse<List<SpDetailRes>> getSpDetailsRecommendedFromAi(@AuthenticationPrincipal Long memberId,
-                                                                              @RequestParam List<Long> bmIds) {
-        List<SpDetailRes> spDetailResList = spService.getSpDetailsRecommendedFromAi(memberId, bmIds);
-        return CustomApiResponse.onSuccess(spDetailResList);
-    }
-
+    @Operation(summary = "SP 수정")
     @PutMapping(value = "/{spId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public CustomApiResponse updateSp(@AuthenticationPrincipal Long companyId,
                                       @PathVariable Long spId,
@@ -64,6 +66,7 @@ public class SpController {
         return CustomApiResponse.onSuccess();
     }
 
+    @Operation(summary = "SP 삭제")
     @DeleteMapping("/{spId}")
     public CustomApiResponse deleteSp(@AuthenticationPrincipal Long companyId,
                                       @PathVariable Long spId) {
