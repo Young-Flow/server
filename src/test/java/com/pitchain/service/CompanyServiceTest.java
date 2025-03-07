@@ -44,6 +44,7 @@ public class CompanyServiceTest {
 
     private static final String COMPANY_EMAIL = "companyEmail";
     private static final String COMPANY_PASSWORD = "companyPassword";
+    private static final String COMPANY_PASSWORD_CONFIRMATION = "companyPassword";
     private static final String COMPANY_NAME = "companyName";
     private static final String COMPANY_ADDRESS = "companyAddress";
 
@@ -56,9 +57,9 @@ public class CompanyServiceTest {
     }
 
     @Test
-    void 회사_생성_성공() {
+    void 회사_가입_성공() {
         //given
-        CreateCompanyReq req = new CreateCompanyReq(COMPANY_EMAIL, COMPANY_PASSWORD);
+        CreateCompanyReq req = new CreateCompanyReq(COMPANY_EMAIL, COMPANY_PASSWORD, COMPANY_PASSWORD_CONFIRMATION);
 
         //when
         companyService.createCompany(req);
@@ -68,14 +69,14 @@ public class CompanyServiceTest {
         Company company = all.get(0);
         assertThat(all).hasSize(1);
         assertThat(company.getEmail()).isEqualTo(COMPANY_EMAIL);
-        assertThat(company.getPassword()).isEqualTo(COMPANY_PASSWORD);
+        assertThat(passwordEncoder.matches(COMPANY_PASSWORD, company.getPassword())).isTrue();
     }
 
     @Test
-    void 회사_생성_실패() {
+    void 회사_가입_실패() {
         //given
         saveCompany();
-        CreateCompanyReq req = new CreateCompanyReq(COMPANY_EMAIL, COMPANY_PASSWORD);
+        CreateCompanyReq req = new CreateCompanyReq(COMPANY_EMAIL, COMPANY_PASSWORD, COMPANY_PASSWORD_CONFIRMATION);
 
         //when
         GeneralHandler e = assertThrows(GeneralHandler.class, () -> companyService.createCompany(req));
@@ -83,6 +84,20 @@ public class CompanyServiceTest {
         //then
         assertThat(e.getErrorStatus()).isEqualTo(ErrorStatus.COMPANY_EMAIL_CONFLICT);
     }
+
+    @Test
+    void 회사_가입_실패_비밀번호_확인_실패인_경우() {
+        //given
+        String wrongPasswordConfirmation = "wrongPasswordConfirmation";
+        CreateCompanyReq req = new CreateCompanyReq(COMPANY_EMAIL, COMPANY_PASSWORD, wrongPasswordConfirmation);
+
+        //when
+        GeneralHandler e = assertThrows(GeneralHandler.class, () -> companyService.createCompany(req));
+
+        //then
+        assertThat(e.getErrorStatus()).isEqualTo(ErrorStatus.COMPANY_PASSWORD_UNCONFIRMED);
+    }
+
 
     @Test
     void 회사_로그인_성공() {

@@ -19,7 +19,7 @@ public enum ErrorStatus implements ResponseStatus {
     TEST_ERROR(HttpStatus.BAD_REQUEST, "TEST", "테스트 에러입니다."),
 
     // jwt
-    MISSING_ACCESS_TOKEN(HttpStatus.BAD_REQUEST, "TOKEN4012", "Access Token이 존재하지 않습니다."),
+    MISSING_ACCESS_TOKEN(HttpStatus.BAD_REQUEST, "TOKEN4001", "Access Token이 존재하지 않습니다."),
 
     // member
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER4041", "존재하지 않는 사용자입니다."),
@@ -27,6 +27,7 @@ public enum ErrorStatus implements ResponseStatus {
     MEMBER_FORBIDDEN(HttpStatus.FORBIDDEN, "MEMBER4031", "사용자에게 권한이 없습니다."),
 
     // company
+    COMPANY_PASSWORD_UNCONFIRMED(HttpStatus.BAD_REQUEST, "COMPANY4001", "회사 비밀번호가 확인되지 않았습니다."),
     COMPANY_FORBIDDEN(HttpStatus.FORBIDDEN, "COMPANY4031", "회사에게 권한이 없습니다."),
     COMPANY_PASSWORD_NOT_MATCHED(HttpStatus.FORBIDDEN, "COMPANY4032", "회사 비밀번호가 일치하지 않습니다."),
     COMPANY_EMAIL_CONFLICT(HttpStatus.CONFLICT, "COMPANY4091", "회사 이메일이 이미 존재합니다."),
