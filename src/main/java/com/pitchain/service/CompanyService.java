@@ -35,7 +35,8 @@ public class CompanyService {
         Optional<Company> optionalCompany = companyRepository.findByEmail(req.email());
         verifyEmailConflict(optionalCompany);
 
-        Company company = req.createUnverifiedCompany();
+        String encodedPassword = passwordEncoder.encode(req.password());
+        Company company = req.createUnverifiedCompany(encodedPassword);
         companyRepository.save(company);
     }
 

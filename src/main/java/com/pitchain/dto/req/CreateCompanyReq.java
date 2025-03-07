@@ -7,7 +7,7 @@ public record CreateCompanyReq(
         String password
 ) {
 
-    public Company createUnverifiedCompany() {
-        return Company.createUnverifiedCompany(email, password);
+    public Company createUnverifiedCompany(String encodedPassword) {
+        return Company.createUnverifiedCompany(email, encodedPassword);
     }
 }
