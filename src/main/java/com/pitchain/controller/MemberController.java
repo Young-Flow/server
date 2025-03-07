@@ -8,9 +8,7 @@ import com.pitchain.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RequestMapping("/members")
@@ -24,5 +22,12 @@ public class MemberController {
     public CustomApiResponse<MemberDetailRes> getMyDetail(@AuthenticationPrincipal Long memberId) {
         MemberDetailRes memberDetailRes = memberService.getMyDetail(memberId);
         return CustomApiResponse.onSuccess(memberDetailRes);
+    }
+
+    @Operation(summary = "Access Token 재발급")
+    @PostMapping
+    public CustomApiResponse<String> reissueAccessToken(@RequestParam String refreshToken) {
+        String accessToken = memberService.reissueAccessToken(refreshToken);
+        return CustomApiResponse.onSuccess(accessToken);
     }
 }
