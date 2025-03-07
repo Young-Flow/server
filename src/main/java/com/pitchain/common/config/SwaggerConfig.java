@@ -1,12 +1,19 @@
 package com.pitchain.common.config;
 
+import com.pitchain.common.apiPayload.annotation.ErrorApiResponse;
+import com.pitchain.common.apiPayload.annotation.ErrorApiResponses;
+import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.media.*;
+import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
+import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,4 +56,42 @@ public class SwaggerConfig {
                 .version("v0.0.1");
     }
 
+    @Bean
+    public OperationCustomizer customizeResponses() {
+        return (operation, handlerMethod) -> {
+            processErrorApiResponse(operation, handlerMethod.getMethodAnnotation(ErrorApiResponse.class));
+            processErrorApiResponses(operation, handlerMethod.getMethodAnnotation(ErrorApiResponses.class));
+            return operation;
+        };
+    }
+
+    private void processErrorApiResponse(Operation operation, ErrorApiResponse errorApiResponse) {
+        if (errorApiResponse != null) {
+            addErrorResponse(operation.getResponses(), errorApiResponse.value());
+        }
+    }
+
+    private void processErrorApiResponses(Operation operation, ErrorApiResponses errorApiResponses) {
+        if (errorApiResponses != null) {
+            ApiResponses responses = operation.getResponses();
+            for (ErrorStatus errorStatus : errorApiResponses.value()) {
+                addErrorResponse(responses, errorStatus);
+            }
+        }
+    }
+
+    private void addErrorResponse(ApiResponses responses, ErrorStatus errorStatus) {
+        String code = errorStatus.getCode();
+        String description = errorStatus.getMessage();
+        Content errorContent = new Content().addMediaType("application/json", new MediaType().schema(
+                new Schema<>()
+                        .type("object")
+                        .addProperty("isSuccess", new BooleanSchema()._default(false))
+                        .addProperty("code", new StringSchema()._default(code))
+                        .addProperty("message", new StringSchema()._default(description))
+        ));
+        responses.put(code, new io.swagger.v3.oas.models.responses.ApiResponse()
+                .description(description)
+                .content(errorContent));
+    }
 }
