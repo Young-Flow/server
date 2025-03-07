@@ -4,7 +4,8 @@ import com.pitchain.entity.Company;
 
 public record CreateCompanyReq(
         String email,
-        String password
+        String password,
+        String passwordConfirmation
 ) {
 
     public Company createUnverifiedCompany(String encodedPassword) {

@@ -34,6 +34,7 @@ public class CompanyService {
     public void createCompany(CreateCompanyReq req) {
         Optional<Company> optionalCompany = companyRepository.findByEmail(req.email());
         verifyEmailConflict(optionalCompany);
+        confirmPassword(req.password(), req.passwordConfirmation());
 
         String encodedPassword = passwordEncoder.encode(req.password());
         Company company = req.createUnverifiedCompany(encodedPassword);
@@ -109,6 +110,11 @@ public class CompanyService {
     private static void verifyEmailConflict(Optional<Company> optionalCompany) {
         if (optionalCompany.isPresent())
             throw new GeneralHandler(ErrorStatus.COMPANY_EMAIL_CONFLICT);
+    }
+
+    private void confirmPassword(String password, String passwordConfirmation) {
+        if (!password.equals(passwordConfirmation))
+            throw new GeneralHandler(ErrorStatus.COMPANY_PASSWORD_UNCONFIRMED);
     }
 
     private void verifyPassword(String inputPassword, String encodedPassword) {
