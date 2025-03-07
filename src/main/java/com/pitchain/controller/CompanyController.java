@@ -22,8 +22,8 @@ public class CompanyController {
     private final CompanyService companyService;
 
     @Operation(summary = "회사 회원가입")
-    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public CustomApiResponse<Void> createCompany(@RequestPart CreateCompanyReq req) {
+    @PostMapping()
+    public CustomApiResponse<Void> createCompany(@RequestBody CreateCompanyReq req) {
         companyService.createCompany(req);
         return CustomApiResponse.onSuccess();
     }

@@ -29,13 +29,13 @@ public class Company {
 
     private String logoImgKey;
 
-    public static Company createUnverifiedCompany(String email, String password) {
-        return new Company(email, password);
+    public static Company createUnverifiedCompany(String email, String encodedPassword) {
+        return new Company(email, encodedPassword);
     }
 
-    public Company(String email, String password) {
+    public Company(String email, String encodedPassword) {
         this.email = email;
-        this.password = password;
+        this.password = encodedPassword;
         this.isVerified = false;
     }
 
