@@ -17,17 +17,15 @@ public class Company {
     @Column(name = "company_id")
     private Long id;
 
-    private String email;
-
     private String password;
 
     private Boolean isVerified; //todo 추후 사업지 등록증을 통한 인증으로 변경 예정
 
-    private String name;
-
     private String address;
 
-    private String logoImgKey;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     public static Company createUnverifiedCompany(String email, String encodedPassword) {
         return new Company(email, encodedPassword);

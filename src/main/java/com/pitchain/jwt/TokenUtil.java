@@ -6,8 +6,8 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
+import com.pitchain.common.constant.MemberRole;
 import com.pitchain.common.constant.TokenType;
-import com.pitchain.common.constant.UserRole;
 import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.redis.RedisTokenUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,29 +43,29 @@ public class TokenUtil {
 
     private final RedisTokenUtil redisTokenUtil;
 
-    public String issueAccessToken(Long userId, UserRole userRole) {
+    public String issueAccessToken(Long userId, MemberRole memberRole) {
         return JWT.create()
                 .withSubject(ACCESS_TOKEN_SUBJECT)
                 .withClaim("id", userId)
-                .withClaim("role", userRole.name())
+                .withClaim("role", memberRole.name())
                 .withExpiresAt(new Date(System.currentTimeMillis() + accessTokenExpirationPeriod))
                 .sign(Algorithm.HMAC512(secretKey));
     }
 
     // todo 프로토타입 시연을 위한 임시 메소드
-    public String issueAccessTokenWithoutExpiration(Long userId, UserRole userRole) {
+    public String issueAccessTokenWithoutExpiration(Long userId, MemberRole memberRole) {
         return JWT.create()
                 .withSubject(ACCESS_TOKEN_SUBJECT)
                 .withClaim("id", userId)
-                .withClaim("role", userRole.name())
+                .withClaim("role", memberRole.name())
                 .sign(Algorithm.HMAC512(secretKey));
     }
 
-    public String issueRefreshToken(Long userId, UserRole userRole) {
+    public String issueRefreshToken(Long userId, MemberRole memberRole) {
         String refreshToken = JWT.create()
                 .withSubject(REFRESH_TOKEN_SUBJECT)
                 .withClaim("id", userId)
-                .withClaim("role", userRole.name())
+                .withClaim("role", memberRole.name())
                 .withExpiresAt(new Date(System.currentTimeMillis() + accessTokenExpirationPeriod))
                 .sign(Algorithm.HMAC512(secretKey));
         saveRefreshToken(userId, refreshToken);
@@ -85,9 +85,9 @@ public class TokenUtil {
         }
 
         Long userId = decodedJWT.getClaim("id").asLong();
-        UserRole userRole = UserRole.valueOf(decodedJWT.getClaim("role").asString());
+        MemberRole memberRole = MemberRole.valueOf(decodedJWT.getClaim("role").asString());
 
-        return issueAccessToken(userId, userRole);
+        return issueAccessToken(userId, memberRole);
     }
 
     public String extractToken(HttpServletRequest request, TokenType tokenType) {

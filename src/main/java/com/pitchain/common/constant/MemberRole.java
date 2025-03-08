@@ -1,5 +1,5 @@
 package com.pitchain.common.constant;
 
-public enum UserRole {
+public enum MemberRole {
     COMPANY, INVESTOR
 }

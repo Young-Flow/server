@@ -3,7 +3,7 @@ package com.pitchain.controller;
 import com.pitchain.common.apiPayload.annotation.ErrorApiResponse;
 import com.pitchain.common.apiPayload.dto.CustomApiResponse;
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
-import com.pitchain.common.constant.UserRole;
+import com.pitchain.common.constant.MemberRole;
 import com.pitchain.dto.res.MemberDetailRes;
 import com.pitchain.jwt.UserDetails;
 import com.pitchain.service.MemberService;
@@ -25,7 +25,7 @@ public class MemberController {
         Long userId = userDetails.id();
         String role = userDetails.userRole();
 
-        if (UserRole.INVESTOR.name().equals(role)) {
+        if (MemberRole.INVESTOR.name().equals(role)) {
             MemberDetailRes memberDetailRes = memberService.getMyDetail(userId);
             return CustomApiResponse.onSuccess(memberDetailRes);
         } else {  //예시
