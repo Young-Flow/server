@@ -1,6 +1,7 @@
 package com.pitchain.controller;
 
 import com.pitchain.common.apiPayload.dto.CustomApiResponse;
+import com.pitchain.common.constant.UserRole;
 import com.pitchain.jwt.TokenUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,8 +18,8 @@ public class TokenController {
 
     @Operation(summary = "토큰 발급 / 개발용")
     @GetMapping("/dev-token")
-    public CustomApiResponse<String> token(@RequestParam Long id) {
-        return CustomApiResponse.onSuccess(tokenUtil.issueAccessTokenWithoutExpiration(id));
+    public CustomApiResponse<String> token(@RequestParam Long id, @RequestParam UserRole userRole) {
+        return CustomApiResponse.onSuccess(tokenUtil.issueAccessTokenWithoutExpiration(id, userRole));
     }
 
 }

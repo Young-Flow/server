@@ -48,7 +48,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         DecodedJWT decodedJWT = tokenUtil.decodedJWT(token);
         Long id = decodedJWT.getClaim("id").asLong();
-        Authentication authentication = new UsernamePasswordAuthenticationToken(id, null);
+        String role = decodedJWT.getClaim("role").asString();
+
+        UserDetails userDetails = new UserDetails(id, role);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null);
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         doFilter(request, response, filterChain);

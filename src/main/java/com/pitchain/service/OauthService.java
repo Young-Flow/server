@@ -1,6 +1,7 @@
 package com.pitchain.service;
 
 import com.pitchain.common.constant.OauthProvider;
+import com.pitchain.common.constant.UserRole;
 import com.pitchain.dto.req.OauthLoginReq;
 import com.pitchain.dto.res.LoginRes;
 import com.pitchain.entity.Member;
@@ -32,8 +33,8 @@ public class OauthService {
 
         Member member = byOauthProviderAndSocialId.orElseGet(() -> memberRepository.save(new Member(oauthMemberInfo)));
 
-        String accessToken = tokenUtil.issueAccessToken(member.getId());
-        String refreshToken = tokenUtil.issueRefreshToken(member.getId());
+        String accessToken = tokenUtil.issueAccessToken(member.getId(), UserRole.INVESTOR);
+        String refreshToken = tokenUtil.issueRefreshToken(member.getId(), UserRole.INVESTOR);
 
         return LoginRes.createRes(accessToken, refreshToken);
     }

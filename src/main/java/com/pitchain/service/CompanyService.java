@@ -2,6 +2,7 @@ package com.pitchain.service;
 
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.constant.S3UploadTarget;
+import com.pitchain.common.constant.UserRole;
 import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.controller.UpdatePasswordReq;
 import com.pitchain.dto.req.CreateCompanyReq;
@@ -47,8 +48,8 @@ public class CompanyService {
 
         verifyPassword(req.password(), company.getPassword());
 
-        String accessToken = tokenUtil.issueAccessToken(company.getId());
-        String refreshToken = tokenUtil.issueRefreshToken(company.getId());
+        String accessToken = tokenUtil.issueAccessToken(company.getId(), UserRole.COMPANY);
+        String refreshToken = tokenUtil.issueRefreshToken(company.getId(), UserRole.COMPANY);
 
         return LoginRes.createRes(accessToken, refreshToken);
     }
