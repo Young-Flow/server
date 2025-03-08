@@ -25,7 +25,7 @@ public class MemberController {
         Long userId = userDetails.id();
         String role = userDetails.userRole();
 
-        if (MemberRole.INVESTOR.name().equals(role)) {
+        if (MemberRole.INDIVIDUAL.name().equals(role)) {
             MemberDetailRes memberDetailRes = memberService.getMyDetail(userId);
             return CustomApiResponse.onSuccess(memberDetailRes);
         } else {  //예시

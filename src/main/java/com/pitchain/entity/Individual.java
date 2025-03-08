@@ -6,18 +6,18 @@ import com.pitchain.common.constant.SubCategory;
 import com.pitchain.common.entity.BaseEntity;
 import com.pitchain.oauth2.member.OauthMemberInfo;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Table
-public class Investor extends BaseEntity {
+public class Individual extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +25,8 @@ public class Investor extends BaseEntity {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private Country country;
+    @Builder.Default
+    private Country country = Country.ROK;
 
     private String socialId;
 
@@ -50,16 +51,11 @@ public class Investor extends BaseEntity {
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CategoryPref> categoryPrefs = new ArrayList<>();
 
-    public Investor(Country country, String profileImgKey) {
-        this.country = country;
-        this.profileImgKey = profileImgKey;
-    }
-
-    public Investor(OauthMemberInfo request) {
-        this.socialId = request.getSocialId();
-        this.email = request.getEmail();
-        this.nickname = request.getNickname();
-        this.oauthProvider = request.getOauthProvider();
+    public static Individual createInvestor(OauthMemberInfo oauthMemberInfo) {
+        return Individual.builder()
+                .socialId(oauthMemberInfo.getSocialId())
+                .oauthProvider(oauthMemberInfo.getOauthProvider())
+                .build();
     }
 
     public void addCategoryPref(List<SubCategory> subCategories) {
