@@ -51,10 +51,10 @@ public class Individual extends BaseEntity {
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CategoryPref> categoryPrefs = new ArrayList<>();
 
-    public static Individual createInvestor(OauthMemberInfo oauthMemberInfo) {
+    public static Individual of(String socailId, OauthProvider oauthProvider) {
         return Individual.builder()
-                .socialId(oauthMemberInfo.getSocialId())
-                .oauthProvider(oauthMemberInfo.getOauthProvider())
+                .socialId(builder().socialId)
+                .oauthProvider(oauthProvider)
                 .build();
     }
 

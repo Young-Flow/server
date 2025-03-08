@@ -2,13 +2,13 @@ package com.pitchain.entity;
 
 import com.pitchain.common.constant.MemberRole;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Member {
 
     @Id
@@ -25,4 +25,11 @@ public class Member {
 
     private String name;
 
+    public static Member from(String email, String name) {
+        return Member.builder()
+                .role(MemberRole.INDIVIDUAL)
+                .email(email)
+                .name(name)
+                .build();
+    }
 }

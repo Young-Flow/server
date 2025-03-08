@@ -26,6 +26,4 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
                 LEFT JOIN Investment  i ON bm.id = i.bm.id AND i.member.id = m.id
             """)
     List<PreferenceInfoDto> getMemberPreferenceInfos();
-
-    Optional<Member> findByOauthProviderAndSocialId(OauthProvider oauthProvider, String socialId);
 }
