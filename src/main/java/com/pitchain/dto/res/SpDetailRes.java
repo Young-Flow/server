@@ -25,8 +25,7 @@ public record SpDetailRes(
         boolean isLiked,
         long likeCnt
 ) {
-    public static SpDetailRes createRes(String companyProfileImgURL, SpWithLikeDto spWithLikeDto, String spURL, String thumbnailImgURL,
-                                        long likeCnt, List<String> subCategories) {
+    public static SpDetailRes createRes(SpWithLikeDto spWithLikeDto, long likeCnt, List<String> subCategories) {
         Sp sp = spWithLikeDto.getSp();
         Bm bm = sp.getBm();
         Company company = bm.getCompany();
@@ -34,11 +33,11 @@ public record SpDetailRes(
         return SpDetailRes.builder()
                 .bmId(sp.getBm().getId())
                 .bmName(bm.getName())
-                .companyProfileImgURL(companyProfileImgURL)
+                .companyProfileImgURL(member.getProfileImgKey())
                 .companyName(member.getName())
                 .companyAddress(company.getAddress())
-                .spURL(spURL)
-                .thumbnailImgURL(thumbnailImgURL)
+                .spURL(sp.getSpKey())
+                .thumbnailImgURL(sp.getThumbnailImgKey())
                 .views(sp.getViews())
                 .name(sp.getName())
                 .mainCategory(bm.getMainCategory().getKoreanName())

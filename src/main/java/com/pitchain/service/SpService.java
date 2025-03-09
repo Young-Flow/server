@@ -52,18 +52,12 @@ public class SpService {
         return spWithLikeDtos.stream()
                 .map(spWithLikeDto -> {
                     Sp sp = spWithLikeDto.getSp();
-                    String spURL = s3Service.getFileURL(sp.getSpKey());
-                    String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
-
                     Bm bm = sp.getBm();
+
                     long likeCnt = spLikeRepository.countBySp(sp);
                     List<String> subCategories = bm.getKoreanSubCategories();
 
-                    Company company = bm.getCompany();
-                    Member member = company.getMember();
-                    String profileImgURL = s3Service.getFileURL(member.getProfileImgKey());
-
-                    return SpDetailRes.createRes(profileImgURL, spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories);
+                    return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories);
                 })
                 .toList();
     }
@@ -83,18 +77,12 @@ public class SpService {
         List<SpDetailRes> content = spWithLikeDtos.stream()
                 .map(spWithLikeDto -> {
                     Sp sp = spWithLikeDto.getSp();
-                    String spURL = s3Service.getFileURL(sp.getSpKey());
-                    String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
-
                     Bm bm = sp.getBm();
+
                     long likeCnt = spLikeRepository.countBySp(sp);
                     List<String> subCategories = bm.getKoreanSubCategories();
 
-                    Company company = bm.getCompany();
-                    Member member = company.getMember();
-                    String profileImgURL = s3Service.getFileURL(member.getProfileImgKey());
-
-                    return SpDetailRes.createRes(profileImgURL, spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories);
+                    return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories);
                 })
                 .toList();
 
@@ -106,18 +94,12 @@ public class SpService {
         SpWithLikeDto spWithLikeDto = spRepository.findSpWithLike(memberDetails.id(), spId)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.SP_NOT_FOUND));
         Sp sp = spWithLikeDto.getSp();
-        String spURL = s3Service.getFileURL(sp.getSpKey());
-        String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
-
         Bm bm = sp.getBm();
+
         long likeCnt = spLikeRepository.countBySp(sp);
         List<String> subCategories = bm.getKoreanSubCategories();
 
-        Company company = bm.getCompany();
-        Member member = company.getMember();
-        String profileImgURL = s3Service.getFileURL(member.getProfileImgKey());
-
-        return SpDetailRes.createRes(profileImgURL, spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories);
+        return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories);
     }
 
     public void updateSp(MemberDetails memberDetails, Long spId, String name, MultipartFile spVid, MultipartFile thumbnailImg) {
