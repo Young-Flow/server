@@ -3,6 +3,7 @@ package com.pitchain.dto.res;
 import com.pitchain.dto.BmWithScrapDto;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.Company;
+import com.pitchain.entity.Member;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -11,7 +12,7 @@ import java.util.List;
 @Builder
 public record BmDetailRes(
         Long companyId,
-        String companyLogoImgURL,
+        String companyProfileImgURL,
         String companyName,
         String companyAddress,
 
@@ -32,15 +33,16 @@ public record BmDetailRes(
         List<PtImgRes> ptImgResList
 ) {
     public static BmDetailRes createRes(
-            BmWithScrapDto bmWithScrapDto, long scrapCnt, List<PtImgRes> ptImgResList, List<String> subCategories, String descImgURL, String companyLogoImgURL, List<String> spURLs
+            BmWithScrapDto bmWithScrapDto, long scrapCnt, List<PtImgRes> ptImgResList, List<String> subCategories, String descImgURL, String profileImgURL, List<String> spURLs
     ) {
         Bm bm = bmWithScrapDto.getBm();
         Company company = bm.getCompany();
+        Member member = company.getMember();
 
         return BmDetailRes.builder()
                 .companyId(company.getId())
-                .companyLogoImgURL(companyLogoImgURL)
-                .companyName(company.getName())
+                .companyProfileImgURL(profileImgURL)
+                .companyName(member.getName())
                 .companyAddress(company.getAddress())
 
                 .bmId(bm.getId())

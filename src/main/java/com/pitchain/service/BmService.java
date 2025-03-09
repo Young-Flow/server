@@ -9,10 +9,11 @@ import com.pitchain.dto.req.UpdateBmReq;
 import com.pitchain.dto.res.BmDetailRes;
 import com.pitchain.dto.res.PtImgRes;
 import com.pitchain.entity.*;
+import com.pitchain.jwt.MemberDetails;
 import com.pitchain.repository.BmRepository;
+import com.pitchain.repository.BmScrapRepository;
 import com.pitchain.repository.EntityFacade;
 import com.pitchain.repository.MyBmHistoryRepository;
-import com.pitchain.repository.BmScrapRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,8 +32,8 @@ public class BmService {
     private final MyBmHistoryRepository myBmHistoryRepository;
     private final S3Service s3Service;
 
-    public void createBm(Long companyId, CreateBmReq createBmReq, MultipartFile descImg) {
-        Company company = entityFacade.getCompany(companyId);
+    public void createBm(MemberDetails memberDetails, CreateBmReq createBmReq, MultipartFile descImg) {
+        Company company = entityFacade.getCompany(memberDetails);
 
         String descImgKey = s3Service.uploadFile(descImg, S3UploadTarget.COMPANY_DESC);
 
@@ -42,8 +43,8 @@ public class BmService {
         bmRepository.save(newBm);
     }
 
-    public BmDetailRes getBmDetail(Long memberId, Long bmId) {
-        Member member = entityFacade.getMember(memberId);
+    public BmDetailRes getBmDetail(MemberDetails memberDetails, Long bmId) {
+        Member member = entityFacade.getMember(memberDetails.id());
 
         BmWithScrapDto bmWithScrapDto = bmRepository.getBmWithScrapDto(member.getId(), bmId)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
@@ -54,19 +55,18 @@ public class BmService {
         List<String> subCategories = bm.getKoreanSubCategories();
         String descImgURL = s3Service.getFileURL(bm.getDescImgKey());
 
-        Company company = bm.getCompany();
-        String companyLogoImg = s3Service.getFileURL(company.getLogoImgKey());
+        String profileImgURL = s3Service.getFileURL(member.getProfileImgKey());
 
         List<String> spURLs = bm.getSps().stream().map(sp -> s3Service.getFileURL(sp.getSpKey())).toList();
 
         myBmHistoryRepository.findByMemberAndBm(member, bm)
                 .orElseGet(() -> myBmHistoryRepository.save(new MyBmHistory(member, bm)));
 
-        return BmDetailRes.createRes(bmWithScrapDto, scrapCnt, ptImgResList, subCategories, descImgURL, companyLogoImg, spURLs);
+        return BmDetailRes.createRes(bmWithScrapDto, scrapCnt, ptImgResList, subCategories, descImgURL, profileImgURL, spURLs);
     }
 
-    public void updateBm(Long companyId, Long bmId, UpdateBmReq updateBmReq, MultipartFile descImg) {
-        Company company = entityFacade.getCompany(companyId);
+    public void updateBm(MemberDetails memberDetails, Long bmId, UpdateBmReq updateBmReq, MultipartFile descImg) {
+        Company company = entityFacade.getCompany(memberDetails);
         Bm bm = entityFacade.getBm(bmId);
 
         validateBmOwner(bm, company);
@@ -79,8 +79,8 @@ public class BmService {
         bm.update(updateBm);
     }
 
-    public void updatePtImgs(Long companyId, Long bmId, List<MultipartFile> uploadPtImgs) {
-        Company company = entityFacade.getCompany(companyId);
+    public void updatePtImgs(MemberDetails memberDetails, Long bmId, List<MultipartFile> uploadPtImgs) {
+        Company company = entityFacade.getCompany(memberDetails);
         Bm bm = bmRepository.getByIdWithPtImgs(bmId)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
 
@@ -92,8 +92,8 @@ public class BmService {
         bm.updatePtImgs(uploadedPtImgs);
     }
 
-    public void deleteBm(Long companyId, Long bmId) {
-        Company company = entityFacade.getCompany(companyId);
+    public void deleteBm(MemberDetails memberDetails, Long bmId) {
+        Company company = entityFacade.getCompany(memberDetails);
         Bm bm = entityFacade.getBm(bmId);
 
         validateBmOwner(bm, company);
