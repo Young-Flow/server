@@ -1,7 +1,9 @@
 package com.pitchain.service;
 
 import com.pitchain.dto.res.MemberDetailRes;
+import com.pitchain.entity.Individual;
 import com.pitchain.entity.Member;
+import com.pitchain.jwt.MemberDetails;
 import com.pitchain.jwt.TokenUtil;
 import com.pitchain.repository.EntityFacade;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +19,13 @@ public class MemberService {
     private final S3Service s3Service;
     private final TokenUtil tokenUtil;
 
-    public MemberDetailRes getMyDetail(Long memberId) {
-        Member member = entityFacade.getMember(memberId);
+    public MemberDetailRes getMyDetail(MemberDetails memberDetails) {
+        Individual individual = entityFacade.getIndividual(memberDetails);
 
+        Member member = individual.getMember();
         String profileImgURL = s3Service.getFileURL(member.getProfileImgKey());
 
-        return MemberDetailRes.createRes(member, profileImgURL);
+        return MemberDetailRes.createRes(member, individual, profileImgURL);
     }
 
     public String reissueAccessToken(String refreshToken) {
