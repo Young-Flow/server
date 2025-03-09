@@ -10,10 +10,8 @@ import com.pitchain.common.util.InfinityScrollUtil;
 import com.pitchain.dto.SpWithLikeDto;
 import com.pitchain.dto.req.CreateSpReq;
 import com.pitchain.dto.res.SpDetailRes;
-import com.pitchain.entity.Bm;
-import com.pitchain.entity.CategoryPref;
-import com.pitchain.entity.Company;
-import com.pitchain.entity.Sp;
+import com.pitchain.entity.*;
+import com.pitchain.jwt.MemberDetails;
 import com.pitchain.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,13 +32,11 @@ public class SpService {
     private final S3Service s3Service;
     private final CategoryPrefRepository categoryPrefRepository;
 
-    public void createSp(Long companyId, CreateSpReq createSpReq, MultipartFile spVid, MultipartFile thumbnailImg) {
-        Company company = entityFacade.getCompany(companyId);
+    public void createSp(MemberDetails memberDetails, CreateSpReq createSpReq, MultipartFile spVid, MultipartFile thumbnailImg) {
+        Company company = entityFacade.getCompany(memberDetails);
         Bm bm = entityFacade.getBm(createSpReq.bmId());
 
         String spOriginKey = s3Service.uploadFile(spVid, S3UploadTarget.COMPANY_VIDEO);
-
-        //todo AWS Lambda에서 정상적으로 트랜스코딩 완료됐으면 여기로 알려주기
 
         String spKey = createSpM3U8Key(spOriginKey);
         String thumbnailImgKey = s3Service.uploadFile(thumbnailImg, S3UploadTarget.COMPANY_THUMBNAIL);
@@ -50,8 +46,8 @@ public class SpService {
     }
 
     @Transactional(readOnly = true)
-    public List<SpDetailRes> getSpDetails(Long memberId) {
-        List<SpWithLikeDto> spWithLikeDtos = spRepository.findAllWithLike(memberId);
+    public List<SpDetailRes> getSpDetails(MemberDetails memberDetails) {
+        List<SpWithLikeDto> spWithLikeDtos = spRepository.findAllWithLike(memberDetails.id());
 
         return spWithLikeDtos.stream()
                 .map(spWithLikeDto -> {
@@ -64,18 +60,19 @@ public class SpService {
                     List<String> subCategories = bm.getKoreanSubCategories();
 
                     Company company = bm.getCompany();
-                    String logoImgURL = s3Service.getFileURL(company.getLogoImgKey());
+                    Member member = company.getMember();
+                    String profileImgURL = s3Service.getFileURL(member.getProfileImgKey());
 
-                    return SpDetailRes.createRes(company, logoImgURL, spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories);
+                    return SpDetailRes.createRes(profileImgURL, spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories);
                 })
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public InfinityScrollRes<SpDetailRes> getSpDetailsFilteredCategory(Long memberId, String mainCategoryInKorean, Long lastSpId, int size) {
+    public InfinityScrollRes<SpDetailRes> getSpDetailsFilteredCategory(MemberDetails memberDetails, String mainCategoryInKorean, Long lastSpId, int size) {
         MainCategory mainCategory = MainCategory.from(mainCategoryInKorean);
 
-        List<SpWithLikeDto> spWithLikeDtos = spRepositoryCustom.getSpWithLikeDtoFilteredCategory(memberId, mainCategory, lastSpId, size);
+        List<SpWithLikeDto> spWithLikeDtos = spRepositoryCustom.getSpWithLikeDtoFilteredCategory(memberDetails.id(), mainCategory, lastSpId, size);
 
         boolean hasNext = InfinityScrollUtil.hasNext(spWithLikeDtos.size(), size);
         if (hasNext)
@@ -94,9 +91,10 @@ public class SpService {
                     List<String> subCategories = bm.getKoreanSubCategories();
 
                     Company company = bm.getCompany();
-                    String logoImgURL = s3Service.getFileURL(company.getLogoImgKey());
+                    Member member = company.getMember();
+                    String profileImgURL = s3Service.getFileURL(member.getProfileImgKey());
 
-                    return SpDetailRes.createRes(company, logoImgURL, spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories);
+                    return SpDetailRes.createRes(profileImgURL, spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories);
                 })
                 .toList();
 
@@ -104,8 +102,8 @@ public class SpService {
     }
 
     @Transactional(readOnly = true)
-    public SpDetailRes getSpDetail(Long memberId, Long spId) {
-        SpWithLikeDto spWithLikeDto = spRepository.findSpWithLike(memberId, spId)
+    public SpDetailRes getSpDetail(MemberDetails memberDetails, Long spId) {
+        SpWithLikeDto spWithLikeDto = spRepository.findSpWithLike(memberDetails.id(), spId)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.SP_NOT_FOUND));
         Sp sp = spWithLikeDto.getSp();
         String spURL = s3Service.getFileURL(sp.getSpKey());
@@ -116,59 +114,14 @@ public class SpService {
         List<String> subCategories = bm.getKoreanSubCategories();
 
         Company company = bm.getCompany();
-        String logoImgURL = s3Service.getFileURL(company.getLogoImgKey());
+        Member member = company.getMember();
+        String profileImgURL = s3Service.getFileURL(member.getProfileImgKey());
 
-        return SpDetailRes.createRes(company, logoImgURL, spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories);
+        return SpDetailRes.createRes(profileImgURL, spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories);
     }
 
-    public List<SpDetailRes> getSpDetailsRecommendedFromAi(Long memberId, List<Long> bmIds) {
-        List<SpWithLikeDto> spWithLikeDtos = spRepository.getSpWithLikeDtoRecommendedFromAi(memberId, bmIds);
-
-        return spWithLikeDtos.stream()
-                .map(spWithLikeDto -> {
-                    Sp sp = spWithLikeDto.getSp();
-                    String spURL = s3Service.getFileURL(sp.getSpKey());
-                    String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
-
-                    Bm bm = sp.getBm();
-                    long likeCnt = spLikeRepository.countBySp(sp);
-                    List<String> subCategories = bm.getKoreanSubCategories();
-
-                    Company company = bm.getCompany();
-                    String logoImgURL = s3Service.getFileURL(company.getLogoImgKey());
-
-                    return SpDetailRes.createRes(company, logoImgURL, spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories);
-                })
-                .toList();
-    }
-
-    public List<SpDetailRes> getRecommendationByPref(Long memberId) {
-        List<CategoryPref> categoryPrefs = categoryPrefRepository.findAllByMemberId(memberId)
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.CATEGORY_PREF_NOT_FOUND));
-        List<SubCategory> subCategoryPrefs = categoryPrefs.stream().map(CategoryPref::getSubCategory).toList();
-
-        List<SpWithLikeDto> spWithLikeDtos = spRepository.getSpWithLikeDtoByPref(memberId, subCategoryPrefs);
-
-        return spWithLikeDtos.stream()
-                .map(spWithLikeDto -> {
-                    Sp sp = spWithLikeDto.getSp();
-                    String spURL = s3Service.getFileURL(sp.getSpKey());
-                    String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
-
-                    Bm bm = sp.getBm();
-                    long likeCnt = spLikeRepository.countBySp(sp);
-                    List<String> subCategories = bm.getKoreanSubCategories();
-
-                    Company company = bm.getCompany();
-                    String logoImgURL = s3Service.getFileURL(company.getLogoImgKey());
-
-                    return SpDetailRes.createRes(company, logoImgURL, spWithLikeDto, spURL, thumbnailImgURL, likeCnt, subCategories);
-                })
-                .toList();
-    }
-
-    public void updateSp(Long companyId, Long spId, String name, MultipartFile spVid, MultipartFile thumbnailImg) {
-        Company company = entityFacade.getCompany(companyId);
+    public void updateSp(MemberDetails memberDetails, Long spId, String name, MultipartFile spVid, MultipartFile thumbnailImg) {
+        Company company = entityFacade.getCompany(memberDetails);
         Sp sp = entityFacade.getSp(spId);
 
         validateSpOwner(sp, company);

@@ -4,6 +4,7 @@ import com.pitchain.common.apiPayload.dto.CustomApiResponse;
 import com.pitchain.common.entity.InfinityScrollRes;
 import com.pitchain.dto.req.CreateSpReq;
 import com.pitchain.dto.res.SpDetailRes;
+import com.pitchain.jwt.MemberDetails;
 import com.pitchain.service.SpService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -22,55 +23,55 @@ public class SpController {
 
     @Operation(summary = "SP 생성")
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public CustomApiResponse createSp(@AuthenticationPrincipal Long companyId,
+    public CustomApiResponse createSp(@AuthenticationPrincipal MemberDetails memberDetails,
                                       @RequestPart CreateSpReq createSpReq,
                                       @RequestPart(required = false) MultipartFile spVideo,
                                       @RequestPart(required = false) MultipartFile thumbnailImg) {
-        spService.createSp(companyId, createSpReq, spVideo, thumbnailImg);
+        spService.createSp(memberDetails, createSpReq, spVideo, thumbnailImg);
         return CustomApiResponse.onSuccess();
     }
 
     @Operation(summary = "SP 리스트 조회")
     @GetMapping
-    public CustomApiResponse<List<SpDetailRes>> getSpDetails(@AuthenticationPrincipal Long memberId) {
-        List<SpDetailRes> spDetailResList = spService.getSpDetails(memberId);
+    public CustomApiResponse<List<SpDetailRes>> getSpDetails(@AuthenticationPrincipal MemberDetails memberDetails) {
+        List<SpDetailRes> spDetailResList = spService.getSpDetails(memberDetails);
         return CustomApiResponse.onSuccess(spDetailResList);
     }
 
     @Operation(summary = "카테고리별 SP 리스트 조회", description = "첫 조회 시 쿼리 파라미터에 lastSpId를 포함시키지 않습니다.")
     @GetMapping("/category")
-    public CustomApiResponse<InfinityScrollRes<SpDetailRes>> getSpDetailsFilteredCategory(@AuthenticationPrincipal Long memberId,
+    public CustomApiResponse<InfinityScrollRes<SpDetailRes>> getSpDetailsFilteredCategory(@AuthenticationPrincipal MemberDetails memberDetails,
                                                                                           @RequestParam String mainCategoryInKorean,
                                                                                           @RequestParam(required = false) Long lastSpId,
                                                                                           @RequestParam(defaultValue = "10") int size) {
-        InfinityScrollRes<SpDetailRes> spDetailResList = spService.getSpDetailsFilteredCategory(memberId, mainCategoryInKorean, lastSpId, size);
+        InfinityScrollRes<SpDetailRes> spDetailResList = spService.getSpDetailsFilteredCategory(memberDetails, mainCategoryInKorean, lastSpId, size);
         return CustomApiResponse.onSuccess(spDetailResList);
     }
 
     @Operation(summary = "SP 상세 조회")
     @GetMapping("/{spId}")
-    public CustomApiResponse<SpDetailRes> getSpDetail(@AuthenticationPrincipal Long memberId,
+    public CustomApiResponse<SpDetailRes> getSpDetail(@AuthenticationPrincipal MemberDetails memberDetails,
                                                       @PathVariable Long spId) {
-        SpDetailRes spDetailRes = spService.getSpDetail(memberId, spId);
+        SpDetailRes spDetailRes = spService.getSpDetail(memberDetails, spId);
         return CustomApiResponse.onSuccess(spDetailRes);
     }
 
     @Operation(summary = "SP 수정")
     @PutMapping(value = "/{spId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public CustomApiResponse updateSp(@AuthenticationPrincipal Long companyId,
+    public CustomApiResponse updateSp(@AuthenticationPrincipal MemberDetails memberDetails,
                                       @PathVariable Long spId,
                                       @RequestPart String name,
                                       @RequestPart(required = false) MultipartFile spVideo,
                                       @RequestPart(required = false) MultipartFile thumbnailImg) {
-        spService.updateSp(companyId, spId, name, spVideo, thumbnailImg);
+        spService.updateSp(memberDetails, spId, name, spVideo, thumbnailImg);
         return CustomApiResponse.onSuccess();
     }
 
     @Operation(summary = "SP 삭제")
     @DeleteMapping("/{spId}")
-    public CustomApiResponse deleteSp(@AuthenticationPrincipal Long companyId,
+    public CustomApiResponse deleteSp(@AuthenticationPrincipal MemberDetails memberDetails,
                                       @PathVariable Long spId) {
-        spService.deleteSp(companyId, spId);
+        spService.deleteSp(memberDetails, spId);
         return CustomApiResponse.onSuccess();
     }
 }
