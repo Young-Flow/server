@@ -3,7 +3,6 @@ package com.pitchain.service;
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.constant.MainCategory;
 import com.pitchain.common.constant.S3UploadTarget;
-import com.pitchain.common.constant.SubCategory;
 import com.pitchain.common.entity.InfinityScrollRes;
 import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.common.util.InfinityScrollUtil;
@@ -56,8 +55,10 @@ public class SpService {
 
                     long likeCnt = spLikeRepository.countBySp(sp);
                     List<String> subCategories = bm.getKoreanSubCategories();
+                    String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
+                    String spURL = s3Service.getFileURL(sp.getSpKey());
 
-                    return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories);
+                    return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories, spURL, thumbnailImgURL);
                 })
                 .toList();
     }
@@ -81,8 +82,10 @@ public class SpService {
 
                     long likeCnt = spLikeRepository.countBySp(sp);
                     List<String> subCategories = bm.getKoreanSubCategories();
+                    String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
+                    String spURL = s3Service.getFileURL(sp.getSpKey());
 
-                    return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories);
+                    return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories, spURL, thumbnailImgURL);
                 })
                 .toList();
 
@@ -98,8 +101,10 @@ public class SpService {
 
         long likeCnt = spLikeRepository.countBySp(sp);
         List<String> subCategories = bm.getKoreanSubCategories();
+        String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
+        String spURL = s3Service.getFileURL(sp.getSpKey());
 
-        return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories);
+        return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories, spURL, thumbnailImgURL);
     }
 
     public void updateSp(MemberDetails memberDetails, Long spId, String name, MultipartFile spVid, MultipartFile thumbnailImg) {
@@ -118,8 +123,8 @@ public class SpService {
         sp.update(updateSp);
     }
 
-    public void deleteSp(Long companyId, Long spId) {
-        Company company = entityFacade.getCompany(companyId);
+    public void deleteSp(MemberDetails memberDetails, Long spId) {
+        Company company = entityFacade.getCompany(memberDetails);
         Sp sp = entityFacade.getSp(spId);
 
         validateSpOwner(sp, company);

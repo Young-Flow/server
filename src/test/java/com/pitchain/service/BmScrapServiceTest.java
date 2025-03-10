@@ -1,11 +1,12 @@
 package com.pitchain.service;
 
-import com.pitchain.common.constant.Country;
 import com.pitchain.common.constant.MainCategory;
+import com.pitchain.common.constant.MemberRole;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.BmScrap;
 import com.pitchain.entity.Company;
 import com.pitchain.entity.Member;
+import com.pitchain.jwt.MemberDetails;
 import com.pitchain.repository.BmRepository;
 import com.pitchain.repository.CompanyRepository;
 import com.pitchain.repository.MemberRepository;
@@ -39,11 +40,12 @@ class BmScrapServiceTest {
     @Test
     void BM_스크랩_등록_성공() {
         //given
-        Member member = saveMember();
-        Bm bm = saveBm();
+        Company company = saveCompany();
+        Bm bm = saveBm(company);
+        Member member = saveIndividual();
 
         //when
-        bmScrapService.toggleScrapBm(bm.getId(), member.getId());
+        bmScrapService.toggleScrapBm(bm.getId(), createIndividualMemberDetails(member));
 
         //then
         boolean isScraped = bmScrapRepository.existsByMemberAndBm(member, bm);
@@ -53,30 +55,35 @@ class BmScrapServiceTest {
     @Test
     void BM_스크랩_취소_성공() {
         //given
-        Member member = saveMember();
-        Bm bm = saveBm();
+        Company company = saveCompany();
+        Bm bm = saveBm(company);
+        Member member = saveIndividual();
 
         BmScrap bmScrap = new BmScrap(member, bm);
         bmScrapRepository.save(bmScrap);
 
         //when
-        bmScrapService.toggleScrapBm(bm.getId(), member.getId());
+        bmScrapService.toggleScrapBm(bm.getId(), createIndividualMemberDetails(member));
 
         //then
         boolean isScraped = bmScrapRepository.existsByMemberAndBm(member, bm);
         assertThat(isScraped).isFalse();
     }
 
-    private Member saveMember() {
-        return memberRepository.save(new Member(Country.USA, "profileImg"));
+    private Member saveIndividual() {
+        return memberRepository.save(Member.fromIndividual("email", "name"));
     }
 
-    private Bm saveBm() {
-        Company company = companyRepository.save(new Company(
-                "companyEmail", "companyPassword", false,
-                "companyName", "companyAddress", "bm_logo_img_key"
-        ));
+    private MemberDetails createIndividualMemberDetails(Member member) {
+        return new MemberDetails(member.getId(), MemberRole.INDIVIDUAL);
+    }
 
+    private Company saveCompany() {
+        Member member = memberRepository.save(Member.fromCompany("email"));
+        return companyRepository.save(new Company(member, "encodedPassword"));
+    }
+
+    private Bm saveBm(Company company) {
         Bm bm = new Bm(
                 company, "bmName", MainCategory.FOOD,
                 "bmIntro", "bmDescription", "bmDescriptionImg", "bmAddress",

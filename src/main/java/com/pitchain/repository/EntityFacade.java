@@ -15,7 +15,6 @@ public class EntityFacade {
     private final BmRepository bmRepository;
     private final SpRepository spRepository;
     private final CompanyRepository companyRepository;
-    private final IndividualRepository IndividualRepository;
 
     public Member getMember(Long memberId) {
         return memberRepository.findById(memberId)
@@ -32,24 +31,11 @@ public class EntityFacade {
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.SP_NOT_FOUND));
     }
 
-    public Company getCompany(Long companyId) {
-        return companyRepository.findById(companyId)
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.COMPANY_NOT_FOUND));
-    }
-
-    public Individual getIndividual(MemberDetails memberDetails) {
-        if (memberDetails.memberRole().equals(MemberRole.COMPANY))
-            throw new GeneralHandler(ErrorStatus.COMPANY_FORBIDDEN);
-
-        return IndividualRepository.findById(memberDetails.id())
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.INDIVIDUAL_NOT_FOUND));
-    }
-
     public Company getCompany(MemberDetails memberDetails) {
         if (memberDetails.memberRole().equals(MemberRole.INDIVIDUAL))
             throw new GeneralHandler(ErrorStatus.MEMBER_FORBIDDEN);
 
-        return companyRepository.findById(memberDetails.id())
+        return companyRepository.findByMemberId(memberDetails.id())
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.COMPANY_NOT_FOUND));
     }
 }

@@ -10,7 +10,6 @@ public enum S3UploadTarget {
 
     // COMPANY
     COMPANY_DESC(MIME.IMAGE, "company/desc-img/"),
-    COMPANY_LOGO(MIME.IMAGE, "company/logo-img/"),
     COMPANY_PT(MIME.IMAGE, "company/pt-img/"),
     COMPANY_THUMBNAIL(MIME.IMAGE, "company/thumbnail-img/"),
     COMPANY_VIDEO(MIME.VIDEO, Strings.EMPTY),

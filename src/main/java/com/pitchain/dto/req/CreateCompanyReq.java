@@ -1,6 +1,7 @@
 package com.pitchain.dto.req;
 
 import com.pitchain.entity.Company;
+import com.pitchain.entity.Member;
 
 public record CreateCompanyReq(
         String email,
@@ -8,7 +9,7 @@ public record CreateCompanyReq(
         String passwordConfirmation
 ) {
 
-    public Company createUnverifiedCompany(String encodedPassword) {
-        return Company.createUnverifiedCompany(email, encodedPassword);
+    public Company createUnverifiedCompany(Member member, String encodedPassword) {
+        return Company.createUnverifiedCompany(member, encodedPassword);
     }
 }

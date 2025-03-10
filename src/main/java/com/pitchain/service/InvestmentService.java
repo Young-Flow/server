@@ -1,12 +1,14 @@
 package com.pitchain.service;
 
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
+import com.pitchain.common.constant.MemberRole;
 import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.dto.InvestmentStatusDto;
 import com.pitchain.dto.res.InvestmentStatusRes;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.Investment;
 import com.pitchain.entity.Member;
+import com.pitchain.jwt.MemberDetails;
 import com.pitchain.repository.BmRepository;
 import com.pitchain.repository.InvestmentRepository;
 import com.pitchain.repository.MemberRepository;
@@ -23,8 +25,12 @@ public class InvestmentService {
     private final BmRepository bmRepository;
     private final MemberRepository memberRepository;
 
-    public void addInvestment(Long bmId, Long memberId, long amount) {
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+    public void addInvestment(Long bmId, MemberDetails memberDetails, long amount) {
+        if (memberDetails.memberRole().equals(MemberRole.COMPANY))
+            throw new GeneralHandler(ErrorStatus.COMPANY_FORBIDDEN);
+
+        Member member = memberRepository.findById(memberDetails.id())
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
         Bm bm = bmRepository.findById(bmId).orElseThrow(() -> new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
         Investment investment = Investment.builder()

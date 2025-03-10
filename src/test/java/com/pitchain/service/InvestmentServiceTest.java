@@ -1,18 +1,13 @@
 package com.pitchain.service;
 
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
-import com.pitchain.common.constant.Country;
 import com.pitchain.common.constant.MainCategory;
+import com.pitchain.common.constant.MemberRole;
 import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.dto.res.InvestmentStatusRes;
-import com.pitchain.entity.Bm;
-import com.pitchain.entity.Company;
-import com.pitchain.entity.Investment;
-import com.pitchain.entity.Member;
-import com.pitchain.repository.BmRepository;
-import com.pitchain.repository.CompanyRepository;
-import com.pitchain.repository.InvestmentRepository;
-import com.pitchain.repository.MemberRepository;
+import com.pitchain.entity.*;
+import com.pitchain.jwt.MemberDetails;
+import com.pitchain.repository.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,22 +35,26 @@ class InvestmentServiceTest {
     private BmRepository bmRepository;
     @Autowired
     private InvestmentRepository investmentRepository;
+    @Autowired
+    private IndividualRepository individualRepository;
 
     @Test
     void 투자_등록_성공() {
         //given
-        Member member = saveMember();
+        Member individual = saveIndividual();
+        MemberDetails individualMemberDetails = createIndividualMemberDetails(individual);
+
         Company company = saveCompany();
         Bm bm = saveBm(company);
         long amount = 1000L;
 
         //when
-        investmentService.addInvestment(bm.getId(), member.getId(), amount);
+        investmentService.addInvestment(bm.getId(), individualMemberDetails, amount);
 
         //then
         List<Investment> investments = investmentRepository.findAll();
         Investment investment = investments.get(0);
-        assertThat(investment.getMember()).isEqualTo(member);
+        assertThat(investment.getMember()).isEqualTo(individual);
         assertThat(investment.getBm()).isEqualTo(bm);
         assertThat(investment.getAmount()).isEqualTo(amount);
     }
@@ -63,16 +62,19 @@ class InvestmentServiceTest {
     @Test
     void 투자_등록_실패() {
         //given
-        Member member = saveMember();
+        Member individual = saveIndividual();
+        MemberDetails individualMemberDetails = createIndividualMemberDetails(individual);
+
         Company company = saveCompany();
         Bm bm = saveBm(company);
         long amount = 1000L;
 
         Long invalidId = Long.MAX_VALUE;
+        MemberDetails invalidIndividualMemberDetails = new MemberDetails(Long.MAX_VALUE, MemberRole.INDIVIDUAL);
 
         //when
-        GeneralHandler error1 = Assertions.assertThrows(GeneralHandler.class, () -> investmentService.addInvestment(invalidId, member.getId(), amount));
-        GeneralHandler error2 = Assertions.assertThrows(GeneralHandler.class, () -> investmentService.addInvestment(bm.getId(), invalidId, amount));
+        GeneralHandler error1 = Assertions.assertThrows(GeneralHandler.class, () -> investmentService.addInvestment(invalidId, individualMemberDetails, amount));
+        GeneralHandler error2 = Assertions.assertThrows(GeneralHandler.class, () -> investmentService.addInvestment(bm.getId(), invalidIndividualMemberDetails, amount));
 
         //then
         assertThat(error1.getErrorStatus()).isEqualTo(ErrorStatus.BM_NOT_FOUND);
@@ -85,14 +87,16 @@ class InvestmentServiceTest {
         Company company = saveCompany();
         Long bmId = saveBm(company).getId();
 
-        Member investorA = saveMember();
+        Member individualA = saveIndividual();
+        MemberDetails individualMemberDetailsA = createIndividualMemberDetails(individualA);
         long amountA = 1000L;
 
-        Member investorB = saveMember();
+        Member individualB = saveIndividual();
+        MemberDetails individualMemberDetailsB = createIndividualMemberDetails(individualB);
         long amountB = 2000L;
 
-        investmentService.addInvestment(bmId, investorA.getId(), amountA);
-        investmentService.addInvestment(bmId, investorB.getId(), amountB);
+        investmentService.addInvestment(bmId, individualMemberDetailsA, amountA);
+        investmentService.addInvestment(bmId, individualMemberDetailsB, amountB);
 
         //when
         InvestmentStatusRes investmentStatus = investmentService.getInvestmentStatus(bmId);
@@ -114,18 +118,27 @@ class InvestmentServiceTest {
         assertThat(investmentStatus.achievementRate()).isEqualTo(Math.min((int) ((raisedAmount / (double) goalInvestment) * 100), 100));
     }
 
-    private Member saveMember() {
-        return memberRepository.save(new Member(Country.USA, "profileImg"));
+    private Member saveIndividual() {
+        return memberRepository.save(Member.fromIndividual("email", "name"));
     }
 
-    private Bm saveBm(Company company) {
-        return bmRepository.save(new Bm(company, "bmName", MainCategory.FOOD, "bmIntro", "bmDescription",
-                "bmDescriptionImg", "companyAddress", 100000L, 1000L, 1000, LocalDate.now(), "longPitchUrl"));
+    private MemberDetails createIndividualMemberDetails(Member member) {
+        return new MemberDetails(member.getId(), MemberRole.INDIVIDUAL);
     }
 
     private Company saveCompany() {
-        return companyRepository.save(new Company("companyEmail", "companyPassword",
-                true, "companyName", "companyAddress", "bm_logo_img_key"
-        ));
+        Member member = memberRepository.save(Member.fromCompany("email"));
+        return companyRepository.save(new Company(member, "encodedPassword"));
+    }
+
+    private Bm saveBm(Company company) {
+        Bm bm = new Bm(
+                company, "bmName", MainCategory.FOOD,
+                "bmIntro", "bmDescription", "bmDescriptionImg", "bmAddress",
+                100000L, 1000L, 1000,
+                LocalDate.now(), "longPitchUrl"
+        );
+
+        return bmRepository.save(bm);
     }
 }

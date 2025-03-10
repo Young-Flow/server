@@ -74,7 +74,7 @@ public class BmService {
         bm.update(updateBm);
     }
 
-    public void updatePtImgs(MemberDetails memberDetails, Long bmId, List<MultipartFile> uploadPtImgs) {
+    public void updatePtImgs(MemberDetails memberDetails, Long bmId, List<String> uploadPtImgKeys) {
         Company company = entityFacade.getCompany(memberDetails);
         Bm bm = bmRepository.getByIdWithPtImgs(bmId)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
@@ -82,7 +82,7 @@ public class BmService {
         validateBmOwner(bm, company);
 
         deletePtImgs(bm);
-        List<PtImg> uploadedPtImgs = uploadPtImgs(uploadPtImgs, bm);
+        List<PtImg> uploadedPtImgs = uploadPtImgs(uploadPtImgKeys, bm);
 
         bm.updatePtImgs(uploadedPtImgs);
     }
@@ -109,10 +109,10 @@ public class BmService {
         ptImgs.forEach(pi -> s3Service.deleteImg(pi.getImgKey()));
     }
 
-    private List<PtImg> uploadPtImgs(List<MultipartFile> ptImgs, Bm bm) {
+    private List<PtImg> uploadPtImgs(List<String> ptImgKeys, Bm bm) {
         List<PtImg> uploadPtImgs = new ArrayList<>();
-        for (int serialNum = 0; ptImgs != null && serialNum < ptImgs.size(); serialNum++) {
-            String uploadFileKey = s3Service.uploadFile(ptImgs.get(serialNum), S3UploadTarget.COMPANY_PT);
+        for (int serialNum = 0; ptImgKeys != null && serialNum < ptImgKeys.size(); serialNum++) {
+            String uploadFileKey = ptImgKeys.get(serialNum);
             PtImg ptImg = new PtImg(bm, serialNum, uploadFileKey);
             uploadPtImgs.add(ptImg);
         }

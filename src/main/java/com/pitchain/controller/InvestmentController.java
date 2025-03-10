@@ -2,6 +2,7 @@ package com.pitchain.controller;
 
 import com.pitchain.common.apiPayload.dto.CustomApiResponse;
 import com.pitchain.dto.req.AddInvestmentReq;
+import com.pitchain.jwt.MemberDetails;
 import com.pitchain.service.InvestmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +18,10 @@ public class InvestmentController {
 
     @PostMapping("/{bmId}/investments")
     public CustomApiResponse<AddInvestmentReq> addInvestment(@PathVariable("bmId") Long bmId,
-                                                             @AuthenticationPrincipal Long memberId,
+                                                             @AuthenticationPrincipal MemberDetails memberDetails,
                                                              @Valid @RequestBody AddInvestmentReq req) {
         long amount = req.getAmount();
-        investmentService.addInvestment(bmId, memberId, amount);
+        investmentService.addInvestment(bmId, memberDetails, amount);
         return CustomApiResponse.onSuccess();
     }
 

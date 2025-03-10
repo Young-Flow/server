@@ -1,31 +1,59 @@
 package com.pitchain.service;
 
-import com.pitchain.dto.res.MemberDetailRes;
-import com.pitchain.entity.Individual;
+import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
+import com.pitchain.common.constant.S3UploadTarget;
+import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.dto.req.BaseUpdateMemberReq;
+import com.pitchain.dto.res.BaseMemberProfileRes;
 import com.pitchain.entity.Member;
 import com.pitchain.jwt.MemberDetails;
 import com.pitchain.jwt.TokenUtil;
-import com.pitchain.repository.EntityFacade;
+import com.pitchain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Transactional
 @Service
 public class MemberService {
 
-    private final EntityFacade entityFacade;
     private final S3Service s3Service;
     private final TokenUtil tokenUtil;
+    private final MemberRepository memberRepository;
+    private final IndividualProfileService individualDetailService;
+    private final CompanyProfileService companyDetailService;
 
-    public MemberDetailRes getMyDetail(MemberDetails memberDetails) {
-        Individual individual = entityFacade.getIndividual(memberDetails);
+    public BaseMemberProfileRes getMyProfile(MemberDetails memberDetails) {
+        return switch (memberDetails.memberRole()) {
+            case INDIVIDUAL -> individualDetailService.getMyProfile(memberDetails);
+            case COMPANY -> companyDetailService.getMyProfile(memberDetails);
+        };
+    }
 
-        Member member = individual.getMember();
-        String profileImgURL = s3Service.getFileURL(member.getProfileImgKey());
+    public void updateMyProfile(MemberDetails memberDetails, BaseUpdateMemberReq req) {
+        switch (memberDetails.memberRole()) {
+            case INDIVIDUAL -> individualDetailService.updateMyProfile(memberDetails, req);
+            case COMPANY -> companyDetailService.updateMyProfile(memberDetails, req);
+        }
+    }
 
-        return MemberDetailRes.createRes(member, individual, profileImgURL);
+    public void updateProfileImg(MemberDetails memberDetails, MultipartFile profileImg) {
+        Member member = memberRepository.findById(memberDetails.id())
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        if (member.hasProfileImg()) {
+            s3Service.deleteImg(member.getProfileImgKey());
+        }
+        String logoImgKey = s3Service.uploadFile(profileImg, S3UploadTarget.MEMBER_PROFILE);
+
+        member.updateProfileImgKey(logoImgKey);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isDuplicatedEmail(String email) {
+        return memberRepository.findByEmail(email).isPresent();
     }
 
     public String reissueAccessToken(String refreshToken) {
