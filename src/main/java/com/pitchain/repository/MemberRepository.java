@@ -1,6 +1,5 @@
 package com.pitchain.repository;
 
-import com.pitchain.common.constant.OauthProvider;
 import com.pitchain.dto.PreferenceInfoDto;
 import com.pitchain.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,6 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
+
+    Optional<Member> findByEmail(String email);
 
     @Query("""
                 SELECT new com.pitchain.dto.PreferenceInfoDto(

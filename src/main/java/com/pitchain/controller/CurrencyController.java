@@ -2,6 +2,7 @@ package com.pitchain.controller;
 
 import com.pitchain.common.apiPayload.dto.CustomApiResponse;
 import com.pitchain.dto.res.CurrencyRes;
+import com.pitchain.jwt.MemberDetails;
 import com.pitchain.service.CurrencyService;
 import com.pitchain.service.ExchangeRateService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,9 +21,9 @@ public class CurrencyController {
     private final ExchangeRateService exchangeRateService;
 
     @GetMapping("/currency")
-    public CustomApiResponse calculateExchangeRate(@AuthenticationPrincipal Long memberId,
+    public CustomApiResponse calculateExchangeRate(@AuthenticationPrincipal MemberDetails memberDetails,
                                                    @RequestParam @Positive long amount) {
-        String calculatedAmount = currencyService.calculateExchangeRate(memberId, amount);
+        String calculatedAmount = currencyService.calculateExchangeRate(memberDetails, amount);
         String exchangeRateUpdateDateTime = currencyService.getExchangeRateUpdateDateTime();
 
         CurrencyRes currencyRes = CurrencyRes.createRes(calculatedAmount, exchangeRateUpdateDateTime);

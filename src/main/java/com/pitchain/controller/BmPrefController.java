@@ -1,6 +1,7 @@
 package com.pitchain.controller;
 
 import com.pitchain.common.apiPayload.dto.CustomApiResponse;
+import com.pitchain.jwt.MemberDetails;
 import com.pitchain.service.BmPrefService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,9 +18,9 @@ public class BmPrefController {
     private final BmPrefService bmPrefService;
 
     @PostMapping("/preferences")
-    public CustomApiResponse createCategoryPref(@AuthenticationPrincipal Long memberId,
+    public CustomApiResponse createCategoryPref(@AuthenticationPrincipal MemberDetails memberDetails,
                                                 @RequestBody List<String> subCategoriesInKorean) {
-        bmPrefService.createCategoryPref(memberId, subCategoriesInKorean);
+        bmPrefService.createCategoryPref(memberDetails, subCategoriesInKorean);
         return CustomApiResponse.onSuccess();
     }
 }

@@ -8,4 +8,6 @@ import java.util.Optional;
 
 public interface IndividualRepository extends JpaRepository<Individual, Long> {
     Optional<Individual> findByOauthProviderAndSocialId(OauthProvider oauthProvider, String socialId);
+
+    Optional<Individual> findByMemberId(Long memberId);
 }

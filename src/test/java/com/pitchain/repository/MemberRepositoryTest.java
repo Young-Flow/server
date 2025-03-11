@@ -1,12 +1,10 @@
 package com.pitchain.repository;
 
-import com.pitchain.common.constant.Country;
 import com.pitchain.common.constant.MainCategory;
 import com.pitchain.dto.PreferenceInfoDto;
 import com.pitchain.dto.res.MemberPreferenceInfoRes;
 import com.pitchain.dto.res.PreferenceInfoRes;
 import com.pitchain.entity.*;
-import org.apache.logging.log4j.util.Strings;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -36,6 +34,8 @@ class MemberRepositoryTest {
     private MyBmHistoryRepository myBmHistoryRepository;
     @Autowired
     private MySpHistoryRepository mySpHistoryRepository;
+    @Autowired
+    private IndividualRepository individualRepository;
 
     private static final String COMPANY_EMAIL = "companyEmail";
     private static final String COMPANY_PASSWORD = "companyPassword";
@@ -47,12 +47,13 @@ class MemberRepositoryTest {
     private static final MockMultipartFile THUMBNAIL_IMG = new MockMultipartFile(
             "thumbnail_img", "thumbnail_img.png", "image/png", "test data 2".getBytes());
 
-    private Member saveMember() {
-        return memberRepository.save(new Member(Country.ROK, Strings.EMPTY));
+    private Member saveIndividual() {
+        return memberRepository.save(Member.fromIndividual("email", "name"));
     }
 
     private Company saveCompany() {
-        return companyRepository.save(new Company(COMPANY_EMAIL, COMPANY_PASSWORD, false, COMPANY_NAME, COMPANY_ADDRESS, LOGO_IMG_KEY));
+        Member member = memberRepository.save(Member.fromCompany("email"));
+        return companyRepository.save(new Company(member, "encodedPassword"));
     }
 
     private Bm saveBm(Company company) {
@@ -72,10 +73,10 @@ class MemberRepositoryTest {
     @Test
     void 유저_선호도_정보_조회() {
         // given
-        Member member_1 = saveMember();
-        Member member_2 = saveMember();
-        Member member_3 = saveMember();
-        Member member_4 = saveMember();
+        Member individual_1 = saveIndividual();
+        Member individual_2 = saveIndividual();
+        Member individual_3 = saveIndividual();
+        Member individual_4 = saveIndividual();
 
         Company company_1 = saveCompany();
         Company company_2 = saveCompany();
@@ -85,16 +86,16 @@ class MemberRepositoryTest {
         Bm bm_1 = saveBmWithMainCategory(company_1, MainCategory.FOOD);
 
         Bm bm_2 = saveBmWithMainCategory(company_2, MainCategory.FOOD);
-        investmentRepository.save(new Investment(member_2, bm_2, 2000L));
+        investmentRepository.save(new Investment(individual_2, bm_2, 2000L));
 
         Bm bm_3 = saveBmWithMainCategory(company_3, MainCategory.FOOD);
-        investmentRepository.save(new Investment(member_3, bm_3, 3000L));
-        mySpHistoryRepository.save(new MySpHistory(member_3, bm_3, 98765));
+        investmentRepository.save(new Investment(individual_3, bm_3, 3000L));
+        mySpHistoryRepository.save(new MySpHistory(individual_3, bm_3, 98765));
 
         Bm bm_4 = saveBmWithMainCategory( company_4, MainCategory.FOOD);
-        investmentRepository.save(new Investment(member_4, bm_4, 4000L));
-        mySpHistoryRepository.save(new MySpHistory(member_4, bm_4, 123456));
-        myBmHistoryRepository.save(new MyBmHistory(member_4, bm_4));
+        investmentRepository.save(new Investment(individual_4, bm_4, 4000L));
+        mySpHistoryRepository.save(new MySpHistory(individual_4, bm_4, 123456));
+        myBmHistoryRepository.save(new MyBmHistory(individual_4, bm_4));
 
         // when
         List<PreferenceInfoDto> preferenceInfoDtos = memberRepository.getMemberPreferenceInfos();

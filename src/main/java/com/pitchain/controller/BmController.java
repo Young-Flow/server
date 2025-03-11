@@ -52,8 +52,8 @@ public class BmController {
     @PostMapping(value = "{bmId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public CustomApiResponse updatePtImgs(@AuthenticationPrincipal MemberDetails memberDetails,
                                           @PathVariable Long bmId,
-                                          @RequestPart(required = false) List<MultipartFile> ptImgs) {
-        bmService.updatePtImgs(memberDetails, bmId, ptImgs);
+                                          @RequestPart(required = false) List<String> ptImgKeys) {
+        bmService.updatePtImgs(memberDetails, bmId, ptImgKeys);
         return CustomApiResponse.onSuccess();
     }
 

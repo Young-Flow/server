@@ -1,8 +1,9 @@
 package com.pitchain.service;
 
-import com.pitchain.common.constant.Country;
 import com.pitchain.common.constant.MainCategory;
+import com.pitchain.common.constant.MemberRole;
 import com.pitchain.entity.*;
+import com.pitchain.jwt.MemberDetails;
 import com.pitchain.repository.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,47 +36,55 @@ public class SpLikeServiceTest {
     @Test
     void SP_좋아요_등록_성공() {
         //given
-        Member member = saveMember();
+        Member individual = saveIndividual();
+        MemberDetails individualMemberDetails = createIndividualMemberDetails(individual);
+
         Company company = saveCompany();
         Bm bm = saveBm(company);
         Sp sp = saveSp(bm);
 
         //when
-        spLikeService.toggleLikeSp(sp.getId(), member.getId());
+        spLikeService.toggleLikeSp(sp.getId(), individualMemberDetails);
 
         //then
-        boolean isLiked = spLikeRepository.existsByMemberAndSp(member, sp);
+        boolean isLiked = spLikeRepository.existsByMemberAndSp(individual, sp);
         assertThat(isLiked).isTrue();
     }
 
     @Test
     void SP_좋아요_취소_성공() {
         //given
-        Member member = saveMember();
+        Member individual = saveIndividual();
+        MemberDetails individualMemberDetails = createIndividualMemberDetails(individual);
+
         Company company = saveCompany();
         Bm bm = saveBm(company);
         Sp sp = saveSp(bm);
 
-        SpLike mySp = new SpLike(member, sp);
+        SpLike mySp = new SpLike(individual, sp);
         spLikeRepository.save(mySp);
 
         //when
-        spLikeService.toggleLikeSp(sp.getId(), member.getId());
+        spLikeService.toggleLikeSp(sp.getId(), individualMemberDetails);
 
         //then
-        boolean isLiked = spLikeRepository.existsByMemberAndSp(member, sp);
+        boolean isLiked = spLikeRepository.existsByMemberAndSp(individual, sp);
         assertThat(isLiked).isFalse();
     }
 
-    private Member saveMember() {
-        return memberRepository.save(new Member(Country.USA, "profileImg"));
+    private Member saveIndividual() {
+        return memberRepository.save(Member.fromIndividual("email", "name"));
+    }
+
+    private MemberDetails createIndividualMemberDetails(Member member) {
+        return new MemberDetails(member.getId(), MemberRole.INDIVIDUAL);
     }
 
     private Company saveCompany() {
-        return companyRepository.save(new Company("companyEmail", "companyPassword",
-                true, "companyName", "companyAddress", "bm_logo_img_key"
-        ));
+        Member member = memberRepository.save(Member.fromCompany("email"));
+        return companyRepository.save(new Company(member, "encodedPassword"));
     }
+
 
     private Bm saveBm(Company company) {
         return bmRepository.save(new Bm(company, "bmName", MainCategory.FOOD, "bmIntro", "bmDescription",

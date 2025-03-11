@@ -1,6 +1,7 @@
 package com.pitchain.controller;
 
 import com.pitchain.common.apiPayload.dto.CustomApiResponse;
+import com.pitchain.jwt.MemberDetails;
 import com.pitchain.service.BmScrapService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,8 +19,8 @@ public class BmScrapController {
 
     @PostMapping("/{bmId}/scrap")
     public CustomApiResponse toggleScrapBm(@PathVariable("bmId") Long bmId,
-                                           @AuthenticationPrincipal Long memberId) {
-        bmScrapService.toggleScrapBm(bmId, memberId);
+                                           @AuthenticationPrincipal MemberDetails memberDetails) {
+        bmScrapService.toggleScrapBm(bmId, memberDetails);
         return CustomApiResponse.onSuccess();
     }
 }

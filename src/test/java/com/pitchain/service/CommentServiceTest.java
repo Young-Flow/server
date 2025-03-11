@@ -1,8 +1,8 @@
 package com.pitchain.service;
 
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
-import com.pitchain.common.constant.Country;
 import com.pitchain.common.constant.MainCategory;
+import com.pitchain.common.constant.MemberRole;
 import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.dto.req.CommentReq;
 import com.pitchain.dto.res.BaseCommentRes;
@@ -13,6 +13,7 @@ import com.pitchain.entity.Bm;
 import com.pitchain.entity.Comment;
 import com.pitchain.entity.Company;
 import com.pitchain.entity.Member;
+import com.pitchain.jwt.MemberDetails;
 import com.pitchain.repository.BmRepository;
 import com.pitchain.repository.CommentRepository;
 import com.pitchain.repository.CompanyRepository;
@@ -61,7 +62,9 @@ class CommentServiceTest {
     @Test
     void 댓글_등록_성공() {
         //given
-        Member member = saveMember();
+        Member individual = saveIndividual();
+        MemberDetails individualMemberDetails = createIndividualMemberDetails(individual);
+
         Company company = saveCompany();
         Bm bm = saveBm(company);
 
@@ -70,12 +73,12 @@ class CommentServiceTest {
         addCommentReq.setContent(content);
 
         //when
-        commentService.addComment(bm.getId(), member.getId(), addCommentReq);
+        commentService.addComment(bm.getId(), individualMemberDetails, addCommentReq);
 
         //then
         List<Comment> comments = commentRepository.findByBm(bm);
         Comment comment = comments.get(0);
-        assertThat(comment.getMember()).isEqualTo(member);
+        assertThat(comment.getMember()).isEqualTo(individual);
         assertThat(comment.getParentComment()).isNull();
         assertThat(comment.getChildComments().size()).isEqualTo(0);
         assertThat(comment.getContent()).isEqualTo(content);
@@ -86,11 +89,13 @@ class CommentServiceTest {
     @Transactional(propagation = NEVER)
     void 답글_등록_성공() {
         //given
-        Member member = saveMember();
+        Member individual = saveIndividual();
+        MemberDetails individualMemberDetails = createIndividualMemberDetails(individual);
+
         Company company = saveCompany();
         Bm bm = saveBm(company);
 
-        Comment parentComment = saveComment(member, bm);
+        Comment parentComment = saveComment(individual, bm);
         Long parentCommentId = parentComment.getId();
 
         CommentReq.AddCommentReq addReplyCommentReq = new CommentReq.AddCommentReq();
@@ -99,7 +104,7 @@ class CommentServiceTest {
         addReplyCommentReq.setParentCommentId(parentCommentId);
 
         //when
-        commentService.addComment(bm.getId(), member.getId(), addReplyCommentReq);
+        commentService.addComment(bm.getId(), individualMemberDetails, addReplyCommentReq);
 
         //then
         List<Comment> comments = commentRepository.findByBm(bm);
@@ -109,37 +114,41 @@ class CommentServiceTest {
         Comment replyComment = replyComments.get(0);
         assertThat(replyComment.getParentComment()).isEqualTo(comment);
         assertThat(replyComment.getContent()).isEqualTo(replyCommentContent);
-        assertThat(replyComment.getMember().getId()).isEqualTo(member.getId());
+        assertThat(replyComment.getMember().getId()).isEqualTo(individual.getId());
         assertThat(replyComment.getBm().getId()).isEqualTo(bm.getId());
     }
 
     @Test
     void 댓글_존재_조회_성공() {
         //given
-        Member member = saveMember();
+        Member individual = saveIndividual();
+        MemberDetails individualMemberDetails = createIndividualMemberDetails(individual);
+
         Company company = saveCompany();
         Bm bm = saveBm(company);
-        Comment comment = saveComment(member, bm);
+        Comment comment = saveComment(individual, bm);
 
         //when
-        List<? extends BaseCommentRes> comments = commentService.getComments(bm.getId());
+        List<? extends BaseCommentRes> comments = commentService.getComments(bm.getId(), individualMemberDetails);
 
         //then
         CommentRes foundComment = (CommentRes) comments.get(0);
         assertThat(foundComment.getCommentId()).isEqualTo(comment.getId());
-        assertThat(foundComment.getWriterId()).isEqualTo(member.getId());
+        assertThat(foundComment.getWriterId()).isEqualTo(individual.getId());
         assertThat(foundComment.getContent()).isEqualTo(comment.getContent());
     }
 
     @Test
     void 댓글_미존재_조회_성공() {
         //given
-        Member member = saveMember();
+        Member individual = saveIndividual();
+        MemberDetails memberDetails = createIndividualMemberDetails(individual);
+
         Company company = saveCompany();
         Bm bm = saveBm(company);
 
         //when
-        List<? extends BaseCommentRes> comments = commentService.getComments(bm.getId());
+        List<? extends BaseCommentRes> comments = commentService.getComments(bm.getId(), memberDetails);
 
         //then
         assertThat(comments.size()).isEqualTo(0);
@@ -149,17 +158,18 @@ class CommentServiceTest {
     @Transactional(propagation = NEVER)
     void 답글_포함_댓글_조회_성공() {
         //given
-        Member memberA = saveMember();
+        Member individualA = saveIndividual();
         Company company = saveCompany();
         Bm bm = saveBm(company);
 
-        Comment parentComment = saveComment(memberA, bm);
+        Comment parentComment = saveComment(individualA, bm);
 
-        Member memberB = saveMember();
-        Comment replyComment = saveReplyComment(memberB, parentComment, bm);
+        Member individualB = saveIndividual();
+        Comment replyComment = saveReplyComment(individualB, parentComment, bm);
+        MemberDetails individualMemberDetails = createIndividualMemberDetails(individualB);
 
         //when
-        List<? extends BaseCommentRes> comments = commentService.getComments(bm.getId());
+        List<? extends BaseCommentRes> comments = commentService.getComments(bm.getId(), individualMemberDetails);
 
         //then
         CommentRes foundComment = (CommentRes) comments.get(0);
@@ -180,18 +190,19 @@ class CommentServiceTest {
     @DisplayName("답글이 있는 댓글은 삭제되어도 조회된다.")
     void 삭제된_댓글_조회_성공() {
         //given
-        Member memberA = saveMember();
+        Member individualA = saveIndividual();
         Company company = saveCompany();
         Bm bm = saveBm(company);
-        Comment parentComment = new Comment(memberA, bm, null, "댓글 내용");
+        Comment parentComment = new Comment(individualA, bm, null, "댓글 내용");
         parentComment.deleteParentComment();
         commentRepository.save(parentComment);
 
-        Member memberB = saveMember();
-        Comment replyComment = saveReplyComment(memberB, parentComment, bm);
+        Member individualB = saveIndividual();
+        Comment replyComment = saveReplyComment(individualB, parentComment, bm);
+        MemberDetails individualMemberDetails = createIndividualMemberDetails(individualB);
 
         //when
-        List<? extends BaseCommentRes> comments = commentService.getComments(bm.getId());
+        List<? extends BaseCommentRes> comments = commentService.getComments(bm.getId(), individualMemberDetails);
 
         //then
         DeletedCommentRes deletedCommentRes = (DeletedCommentRes) comments.get(0);
@@ -206,11 +217,12 @@ class CommentServiceTest {
     @Test
     void 댓글_수정_성공() {
         //given
-        Member member = saveMember();
+        Member individual = saveIndividual();
+        MemberDetails individualMemberDetails = createIndividualMemberDetails(individual);
         Company company = saveCompany();
         Bm bm = saveBm(company);
 
-        Comment comment = saveComment(member, bm);
+        Comment comment = saveComment(individual, bm);
         Long commentId = comment.getId();
 
         CommentReq.ModifyCommentReq modifyCommentReq = new CommentReq.ModifyCommentReq();
@@ -218,35 +230,39 @@ class CommentServiceTest {
         modifyCommentReq.setContent(modifiedContent);
 
         //when
-        commentService.modifyComment(commentId, member.getId(), modifyCommentReq);
+        commentService.modifyComment(commentId, individualMemberDetails, modifyCommentReq);
 
         //then
         Comment modifiedComment = commentRepository.findById(commentId).orElseThrow();
         assertThat(modifiedComment.getContent()).isEqualTo(modifiedContent);
         assertThat(modifiedComment.getBm()).isEqualTo(bm);
-        assertThat(modifiedComment.getMember()).isEqualTo(member);
+        assertThat(modifiedComment.getMember()).isEqualTo(individual);
     }
 
     @Test
     void 댓글_수정_실패() {
         //given
-        Member member = saveMember();
+        Member individual = saveIndividual();
+        MemberDetails individualMemberDetails = createIndividualMemberDetails(individual);
+
         Company company = saveCompany();
         Bm bm = saveBm(company);
 
-        Comment comment = saveComment(member, bm);
+        Comment comment = saveComment(individual, bm);
         Long commentId = comment.getId();
 
-        Member invalidMember = saveMember();
         Long invalidId = Long.MAX_VALUE;
+        Member invalidIndividual = saveIndividual();
+        MemberDetails invalidIndividualMemberDetails1 = createIndividualMemberDetails(invalidIndividual);
+        MemberDetails invalidIndividualMemberDetails2 = new MemberDetails(Long.MAX_VALUE, MemberRole.INDIVIDUAL);
 
         CommentReq.ModifyCommentReq modifyCommentReq = new CommentReq.ModifyCommentReq();
         modifyCommentReq.setContent("댓글 내용");
 
         //when
-        GeneralHandler error1 = Assertions.assertThrows(GeneralHandler.class, () -> commentService.modifyComment(commentId, invalidMember.getId(), modifyCommentReq));
-        GeneralHandler error2 = Assertions.assertThrows(GeneralHandler.class, () -> commentService.modifyComment(invalidId, member.getId(), modifyCommentReq));
-        GeneralHandler error3 = Assertions.assertThrows(GeneralHandler.class, () -> commentService.modifyComment(commentId, invalidId, modifyCommentReq));
+        GeneralHandler error1 = Assertions.assertThrows(GeneralHandler.class, () -> commentService.modifyComment(commentId, invalidIndividualMemberDetails1, modifyCommentReq));
+        GeneralHandler error2 = Assertions.assertThrows(GeneralHandler.class, () -> commentService.modifyComment(invalidId, individualMemberDetails, modifyCommentReq));
+        GeneralHandler error3 = Assertions.assertThrows(GeneralHandler.class, () -> commentService.modifyComment(commentId, invalidIndividualMemberDetails2, modifyCommentReq));
 
         //then
         assertThat(error1.getErrorStatus()).isEqualTo(ErrorStatus.MEMBER_FORBIDDEN);
@@ -258,15 +274,16 @@ class CommentServiceTest {
     @DisplayName("답글이 없는 댓글은 DB에서 삭제된다.")
     void 댓글_삭제_성공() {
         //given
-        Member member = saveMember();
+        Member individual = saveIndividual();
+        MemberDetails individualMemberDetails = createIndividualMemberDetails(individual);
         Company company = saveCompany();
         Bm bm = saveBm(company);
 
-        Comment comment = saveComment(member, bm);
+        Comment comment = saveComment(individual, bm);
         Long commentId = comment.getId();
 
         //when
-        commentService.removeComment(commentId, member.getId());
+        commentService.removeComment(commentId, individualMemberDetails);
 
         //then
         assertThat(commentRepository.findAll().size()).isEqualTo(0);
@@ -277,16 +294,18 @@ class CommentServiceTest {
     @DisplayName("답글이 있는 댓글은 DB에서 삭제되지 않는다.")
     void 답글_있는_댓글_삭제_성공() {
         //given
-        Member memberA = saveMember();
+        Member individualA = saveIndividual();
+        MemberDetails individualMemberDetails = createIndividualMemberDetails(individualA);
+
         Company company = saveCompany();
         Bm bm = saveBm(company);
-        Comment parentComment = saveComment(memberA, bm);
+        Comment parentComment = saveComment(individualA, bm);
 
-        Member memberB = saveMember();
-        saveReplyComment(memberB, parentComment, bm);
+        Member individualB = saveIndividual();
+        saveReplyComment(individualB, parentComment, bm);
 
         //when
-        commentService.removeComment(parentComment.getId(), memberA.getId());
+        commentService.removeComment(parentComment.getId(), individualMemberDetails);
 
         //then
         Comment foundParentComment = commentRepository.findById(parentComment.getId()).orElseThrow();
@@ -296,20 +315,24 @@ class CommentServiceTest {
     @Test
     void 댓글_삭제_실패() {
         //given
-        Member member = saveMember();
+        Member individual = saveIndividual();
+        MemberDetails individualMemberDetails = createIndividualMemberDetails(individual);
+
         Company company = saveCompany();
         Bm bm = saveBm(company);
 
-        Comment comment = saveComment(member, bm);
+        Comment comment = saveComment(individual, bm);
         Long commentId = comment.getId();
 
-        Member invalidMember = saveMember();
         Long invalidId = Long.MAX_VALUE;
+        Member invalidIndividual = saveIndividual();
+        MemberDetails invalidIndividualMemberDetails1 = createIndividualMemberDetails(invalidIndividual);
+        MemberDetails invalidIndividualMemberDetails2 = new MemberDetails(Long.MAX_VALUE, MemberRole.INDIVIDUAL);
 
         //when
-        GeneralHandler error1 = Assertions.assertThrows(GeneralHandler.class, () -> commentService.removeComment(commentId, invalidMember.getId()));
-        GeneralHandler error2 = Assertions.assertThrows(GeneralHandler.class, () -> commentService.removeComment(invalidId, member.getId()));
-        GeneralHandler error3 = Assertions.assertThrows(GeneralHandler.class, () -> commentService.removeComment(commentId, invalidId));
+        GeneralHandler error1 = Assertions.assertThrows(GeneralHandler.class, () -> commentService.removeComment(commentId, invalidIndividualMemberDetails1));
+        GeneralHandler error2 = Assertions.assertThrows(GeneralHandler.class, () -> commentService.removeComment(invalidId, individualMemberDetails));
+        GeneralHandler error3 = Assertions.assertThrows(GeneralHandler.class, () -> commentService.removeComment(commentId, invalidIndividualMemberDetails2));
 
         //then
         assertThat(error1.getErrorStatus()).isEqualTo(ErrorStatus.MEMBER_FORBIDDEN);
@@ -317,19 +340,28 @@ class CommentServiceTest {
         assertThat(error3.getErrorStatus()).isEqualTo(ErrorStatus.MEMBER_NOT_FOUND);
     }
 
-    private Member saveMember() {
-        return memberRepository.save(new Member(Country.USA, "profileImg.jpg"));
+    private Member saveIndividual() {
+        return memberRepository.save(Member.fromIndividual("email", "name"));
+    }
+
+    private MemberDetails createIndividualMemberDetails(Member member) {
+        return new MemberDetails(member.getId(), MemberRole.INDIVIDUAL);
     }
 
     private Company saveCompany() {
-        return companyRepository.save(new Company("companyEmail", "companyPassword",
-                true, "companyName", "companyAddress", "bm_logo_img_key"
-        ));
+        Member member = memberRepository.save(Member.fromCompany("email"));
+        return companyRepository.save(new Company(member, "encodedPassword"));
     }
 
     private Bm saveBm(Company company) {
-        return bmRepository.save(new Bm(company, "bmName", MainCategory.FOOD, "bmIntro", "bmDescription",
-                "bmDescriptionImg", "companyAddress", 100000L, 1000L, 1000, LocalDate.now(), "longPitchUrl"));
+        Bm bm = new Bm(
+                company, "bmName", MainCategory.FOOD,
+                "bmIntro", "bmDescription", "bmDescriptionImg", "bmAddress",
+                100000L, 1000L, 1000,
+                LocalDate.now(), "longPitchUrl"
+        );
+
+        return bmRepository.save(bm);
     }
 
     private Comment saveComment(Member member, Bm bm) {

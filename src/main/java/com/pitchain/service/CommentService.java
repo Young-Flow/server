@@ -10,6 +10,7 @@ import com.pitchain.dto.res.ReplyCommentRes;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.Comment;
 import com.pitchain.entity.Member;
+import com.pitchain.jwt.MemberDetails;
 import com.pitchain.repository.BmRepository;
 import com.pitchain.repository.CommentRepository;
 import com.pitchain.repository.MemberRepository;
@@ -29,8 +30,8 @@ public class CommentService {
     private final S3Service s3Service;
 
     @Transactional
-    public void addComment(Long bmId, Long memberId, CommentReq.AddCommentReq req) {
-        Member member = memberRepository.findById(memberId).orElseThrow(() ->
+    public void addComment(Long bmId, MemberDetails memberDetails, CommentReq.AddCommentReq req) {
+        Member member = memberRepository.findById(memberDetails.id()).orElseThrow(() ->
                 new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
         Bm bm = bmRepository.findById(bmId).orElseThrow(() ->
                 new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
@@ -70,7 +71,9 @@ public class CommentService {
     }
 
     @Transactional(readOnly = true)
-    public List<? extends BaseCommentRes> getComments(Long bmId) {
+    public List<? extends BaseCommentRes> getComments(Long bmId, MemberDetails memberDetails) {
+        Member member = memberRepository.findById(memberDetails.id()).orElseThrow(() ->
+                new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
         Bm bm = bmRepository.findById(bmId).orElseThrow(() ->
                 new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
 
@@ -93,8 +96,8 @@ public class CommentService {
     }
 
     @Transactional
-    public void modifyComment(Long commentId, Long memberId, CommentReq.ModifyCommentReq req) {
-        Member member = memberRepository.findById(memberId).orElseThrow(() ->
+    public void modifyComment(Long commentId, MemberDetails memberDetails, CommentReq.ModifyCommentReq req) {
+        Member member = memberRepository.findById(memberDetails.id()).orElseThrow(() ->
                 new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
         Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
                 new GeneralHandler(ErrorStatus.COMMENT_NOT_FOUND));
@@ -107,8 +110,8 @@ public class CommentService {
     }
 
     @Transactional
-    public void removeComment(Long commentId, Long memberId) {
-        Member member = memberRepository.findById(memberId).orElseThrow(() ->
+    public void removeComment(Long commentId, MemberDetails memberDetails) {
+        Member member = memberRepository.findById(memberDetails.id()).orElseThrow(() ->
                 new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
         Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
                 new GeneralHandler(ErrorStatus.COMMENT_NOT_FOUND));
