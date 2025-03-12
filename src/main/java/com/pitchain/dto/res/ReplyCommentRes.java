@@ -2,15 +2,17 @@ package com.pitchain.dto.res;
 
 import com.pitchain.entity.Comment;
 import com.pitchain.entity.Member;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
 
 @Builder
+@Schema(requiredMode = Schema.RequiredMode.REQUIRED)
 public record ReplyCommentRes(
         Long commentId,
         Long writerId,
-        String writerNickname,
+        String writerName,
         String writerProfileImgURL,
         String content,
         boolean delYN,
@@ -23,7 +25,7 @@ public record ReplyCommentRes(
                 .commentId(comment.getId())
                 .writerId(member.getId())
                 .writerProfileImgURL(writerProfileImgURL)
-                .writerNickname(member.getNickname())
+                .writerName(member.getName())
                 .content(comment.getContent())
                 .delYN(comment.isDelYN())
                 .createdAt(comment.getCreatedAt())

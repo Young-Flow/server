@@ -5,6 +5,7 @@ import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.entity.Member;
 import com.pitchain.entity.Sp;
 import com.pitchain.entity.SpLike;
+import com.pitchain.jwt.MemberDetails;
 import com.pitchain.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,8 +20,8 @@ public class SpLikeService {
     private final SpRepository spRepository;
 
     @Transactional
-    public void toggleLikeSp(Long spId, Long memberId) {
-        Member member = memberRepository.findById(memberId)
+    public void toggleLikeSp(Long spId, MemberDetails memberDetails) {
+        Member member = memberRepository.findById(memberDetails.id())
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
         Sp sp = spRepository.findById(spId)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.SP_NOT_FOUND));

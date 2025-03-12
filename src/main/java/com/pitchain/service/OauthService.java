@@ -1,12 +1,15 @@
 package com.pitchain.service;
 
+import com.pitchain.common.constant.MemberRole;
 import com.pitchain.common.constant.OauthProvider;
 import com.pitchain.dto.req.OauthLoginReq;
 import com.pitchain.dto.res.LoginRes;
+import com.pitchain.entity.Individual;
 import com.pitchain.entity.Member;
 import com.pitchain.jwt.TokenUtil;
 import com.pitchain.oauth2.member.OauthMemberInfo;
 import com.pitchain.oauth2.param.OauthParams;
+import com.pitchain.repository.IndividualRepository;
 import com.pitchain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,19 +26,43 @@ public class OauthService {
     private final RequestOauthInfoService requestOauthInfoService;
     private final TokenUtil tokenUtil;
     private final MemberRepository memberRepository;
+    private final IndividualRepository individualRepository;
 
     public LoginRes getMemberByOauthLogin(OauthLoginReq req) {
-        OauthParams oauthParam = createOauthParams(req);
+        OauthMemberInfo oauthMemberInfo = requestOauthInfo(req);
 
-        OauthMemberInfo oauthMemberInfo = requestOauthInfoService.request(oauthParam);
-        Optional<Member> byOauthProviderAndSocialId = memberRepository.findByOauthProviderAndSocialId(oauthMemberInfo.getOauthProvider(), oauthMemberInfo.getSocialId());
+        Optional<Individual> optionalInvestor = individualRepository.findByOauthProviderAndSocialId(oauthMemberInfo.getOauthProvider(), oauthMemberInfo.getSocialId());
+        if (optionalInvestor.isPresent()) {
+            return handleMember(optionalInvestor.get());
+        }
 
-        Member member = byOauthProviderAndSocialId.orElseGet(() -> memberRepository.save(new Member(oauthMemberInfo)));
+        return handleGuest(oauthMemberInfo);
+    }
 
-        String accessToken = tokenUtil.issueAccessToken(member.getId());
-        String refreshToken = tokenUtil.issueRefreshToken(member.getId());
+    private LoginRes handleMember(Individual individual) {
+        Member member = individual.getMember();
+        return createLoginRes(member.getId());
+    }
 
+    private LoginRes handleGuest(OauthMemberInfo oauthMemberInfo) {
+        Member member = Member.fromIndividual(oauthMemberInfo.getEmail(), oauthMemberInfo.getNickname());
+        memberRepository.save(member);
+
+        Individual individual = Individual.of(member, oauthMemberInfo.getSocialId(), oauthMemberInfo.getOauthProvider());
+        individualRepository.save(individual);
+        return createLoginRes(member.getId());
+    }
+
+    private LoginRes createLoginRes(Long memberId) {
+        String accessToken = tokenUtil.issueAccessToken(memberId, MemberRole.INDIVIDUAL);
+        String refreshToken = tokenUtil.issueRefreshToken(memberId, MemberRole.INDIVIDUAL);
         return LoginRes.createRes(accessToken, refreshToken);
+    }
+
+    private OauthMemberInfo requestOauthInfo(OauthLoginReq req) {
+        OauthParams oauthParam = createOauthParams(req);
+        OauthMemberInfo oauthMemberInfo = requestOauthInfoService.request(oauthParam);
+        return oauthMemberInfo;
     }
 
     private static OauthParams createOauthParams(OauthLoginReq req) {

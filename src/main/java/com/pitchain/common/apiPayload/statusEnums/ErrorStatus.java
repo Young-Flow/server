@@ -22,18 +22,19 @@ public enum ErrorStatus implements ResponseStatus {
     MISSING_ACCESS_TOKEN(HttpStatus.BAD_REQUEST, "TOKEN4001", "Access Token이 존재하지 않습니다."),
 
     // member
+    INVALID_MEMBER_ROLE(HttpStatus.BAD_REQUEST, "MEMBER4001", "유효하지 않은 회원 역할입니다."),
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER4041", "존재하지 않는 사용자입니다."),
-
     MEMBER_FORBIDDEN(HttpStatus.FORBIDDEN, "MEMBER4031", "사용자에게 권한이 없습니다."),
+
+    // individual
+    INDIVIDUAL_NOT_FOUND(HttpStatus.NOT_FOUND, "INDIVIDUAL4041", "개인 유저가 존재하지 않습니다."),
 
     // company
     COMPANY_PASSWORD_UNCONFIRMED(HttpStatus.BAD_REQUEST, "COMPANY4001", "회사 비밀번호가 확인되지 않았습니다."),
     COMPANY_FORBIDDEN(HttpStatus.FORBIDDEN, "COMPANY4031", "회사에게 권한이 없습니다."),
     COMPANY_PASSWORD_NOT_MATCHED(HttpStatus.FORBIDDEN, "COMPANY4032", "회사 비밀번호가 일치하지 않습니다."),
-    COMPANY_EMAIL_CONFLICT(HttpStatus.CONFLICT, "COMPANY4091", "회사 이메일이 이미 존재합니다."),
-
-    // companyName
     COMPANY_NOT_FOUND(HttpStatus.NOT_FOUND, "COMPANY4041", "존재하지 않는 회사입니다."),
+    COMPANY_EMAIL_CONFLICT(HttpStatus.CONFLICT, "COMPANY4091", "회사 이메일이 이미 존재합니다."),
 
     // bm
     BM_NOT_FOUND(HttpStatus.NOT_FOUND, "BM4041", "존재하지 않는 BM입니다."),

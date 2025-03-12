@@ -3,16 +3,19 @@ package com.pitchain.dto.res;
 import com.pitchain.dto.SpWithLikeDto;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.Company;
+import com.pitchain.entity.Member;
 import com.pitchain.entity.Sp;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 import java.util.List;
 
 @Builder
+@Schema(requiredMode = Schema.RequiredMode.REQUIRED)
 public record SpDetailRes(
         Long bmId,
         String bmName,
-        String companyLogoImgURL,
+        String companyProfileImgURL,
         String companyName,
         String companyAddress,
         String spURL,
@@ -24,15 +27,16 @@ public record SpDetailRes(
         boolean isLiked,
         long likeCnt
 ) {
-    public static SpDetailRes createRes(Company company, String companyLogoImgURL, SpWithLikeDto spWithLikeDto, String spURL, String thumbnailImgURL,
-                                        long likeCnt, List<String> subCategories) {
+    public static SpDetailRes createRes(SpWithLikeDto spWithLikeDto, long likeCnt, List<String> subCategories, String spURL, String thumbnailImgURL) {
         Sp sp = spWithLikeDto.getSp();
         Bm bm = sp.getBm();
+        Company company = bm.getCompany();
+        Member member = company.getMember();
         return SpDetailRes.builder()
                 .bmId(sp.getBm().getId())
                 .bmName(bm.getName())
-                .companyLogoImgURL(companyLogoImgURL)
-                .companyName(company.getName())
+                .companyProfileImgURL(member.getProfileImgKey())
+                .companyName(member.getName())
                 .companyAddress(company.getAddress())
                 .spURL(spURL)
                 .thumbnailImgURL(thumbnailImgURL)

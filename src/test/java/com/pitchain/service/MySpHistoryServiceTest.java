@@ -1,11 +1,12 @@
 package com.pitchain.service;
 
-import com.pitchain.common.constant.Country;
 import com.pitchain.common.constant.MainCategory;
+import com.pitchain.common.constant.MemberRole;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.Company;
 import com.pitchain.entity.Member;
 import com.pitchain.entity.MySpHistory;
+import com.pitchain.jwt.MemberDetails;
 import com.pitchain.repository.BmRepository;
 import com.pitchain.repository.CompanyRepository;
 import com.pitchain.repository.MemberRepository;
@@ -41,16 +42,17 @@ class MySpHistoryServiceTest {
         Company company = saveCompany();
         Bm bm = saveBm(company);
 
-        Member member = saveMember();
+        Member individual = saveIndividual();
+        MemberDetails individualMemberDetails = createIndividualMemberDetails(individual);
         int viewTime = 10000;
 
         //when
-        mySpHistoryService.saveMySpHistory(member.getId(), bm.getId(), viewTime);
+        mySpHistoryService.saveMySpHistory(individualMemberDetails, bm.getId(), viewTime);
 
         //then
-        MySpHistory mySpHistory = mySpHistoryRepository.findByMemberAndBm(member, bm).orElseThrow();
+        MySpHistory mySpHistory = mySpHistoryRepository.findByMemberAndBm(individual, bm).orElseThrow();
         Assertions.assertThat(mySpHistory.getBm()).isEqualTo(bm);
-        Assertions.assertThat(mySpHistory.getMember()).isEqualTo(member);
+        Assertions.assertThat(mySpHistory.getMember()).isEqualTo(individual);
         Assertions.assertThat(mySpHistory.getViewTime()).isEqualTo(viewTime);
     }
 
@@ -60,35 +62,45 @@ class MySpHistoryServiceTest {
         Company company = saveCompany();
         Bm bm = saveBm(company);
 
-        Member member = saveMember();
+        Member individual = saveIndividual();
+        MemberDetails individualMemberDetails = createIndividualMemberDetails(individual);
         int viewTime = 10000;
 
-        mySpHistoryRepository.save(new MySpHistory(member, bm, viewTime));
+        mySpHistoryRepository.save(new MySpHistory(individual, bm, viewTime));
 
         //when
         int updatedViewTime = 20000;
-        mySpHistoryService.saveMySpHistory(member.getId(), bm.getId(), updatedViewTime);
+        mySpHistoryService.saveMySpHistory(individualMemberDetails, bm.getId(), updatedViewTime);
 
         //then
-        MySpHistory mySpHistory = mySpHistoryRepository.findByMemberAndBm(member, bm).orElseThrow();
+        MySpHistory mySpHistory = mySpHistoryRepository.findByMemberAndBm(individual, bm).orElseThrow();
         Assertions.assertThat(mySpHistory.getBm()).isEqualTo(bm);
-        Assertions.assertThat(mySpHistory.getMember()).isEqualTo(member);
+        Assertions.assertThat(mySpHistory.getMember()).isEqualTo(individual);
         Assertions.assertThat(mySpHistory.getViewTime()).isEqualTo(updatedViewTime);
 
     }
 
-    private Member saveMember() {
-        return memberRepository.save(new Member(Country.USA, "profileImg.jpg"));
+    private Member saveIndividual() {
+        return memberRepository.save(Member.fromIndividual("email", "name"));
     }
 
-    private Bm saveBm(Company company) {
-        return bmRepository.save(new Bm(company, "bmName", MainCategory.FOOD, "bmIntro", "bmDescription",
-                "bmDescriptionImg", "companyAddress", 100000L, 1000L, 1000, LocalDate.now(), "longPitchUrl"));
+    private MemberDetails createIndividualMemberDetails(Member member) {
+        return new MemberDetails(member.getId(), MemberRole.INDIVIDUAL);
     }
 
     private Company saveCompany() {
-        return companyRepository.save(new Company("companyEmail", "companyPassword",
-                true, "companyName", "companyAddress", "bm_logo_img_key"
-        ));
+        Member member = memberRepository.save(Member.fromCompany("email"));
+        return companyRepository.save(new Company(member, "encodedPassword"));
+    }
+
+    private Bm saveBm(Company company) {
+        Bm bm = new Bm(
+                company, "bmName", MainCategory.FOOD,
+                "bmIntro", "bmDescription", "bmDescriptionImg", "bmAddress",
+                100000L, 1000L, 1000,
+                LocalDate.now(), "longPitchUrl"
+        );
+
+        return bmRepository.save(bm);
     }
 }

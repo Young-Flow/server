@@ -2,6 +2,7 @@ package com.pitchain.controller;
 
 import com.pitchain.common.apiPayload.dto.CustomApiResponse;
 import com.pitchain.dto.req.SaveMySpHistoryReq;
+import com.pitchain.jwt.MemberDetails;
 import com.pitchain.service.MySpHistoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -19,9 +20,9 @@ public class MySpHistoryController {
 
     @Operation(summary = "사용자의 SP 시청 시간을 최초 저장 및 업데이트")
     @PostMapping("/histories")
-    public CustomApiResponse saveMySpHistory(@AuthenticationPrincipal Long memberId,
+    public CustomApiResponse saveMySpHistory(@AuthenticationPrincipal MemberDetails memberDetails,
                                              @RequestBody @Valid SaveMySpHistoryReq req) {
-        mySpHistoryService.saveMySpHistory(memberId, req.getBmId(), req.getViewTime());
+        mySpHistoryService.saveMySpHistory(memberDetails, req.getBmId(), req.getViewTime());
         return CustomApiResponse.onSuccess();
     }
 }

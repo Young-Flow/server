@@ -5,6 +5,7 @@ import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.Member;
 import com.pitchain.entity.MySpHistory;
+import com.pitchain.jwt.MemberDetails;
 import com.pitchain.repository.BmRepository;
 import com.pitchain.repository.MemberRepository;
 import com.pitchain.repository.MySpHistoryRepository;
@@ -21,8 +22,8 @@ public class MySpHistoryService {
     private final BmRepository bmRepository;
 
     @Transactional
-    public void saveMySpHistory(Long memberId, Long bmId, int viewTime) {
-        Member member = memberRepository.findById(memberId)
+    public void saveMySpHistory(MemberDetails memberDetails, Long bmId, int viewTime) {
+        Member member = memberRepository.findById(memberDetails.id())
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
         Bm bm = bmRepository.findById(bmId)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.BM_NOT_FOUND));

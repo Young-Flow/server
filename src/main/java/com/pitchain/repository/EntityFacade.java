@@ -1,11 +1,10 @@
 package com.pitchain.repository;
 
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
+import com.pitchain.common.constant.MemberRole;
 import com.pitchain.common.exception.GeneralHandler;
-import com.pitchain.entity.Bm;
-import com.pitchain.entity.Company;
-import com.pitchain.entity.Member;
-import com.pitchain.entity.Sp;
+import com.pitchain.entity.*;
+import com.pitchain.jwt.MemberDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -32,8 +31,11 @@ public class EntityFacade {
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.SP_NOT_FOUND));
     }
 
-    public Company getCompany(Long companyId) {
-        return companyRepository.findById(companyId)
+    public Company getCompany(MemberDetails memberDetails) {
+        if (memberDetails.memberRole().equals(MemberRole.INDIVIDUAL))
+            throw new GeneralHandler(ErrorStatus.MEMBER_FORBIDDEN);
+
+        return companyRepository.findByMemberId(memberDetails.id())
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.COMPANY_NOT_FOUND));
     }
 }

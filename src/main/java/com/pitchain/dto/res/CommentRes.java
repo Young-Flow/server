@@ -2,6 +2,7 @@ package com.pitchain.dto.res;
 
 import com.pitchain.entity.Comment;
 import com.pitchain.entity.Member;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -9,9 +10,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
+@Schema(requiredMode = Schema.RequiredMode.REQUIRED)
 public class CommentRes extends BaseCommentRes {
     private final Long writerId;
-    private final String writerNickname;
+    private final String writerName;
     private final String writerProfileImgURL;
     private final String content;
     private final LocalDateTime createdAt;
@@ -20,12 +22,12 @@ public class CommentRes extends BaseCommentRes {
     @Builder
     public CommentRes(
             Long commentId, boolean delYN, List<ReplyCommentRes> replyComments,
-            Long writerId, String writerNickname, String writerProfileImgURL, String content,
+            Long writerId, String writerName, String writerProfileImgURL, String content,
             LocalDateTime createdAt, LocalDateTime updatedAt
     ) {
         super(commentId, delYN, replyComments);
         this.writerId = writerId;
-        this.writerNickname = writerNickname;
+        this.writerName = writerName;
         this.writerProfileImgURL = writerProfileImgURL;
         this.content = content;
         this.createdAt = createdAt;
@@ -39,7 +41,7 @@ public class CommentRes extends BaseCommentRes {
                 .delYN(comment.isDelYN())
                 .replyComments(replyComments)
                 .writerId(member.getId())
-                .writerNickname(member.getNickname())
+                .writerName(member.getName())
                 .writerProfileImgURL(writerProfileImgURL)
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt())

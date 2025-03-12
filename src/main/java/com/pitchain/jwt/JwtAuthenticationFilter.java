@@ -2,6 +2,7 @@ package com.pitchain.jwt;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
+import com.pitchain.common.constant.MemberRole;
 import com.pitchain.common.constant.TokenType;
 import com.pitchain.common.exception.GeneralHandler;
 import jakarta.servlet.FilterChain;
@@ -48,7 +49,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         DecodedJWT decodedJWT = tokenUtil.decodedJWT(token);
         Long id = decodedJWT.getClaim("id").asLong();
-        Authentication authentication = new UsernamePasswordAuthenticationToken(id, null);
+        String role = decodedJWT.getClaim("role").asString();
+
+        MemberDetails memberDetails = new MemberDetails(id, MemberRole.toEnum(role));
+        Authentication authentication = new UsernamePasswordAuthenticationToken(memberDetails, null);
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         doFilter(request, response, filterChain);

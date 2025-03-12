@@ -20,8 +20,7 @@ public class S3Controller {
     public CustomApiResponse<String> uploadFile(@RequestPart MultipartFile file,
                                                 @RequestParam S3UploadTarget s3UploadTarget) {
         String fileKey = s3Service.uploadFile(file, s3UploadTarget);
-        String fileURL = s3Service.getFileURL(fileKey);
-        return CustomApiResponse.onSuccess(fileURL);
+        return CustomApiResponse.onSuccess(fileKey);
     }
 
     @Operation(summary = "파일(이미지) 삭제 / 개발용")

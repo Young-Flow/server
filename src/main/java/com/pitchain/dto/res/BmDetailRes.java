@@ -3,15 +3,19 @@ package com.pitchain.dto.res;
 import com.pitchain.dto.BmWithScrapDto;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.Company;
+import com.pitchain.entity.Member;
+import com.pitchain.entity.Sp;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
+@Schema(requiredMode = Schema.RequiredMode.REQUIRED)
 public record BmDetailRes(
         Long companyId,
-        String companyLogoImgURL,
+        String companyProfileImgKey,
         String companyName,
         String companyAddress,
 
@@ -31,16 +35,15 @@ public record BmDetailRes(
 
         List<PtImgRes> ptImgResList
 ) {
-    public static BmDetailRes createRes(
-            BmWithScrapDto bmWithScrapDto, long scrapCnt, List<PtImgRes> ptImgResList, List<String> subCategories, String descImgURL, String companyLogoImgURL, List<String> spURLs
-    ) {
+    public static BmDetailRes createRes(BmWithScrapDto bmWithScrapDto, List<PtImgRes> ptImgResList, long scrapCnt, List<String> subCategories) {
         Bm bm = bmWithScrapDto.getBm();
         Company company = bm.getCompany();
+        Member member = company.getMember();
 
         return BmDetailRes.builder()
                 .companyId(company.getId())
-                .companyLogoImgURL(companyLogoImgURL)
-                .companyName(company.getName())
+                .companyProfileImgKey(member.getProfileImgKey())
+                .companyName(member.getName())
                 .companyAddress(company.getAddress())
 
                 .bmId(bm.getId())
@@ -49,13 +52,13 @@ public record BmDetailRes(
                 .mainCategory(bm.getMainCategory().getKoreanName())
                 .subCategories(subCategories)
                 .description(bm.getDescription())
-                .descImgURL(descImgURL)
+                .descImgURL(bm.getDescImgKey())
                 .bmAddress(bm.getAddress())
                 .createdAt(bm.getCreatedAt())
                 .longPitchURL(bm.getLongPitchURL())
                 .isScraped(bmWithScrapDto.isScraped())
                 .scrapCnt(scrapCnt)
-                .spURLs(spURLs)
+                .spURLs(bm.getSps().stream().map(Sp::getSpKey).toList())
 
                 .ptImgResList(ptImgResList)
                 .build();

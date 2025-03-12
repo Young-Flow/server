@@ -6,6 +6,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
+import com.pitchain.common.constant.MemberRole;
 import com.pitchain.common.constant.TokenType;
 import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.redis.RedisTokenUtil;
@@ -42,34 +43,37 @@ public class TokenUtil {
 
     private final RedisTokenUtil redisTokenUtil;
 
-    public String issueAccessToken(Long memberId) {
+    public String issueAccessToken(Long userId, MemberRole memberRole) {
         return JWT.create()
                 .withSubject(ACCESS_TOKEN_SUBJECT)
-                .withClaim("id", memberId)
+                .withClaim("id", userId)
+                .withClaim("role", memberRole.name())
                 .withExpiresAt(new Date(System.currentTimeMillis() + accessTokenExpirationPeriod))
                 .sign(Algorithm.HMAC512(secretKey));
     }
 
     // todo 프로토타입 시연을 위한 임시 메소드
-    public String issueAccessTokenWithoutExpiration(Long memberId) {
+    public String issueAccessTokenWithoutExpiration(Long userId, MemberRole memberRole) {
         return JWT.create()
                 .withSubject(ACCESS_TOKEN_SUBJECT)
-                .withClaim("id", memberId)
+                .withClaim("id", userId)
+                .withClaim("role", memberRole.name())
                 .sign(Algorithm.HMAC512(secretKey));
     }
 
-    public String issueRefreshToken(Long memberId) {
+    public String issueRefreshToken(Long userId, MemberRole memberRole) {
         String refreshToken = JWT.create()
                 .withSubject(REFRESH_TOKEN_SUBJECT)
-                .withClaim("id", memberId)
+                .withClaim("id", userId)
+                .withClaim("role", memberRole.name())
                 .withExpiresAt(new Date(System.currentTimeMillis() + accessTokenExpirationPeriod))
                 .sign(Algorithm.HMAC512(secretKey));
-        saveRefreshToken(memberId, refreshToken);
+        saveRefreshToken(userId, refreshToken);
         return refreshToken;
     }
 
-    private void saveRefreshToken(Long memberId, String refreshToken) {
-        redisTokenUtil.setRefreshTokenWithExpire(refreshToken, memberId, Duration.ofDays(refreshTokenExpirationPeriod));
+    private void saveRefreshToken(Long userId, String refreshToken) {
+        redisTokenUtil.setRefreshTokenWithExpire(refreshToken, userId, Duration.ofDays(refreshTokenExpirationPeriod));
     }
 
     public String reissueAccessToken(String refreshToken) {
@@ -80,9 +84,10 @@ public class TokenUtil {
             throw new JWTVerificationException(e.getMessage());
         }
 
-        Long memberId = decodedJWT.getClaim("id").asLong();
+        Long userId = decodedJWT.getClaim("id").asLong();
+        MemberRole memberRole = MemberRole.valueOf(decodedJWT.getClaim("role").asString());
 
-        return issueAccessToken(memberId);
+        return issueAccessToken(userId, memberRole);
     }
 
     public String extractToken(HttpServletRequest request, TokenType tokenType) {

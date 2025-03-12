@@ -5,11 +5,13 @@ import com.pitchain.common.constant.SubCategory;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.Company;
 import com.pitchain.entity.Member;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@Schema(requiredMode = Schema.RequiredMode.REQUIRED)
 public record CreateBmReq(
         Long companyId,
         String name,

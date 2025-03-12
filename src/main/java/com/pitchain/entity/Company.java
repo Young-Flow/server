@@ -17,56 +17,38 @@ public class Company {
     @Column(name = "company_id")
     private Long id;
 
-    private String email;
-
     private String password;
 
     private Boolean isVerified; //todo 추후 사업지 등록증을 통한 인증으로 변경 예정
 
-    private String name;
-
     private String address;
 
-    private String logoImgKey;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
-    public static Company createUnverifiedCompany(String email, String encodedPassword) {
-        return new Company(email, encodedPassword);
+    public static Company createUnverifiedCompany(Member member, String encodedPassword) {
+        return new Company(member, encodedPassword);
     }
 
-    public Company(String email, String encodedPassword) {
-        this.email = email;
+    public Company(Member member, String encodedPassword) {
+        this.member = member;
         this.password = encodedPassword;
         this.isVerified = false;
     }
 
-    public Company(String email, String password, Boolean isVerified, String name, String address, String logoImgKey) {
-        this.email = email;
+    public Company(String password, Boolean isVerified, String address) {
         this.password = password;
         this.isVerified = isVerified;
-        this.name = name;
         this.address = address;
-        this.logoImgKey = logoImgKey;
     }
 
-    public void updateCompanyInfo(String name, String address) {
-        this.name = name;
+    public void updateAddress(String address) {
         this.address = address;
-        this.isVerified = true;
     }
 
-    public boolean hasLogoImg() {
-        return logoImgKey != null && !logoImgKey.isEmpty();
+    public void updatePassword(String encodedNewPassword) {
+        this.password = encodedNewPassword;
     }
 
-    public void updateEmail(String email) {
-        this.email = email;
-    }
-
-    public void updatePassword(String password) {
-        this.password = password;
-    }
-
-    public void updateLogoImgKey(String logoImgKey) {
-        this.logoImgKey = logoImgKey;
-    }
 }
