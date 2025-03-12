@@ -5,12 +5,14 @@ import com.pitchain.entity.Bm;
 import com.pitchain.entity.Company;
 import com.pitchain.entity.Member;
 import com.pitchain.entity.Sp;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
+@Schema(requiredMode = Schema.RequiredMode.REQUIRED)
 public record BmDetailRes(
         Long companyId,
         String companyProfileImgKey,

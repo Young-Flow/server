@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 
 @Getter
+@Schema(requiredMode = Schema.RequiredMode.REQUIRED)
 public class SaveMySpHistoryReq {
     @NotNull
     private Long bmId;

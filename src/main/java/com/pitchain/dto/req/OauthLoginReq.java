@@ -11,12 +11,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@Schema(requiredMode = Schema.RequiredMode.REQUIRED)
 public class OauthLoginReq {
     @NotNull
-    @Schema(description = "소셜 로그인 제공자", examples = {"KAKAO", "GOOGLE", "NAVER"}, required = true)
+    @Schema(description = "소셜 로그인 제공자", examples = {"KAKAO", "GOOGLE", "NAVER"})
     private OauthProvider oauthProvider;
 
     @NotBlank
-    @Schema(description = "OAuth Provider Server로 부터 받은 인증 코드", required = true)
+    @Schema(description = "OAuth Provider Server로 부터 받은 인증 코드")
     private String code;
 }

@@ -6,6 +6,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
+@Schema(requiredMode = Schema.RequiredMode.REQUIRED)
 public class LoginRes {
     @Schema(required = true)
     private String accessToken;

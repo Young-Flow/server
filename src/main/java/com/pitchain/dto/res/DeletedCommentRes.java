@@ -1,10 +1,12 @@
 package com.pitchain.dto.res;
 
 import com.pitchain.entity.Comment;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 import java.util.List;
 
+@Schema(requiredMode = Schema.RequiredMode.REQUIRED)
 public class DeletedCommentRes extends BaseCommentRes {
 
     @Builder

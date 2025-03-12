@@ -2,6 +2,7 @@ package com.pitchain.dto.res;
 
 import com.pitchain.entity.Comment;
 import com.pitchain.entity.Member;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
+@Schema(requiredMode = Schema.RequiredMode.REQUIRED)
 public class CommentRes extends BaseCommentRes {
     private final Long writerId;
     private final String writerName;

@@ -3,10 +3,12 @@ package com.pitchain.dto.req;
 import com.pitchain.common.constant.MainCategory;
 import com.pitchain.common.constant.SubCategory;
 import com.pitchain.entity.Bm;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@Schema(requiredMode = Schema.RequiredMode.REQUIRED)
 public record UpdateBmReq(
         String name,
         MainCategory mainCategory,

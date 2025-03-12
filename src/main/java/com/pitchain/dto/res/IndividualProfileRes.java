@@ -3,10 +3,12 @@ package com.pitchain.dto.res;
 import com.pitchain.common.constant.OauthProvider;
 import com.pitchain.entity.Individual;
 import com.pitchain.entity.Member;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Schema(requiredMode = Schema.RequiredMode.REQUIRED)
 public class IndividualProfileRes extends BaseMemberProfileRes {
     private OauthProvider oauthProvider;
 

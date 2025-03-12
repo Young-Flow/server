@@ -2,11 +2,13 @@ package com.pitchain.dto.res;
 
 import com.pitchain.entity.Comment;
 import com.pitchain.entity.Member;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
 
 @Builder
+@Schema(requiredMode = Schema.RequiredMode.REQUIRED)
 public record ReplyCommentRes(
         Long commentId,
         Long writerId,
