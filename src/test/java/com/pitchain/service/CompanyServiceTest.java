@@ -46,7 +46,7 @@ public class CompanyServiceTest {
     private static final String COMPANY_PASSWORD_CONFIRMATION = "companyPassword";
 
     private Company saveCompany() {
-        Member member = memberRepository.save(Member.fromCompany(COMPANY_EMAIL));
+        Member member = memberRepository.save(Member.createCompanyMember(COMPANY_EMAIL));
         String encodedPassword = passwordEncoder.encode(COMPANY_PASSWORD);
         return companyRepository.save(new Company(member, encodedPassword));
     }

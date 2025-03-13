@@ -45,7 +45,7 @@ public class OauthService {
     }
 
     private LoginRes handleGuest(OauthMemberInfo oauthMemberInfo) {
-        Member member = Member.fromIndividual(oauthMemberInfo.getEmail(), oauthMemberInfo.getNickname());
+        Member member = Member.createIndividualMember(oauthMemberInfo.getEmail(), oauthMemberInfo.getNickname());
         memberRepository.save(member);
 
         Individual individual = Individual.of(member, oauthMemberInfo.getSocialId(), oauthMemberInfo.getOauthProvider());

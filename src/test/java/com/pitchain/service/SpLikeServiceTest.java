@@ -73,7 +73,7 @@ public class SpLikeServiceTest {
     }
 
     private Member saveIndividual() {
-        return memberRepository.save(Member.fromIndividual("email", "name"));
+        return memberRepository.save(Member.createIndividualMember("email", "name"));
     }
 
     private MemberDetails createIndividualMemberDetails(Member member) {
@@ -81,7 +81,7 @@ public class SpLikeServiceTest {
     }
 
     private Company saveCompany() {
-        Member member = memberRepository.save(Member.fromCompany("email"));
+        Member member = memberRepository.save(Member.createCompanyMember("email"));
         return companyRepository.save(new Company(member, "encodedPassword"));
     }
 

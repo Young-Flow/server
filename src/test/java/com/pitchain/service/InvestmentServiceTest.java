@@ -119,7 +119,7 @@ class InvestmentServiceTest {
     }
 
     private Member saveIndividual() {
-        return memberRepository.save(Member.fromIndividual("email", "name"));
+        return memberRepository.save(Member.createIndividualMember("email", "name"));
     }
 
     private MemberDetails createIndividualMemberDetails(Member member) {
@@ -127,7 +127,7 @@ class InvestmentServiceTest {
     }
 
     private Company saveCompany() {
-        Member member = memberRepository.save(Member.fromCompany("email"));
+        Member member = memberRepository.save(Member.createCompanyMember("email"));
         return companyRepository.save(new Company(member, "encodedPassword"));
     }
 

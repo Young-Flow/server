@@ -6,7 +6,6 @@ import com.pitchain.common.constant.OauthProvider;
 import com.pitchain.common.constant.S3UploadTarget;
 import com.pitchain.dto.req.UpdateCompanyReq;
 import com.pitchain.dto.req.UpdateIndividualReq;
-import com.pitchain.dto.res.CompanyProfileRes;
 import com.pitchain.dto.res.IndividualProfileRes;
 import com.pitchain.entity.Company;
 import com.pitchain.entity.Individual;
@@ -49,7 +48,7 @@ class MemberServiceTest {
         //given
         Individual individual = saveIndividual();
         Member member = individual.getMember();
-        MemberDetails individualMemberDetails = createIndividualMemberDetails(member);
+        MemberDetails individualMemberDetails = createIndividualMemberMemberDetails(member);
 
         //when
         IndividualProfileRes individualDetailRes = (IndividualProfileRes) memberService.getMyProfile(individualMemberDetails);
@@ -119,7 +118,7 @@ class MemberServiceTest {
         //given
         Individual individual = saveIndividual();
         Member member = individual.getMember();
-        MemberDetails individualMemberDetails = createIndividualMemberDetails(member);
+        MemberDetails individualMemberDetails = createIndividualMemberMemberDetails(member);
 
         UpdateIndividualReq updateMemberReq = new UpdateIndividualReq("newEmail", "newName", Country.USA, MemberRole.INDIVIDUAL);
 
@@ -154,17 +153,17 @@ class MemberServiceTest {
     }
 
     private Individual saveIndividual() {
-        Member member = memberRepository.save(Member.fromIndividual("email", "name"));
+        Member member = memberRepository.save(Member.createIndividualMember("email", "name"));
         Individual individual = Individual.of(member, "socailId", OauthProvider.KAKAO);
         return individualRepository.save(individual);
     }
 
-    private MemberDetails createIndividualMemberDetails(Member member) {
+    private MemberDetails createIndividualMemberMemberDetails(Member member) {
         return new MemberDetails(member.getId(), MemberRole.INDIVIDUAL);
     }
 
     private Company saveCompany() {
-        Member member = memberRepository.save(Member.fromCompany("email"));
+        Member member = memberRepository.save(Member.createCompanyMember("email"));
         return companyRepository.save(new Company(member, "encodedPassword"));
     }
 

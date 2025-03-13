@@ -36,7 +36,7 @@ public class CompanyService {
         verifyEmailConflict(optionalCompany);
         confirmPassword(req.password(), req.passwordConfirmation());
 
-        Member member = Member.fromCompany(req.email());
+        Member member = Member.createCompanyMember(req.email());
         memberRepository.save(member);
 
         String encodedPassword = passwordEncoder.encode(req.password());

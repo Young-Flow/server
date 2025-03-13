@@ -44,7 +44,7 @@ class SpServiceTest {
     private CompanyRepository companyRepository;
 
     private Member saveIndividual() {
-        return memberRepository.save(Member.fromIndividual("email", "name"));
+        return memberRepository.save(Member.createIndividualMember("email", "name"));
     }
 
     private MemberDetails createIndividualMemberDetails(Member member) {
@@ -52,7 +52,7 @@ class SpServiceTest {
     }
 
     private Company saveCompany() {
-        Member member = memberRepository.save(Member.fromCompany("email"));
+        Member member = memberRepository.save(Member.createCompanyMember("email"));
         return companyRepository.save(new Company(member, "encodedPassword"));
     }
 
