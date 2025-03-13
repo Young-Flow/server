@@ -67,6 +67,15 @@ public class TokenUtil {
         return refreshToken;
     }
 
+    public String issueRefreshTokenWithoutExpiration(Long userId, MemberRole memberRole) {
+        String refreshToken = JWT.create()
+                .withSubject(REFRESH_TOKEN_SUBJECT)
+                .withClaim("id", userId)
+                .withClaim("role", memberRole.name())
+                .sign(Algorithm.HMAC512(secretKey));
+        return refreshToken;
+    }
+
     public String reissueAccessToken(String refreshToken) {
         DecodedJWT decodedJWT;
         try {
@@ -104,4 +113,14 @@ public class TokenUtil {
         }
     }
 
+    public MemberClaim getClaim(String refreshToken) {
+        try {
+            DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC512(secretKey)).build().verify(refreshToken);
+            Long id = decodedJWT.getClaim("id").asLong();
+            MemberRole memberRole = MemberRole.valueOf(decodedJWT.getClaim("role").asString());
+            return new MemberClaim(id, memberRole);
+        } catch (JWTVerificationException e) {
+            throw new GeneralHandler(ErrorStatus._UNAUTHORIZED);
+        }
+    }
 }
