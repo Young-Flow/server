@@ -5,6 +5,7 @@ import com.pitchain.common.apiPayload.dto.CustomApiResponse;
 import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.dto.req.BaseUpdateMemberReq;
 import com.pitchain.dto.res.BaseMemberProfileRes;
+import com.pitchain.dto.res.LoginRes;
 import com.pitchain.jwt.MemberDetails;
 import com.pitchain.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,10 +51,10 @@ public class MemberController {
         return CustomApiResponse.onSuccess(isDuplicated);
     }
 
-    @Operation(summary = "Access Token 재발급")
-    @PostMapping
-    public CustomApiResponse<String> reissueAccessToken(@RequestParam String refreshToken) {
-        String accessToken = memberService.reissueAccessToken(refreshToken);
-        return CustomApiResponse.onSuccess(accessToken);
+    @Operation(summary = "Access/Refresh Token 재발급")
+    @GetMapping("/tokens")
+    public CustomApiResponse<LoginRes> reissueToken(@RequestParam String refreshToken) {
+        LoginRes loginRes = memberService.reissueToken(refreshToken);
+        return CustomApiResponse.onSuccess(loginRes);
     }
 }
