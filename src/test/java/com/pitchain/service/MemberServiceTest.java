@@ -6,6 +6,7 @@ import com.pitchain.common.constant.OauthProvider;
 import com.pitchain.common.constant.S3UploadTarget;
 import com.pitchain.dto.req.UpdateCompanyReq;
 import com.pitchain.dto.req.UpdateIndividualReq;
+import com.pitchain.dto.res.CompanyProfileRes;
 import com.pitchain.dto.res.IndividualProfileRes;
 import com.pitchain.entity.Company;
 import com.pitchain.entity.Individual;
@@ -64,6 +65,7 @@ class MemberServiceTest {
         assertThat(individualDetailRes.getName()).isEqualTo(findMember.getName());
         assertThat(individualDetailRes.getEmail()).isEqualTo(findMember.getEmail());
         assertThat(individualDetailRes.getOauthProvider()).isEqualTo(findIndividual.getOauthProvider());
+        assertThat(individualDetailRes.getMemberRole()).isEqualTo(findMember.getRole());
     }
 
     @Test
