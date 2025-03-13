@@ -53,7 +53,7 @@ public class SpService {
                     Sp sp = spWithLikeDto.getSp();
                     Bm bm = sp.getBm();
 
-                    long likeCnt = spLikeRepository.countBySp(sp);
+                    Long likeCnt = spLikeRepository.countBySp(sp);
                     List<String> subCategories = bm.getKoreanSubCategories();
                     String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
                     String spURL = s3Service.getFileURL(sp.getSpKey());
@@ -80,7 +80,7 @@ public class SpService {
                     Sp sp = spWithLikeDto.getSp();
                     Bm bm = sp.getBm();
 
-                    long likeCnt = spLikeRepository.countBySp(sp);
+                    Long likeCnt = spLikeRepository.countBySp(sp);
                     List<String> subCategories = bm.getKoreanSubCategories();
                     String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
                     String spURL = s3Service.getFileURL(sp.getSpKey());
@@ -99,7 +99,7 @@ public class SpService {
         Sp sp = spWithLikeDto.getSp();
         Bm bm = sp.getBm();
 
-        long likeCnt = spLikeRepository.countBySp(sp);
+        Long likeCnt = spLikeRepository.countBySp(sp);
         List<String> subCategories = bm.getKoreanSubCategories();
         String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
         String spURL = s3Service.getFileURL(sp.getSpKey());

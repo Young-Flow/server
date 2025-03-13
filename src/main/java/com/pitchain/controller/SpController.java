@@ -7,6 +7,8 @@ import com.pitchain.dto.res.SpDetailRes;
 import com.pitchain.jwt.MemberDetails;
 import com.pitchain.service.SpService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,9 +26,9 @@ public class SpController {
     @Operation(summary = "SP 생성")
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public CustomApiResponse createSp(@AuthenticationPrincipal MemberDetails memberDetails,
-                                      @RequestPart CreateSpReq createSpReq,
-                                      @RequestPart(required = false) MultipartFile spVideo,
-                                      @RequestPart(required = false) MultipartFile thumbnailImg) {
+                                      @Valid @RequestPart CreateSpReq createSpReq,
+                                      @RequestPart MultipartFile spVideo,
+                                      @RequestPart MultipartFile thumbnailImg) {
         spService.createSp(memberDetails, createSpReq, spVideo, thumbnailImg);
         return CustomApiResponse.onSuccess();
     }
@@ -41,7 +43,7 @@ public class SpController {
     @Operation(summary = "카테고리별 SP 리스트 조회", description = "첫 조회 시 쿼리 파라미터에 lastSpId를 포함시키지 않습니다.")
     @GetMapping("/category")
     public CustomApiResponse<InfinityScrollRes<SpDetailRes>> getSpDetailsFilteredCategory(@AuthenticationPrincipal MemberDetails memberDetails,
-                                                                                          @RequestParam String mainCategoryInKorean,
+                                                                                          @RequestParam(required = false) String mainCategoryInKorean,
                                                                                           @RequestParam(required = false) Long lastSpId,
                                                                                           @RequestParam(defaultValue = "10") int size) {
         InfinityScrollRes<SpDetailRes> spDetailResList = spService.getSpDetailsFilteredCategory(memberDetails, mainCategoryInKorean, lastSpId, size);
@@ -50,8 +52,7 @@ public class SpController {
 
     @Operation(summary = "SP 상세 조회")
     @GetMapping("/{spId}")
-    public CustomApiResponse<SpDetailRes> getSpDetail(@AuthenticationPrincipal MemberDetails memberDetails,
-                                                      @PathVariable Long spId) {
+    public CustomApiResponse<SpDetailRes> getSpDetail(@AuthenticationPrincipal MemberDetails memberDetails, @PathVariable Long spId) {
         SpDetailRes spDetailRes = spService.getSpDetail(memberDetails, spId);
         return CustomApiResponse.onSuccess(spDetailRes);
     }
@@ -60,7 +61,7 @@ public class SpController {
     @PutMapping(value = "/{spId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public CustomApiResponse updateSp(@AuthenticationPrincipal MemberDetails memberDetails,
                                       @PathVariable Long spId,
-                                      @RequestPart String name,
+                                      @NotBlank @RequestPart String name,
                                       @RequestPart(required = false) MultipartFile spVideo,
                                       @RequestPart(required = false) MultipartFile thumbnailImg) {
         spService.updateSp(memberDetails, spId, name, spVideo, thumbnailImg);
@@ -69,8 +70,7 @@ public class SpController {
 
     @Operation(summary = "SP 삭제")
     @DeleteMapping("/{spId}")
-    public CustomApiResponse deleteSp(@AuthenticationPrincipal MemberDetails memberDetails,
-                                      @PathVariable Long spId) {
+    public CustomApiResponse deleteSp(@AuthenticationPrincipal MemberDetails memberDetails, @PathVariable Long spId) {
         spService.deleteSp(memberDetails, spId);
         return CustomApiResponse.onSuccess();
     }

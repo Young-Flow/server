@@ -1,19 +1,22 @@
 package com.pitchain.common.entity;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 
 import java.util.List;
 
+@Getter
 @ToString
 @AllArgsConstructor
 public class InfinityScrollRes<T> {
-    @Getter
+    @NotNull
     private List<T> content;
-    @Getter
+    @NotNull
     private Long lastElementId;
-    private boolean hasNext;
+    @NotNull
+    private Boolean hasNext;
 
     public static <T> InfinityScrollRes<T> createRes(List<T> data, Long lastElementId, boolean hasNext) {
         return new InfinityScrollRes<>(data, lastElementId, hasNext);

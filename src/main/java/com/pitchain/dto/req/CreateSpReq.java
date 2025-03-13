@@ -1,10 +1,11 @@
 package com.pitchain.dto.req;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 
-@Schema(requiredMode = Schema.RequiredMode.REQUIRED)
 public record CreateSpReq(
+        @NotNull(message = "BM ID는 필수입니다.")
         Long bmId,
+        @NotNull(message = "이름은 필수입니다.")
         String name
 ) {
 }

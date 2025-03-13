@@ -6,28 +6,42 @@ import com.pitchain.entity.Company;
 import com.pitchain.entity.Member;
 import com.pitchain.entity.Sp;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 import java.util.List;
 
 @Builder
-@Schema(requiredMode = Schema.RequiredMode.REQUIRED)
 public record SpDetailRes(
+        @NotNull
         Long bmId,
+        @NotBlank
         String bmName,
+        @NotBlank
         String companyProfileImgURL,
+        @NotBlank
         String companyName,
+        @NotBlank
         String companyAddress,
+        @NotBlank
         String spURL,
+        @NotBlank
         String thumbnailImgURL,
-        int views,
+        @NotNull
+        Integer views,
+        @NotBlank
         String name,
+        @NotBlank
         String mainCategory,
+        @NotNull
         List<String> subCategories,
-        boolean isLiked,
-        long likeCnt
+        @NotNull
+        Boolean isLiked,
+        @NotNull
+        Long likeCnt
 ) {
-    public static SpDetailRes createRes(SpWithLikeDto spWithLikeDto, long likeCnt, List<String> subCategories, String spURL, String thumbnailImgURL) {
+    public static SpDetailRes createRes(SpWithLikeDto spWithLikeDto, Long likeCnt, List<String> subCategories, String spURL, String thumbnailImgURL) {
         Sp sp = spWithLikeDto.getSp();
         Bm bm = sp.getBm();
         Company company = bm.getCompany();
