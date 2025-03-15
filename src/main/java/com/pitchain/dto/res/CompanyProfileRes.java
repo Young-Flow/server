@@ -1,5 +1,6 @@
 package com.pitchain.dto.res;
 
+import com.pitchain.common.constant.MemberRole;
 import com.pitchain.entity.Company;
 import com.pitchain.entity.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -12,20 +13,13 @@ public class CompanyProfileRes extends BaseMemberProfileRes {
     private final String address;
     private final boolean isVerified;
 
-    @Builder
-    public CompanyProfileRes(String profileImgURL, String name, String email, String address, boolean isVerified) {
-        super(profileImgURL, name, email);
+    public CompanyProfileRes(String profileImgURL, String name, String email, MemberRole memberRole, String address, boolean isVerified) {
+        super(profileImgURL, name, email, memberRole);
         this.address = address;
         this.isVerified = isVerified;
     }
 
     public static CompanyProfileRes createRes(Member member, Company company, String profileImgURL) {
-        return CompanyProfileRes.builder()
-                .email(member.getEmail())
-                .profileImgURL(profileImgURL)
-                .name(member.getName())
-                .address(company.getAddress())
-                .isVerified(company.getIsVerified())
-                .build();
+        return new CompanyProfileRes(profileImgURL, member.getName(), member.getEmail(), member.getRole(), company.getAddress(), company.IsVerified());
     }
 }

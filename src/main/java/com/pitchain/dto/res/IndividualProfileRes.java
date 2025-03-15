@@ -1,5 +1,6 @@
 package com.pitchain.dto.res;
 
+import com.pitchain.common.constant.MemberRole;
 import com.pitchain.common.constant.OauthProvider;
 import com.pitchain.entity.Individual;
 import com.pitchain.entity.Member;
@@ -12,18 +13,12 @@ import lombok.Getter;
 public class IndividualProfileRes extends BaseMemberProfileRes {
     private OauthProvider oauthProvider;
 
-    @Builder
-    public IndividualProfileRes(String profileImgURL, String name, String email, OauthProvider oauthProvider) {
-        super(profileImgURL, name, email);
+    public IndividualProfileRes(String profileImgURL, String name, String email, MemberRole memberRole, OauthProvider oauthProvider) {
+        super(profileImgURL, name, email, memberRole);
         this.oauthProvider = oauthProvider;
     }
 
     public static IndividualProfileRes createRes(Member member, Individual individual, String profileImgURL) {
-        return IndividualProfileRes.builder()
-                .profileImgURL(profileImgURL)
-                .name(member.getName())
-                .email(member.getEmail())
-                .oauthProvider(individual.getOauthProvider())
-                .build();
+        return new IndividualProfileRes(profileImgURL, member.getName(), member.getEmail(), member.getRole(), individual.getOauthProvider());
     }
 }

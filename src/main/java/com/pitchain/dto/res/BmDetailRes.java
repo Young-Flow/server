@@ -6,31 +6,49 @@ import com.pitchain.entity.Company;
 import com.pitchain.entity.Member;
 import com.pitchain.entity.Sp;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
-@Schema(requiredMode = Schema.RequiredMode.REQUIRED)
 public record BmDetailRes(
+        @NotNull
         Long companyId,
+        @NotEmpty
         String companyProfileImgKey,
+        @NotEmpty
         String companyName,
+        @NotEmpty
         String companyAddress,
 
+        @NotNull
         Long bmId,
+        @NotEmpty
         String bmName,
+        @NotEmpty
         String intro,
+        @NotEmpty
         String mainCategory,
+        @NotEmpty
         List<String> subCategories,
+        @NotEmpty
         String description,
+        @NotEmpty
         String descImgURL,
+        @NotEmpty
         String bmAddress,
+        @Past @NotNull
         LocalDateTime createdAt,
+        @NotEmpty
         String longPitchURL,
-        boolean isScraped,
-        long scrapCnt,
+        @NotNull
+        Boolean isScraped,
+        @NotNull
+        Long scrapCnt,
         List<String> spURLs,
 
         List<PtImgRes> ptImgResList

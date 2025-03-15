@@ -54,7 +54,7 @@ public class Member {
     @Builder.Default
     private List<Investment> investments = new ArrayList<>();
 
-    public static Member fromIndividual(String email, String name) {
+    public static Member createIndividualMember(String email, String name) {
         return Member.builder()
                 .role(MemberRole.INDIVIDUAL)
                 .email(email)
@@ -62,7 +62,7 @@ public class Member {
                 .build();
     }
 
-    public static Member fromCompany(String email) {
+    public static Member createCompanyMember(String email) {
         return Member.builder()
                 .role(MemberRole.COMPANY)
                 .email(email)

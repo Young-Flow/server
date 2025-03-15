@@ -48,7 +48,7 @@ class MemberServiceTest {
         //given
         Individual individual = saveIndividual();
         Member member = individual.getMember();
-        MemberDetails individualMemberDetails = createIndividualMemberDetails(member);
+        MemberDetails individualMemberDetails = createIndividualMemberMemberDetails(member);
 
         //when
         IndividualProfileRes individualDetailRes = (IndividualProfileRes) memberService.getMyProfile(individualMemberDetails);
@@ -64,6 +64,7 @@ class MemberServiceTest {
         assertThat(individualDetailRes.getName()).isEqualTo(findMember.getName());
         assertThat(individualDetailRes.getEmail()).isEqualTo(findMember.getEmail());
         assertThat(individualDetailRes.getOauthProvider()).isEqualTo(findIndividual.getOauthProvider());
+        assertThat(individualDetailRes.getMemberRole()).isEqualTo(findMember.getRole());
     }
 
     @Test
@@ -117,7 +118,7 @@ class MemberServiceTest {
         //given
         Individual individual = saveIndividual();
         Member member = individual.getMember();
-        MemberDetails individualMemberDetails = createIndividualMemberDetails(member);
+        MemberDetails individualMemberDetails = createIndividualMemberMemberDetails(member);
 
         UpdateIndividualReq updateMemberReq = new UpdateIndividualReq("newEmail", "newName", Country.USA, MemberRole.INDIVIDUAL);
 
@@ -152,17 +153,17 @@ class MemberServiceTest {
     }
 
     private Individual saveIndividual() {
-        Member member = memberRepository.save(Member.fromIndividual("email", "name"));
+        Member member = memberRepository.save(Member.createIndividualMember("email", "name"));
         Individual individual = Individual.of(member, "socailId", OauthProvider.KAKAO);
         return individualRepository.save(individual);
     }
 
-    private MemberDetails createIndividualMemberDetails(Member member) {
+    private MemberDetails createIndividualMemberMemberDetails(Member member) {
         return new MemberDetails(member.getId(), MemberRole.INDIVIDUAL);
     }
 
     private Company saveCompany() {
-        Member member = memberRepository.save(Member.fromCompany("email"));
+        Member member = memberRepository.save(Member.createCompanyMember("email"));
         return companyRepository.save(new Company(member, "encodedPassword"));
     }
 

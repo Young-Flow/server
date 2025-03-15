@@ -64,7 +64,7 @@ class BmPrefServiceTest {
     }
 
     private Member saveIndividual() {
-        return memberRepository.save(Member.fromIndividual("email", "name"));
+        return memberRepository.save(Member.createIndividualMember("email", "name"));
     }
 
     private MemberDetails createIndividualMemberDetails(Member member) {

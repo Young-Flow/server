@@ -61,7 +61,7 @@ class BmServiceTest {
             "description", "description.png", "image/png", "test data 2".getBytes());
 
     private Member saveIndividual() {
-        return memberRepository.save(Member.fromIndividual("email", "name"));
+        return memberRepository.save(Member.createIndividualMember("email", "name"));
     }
 
     private MemberDetails createIndividualMemberDetails(Member member) {
@@ -69,7 +69,7 @@ class BmServiceTest {
     }
 
     private Company saveCompany() {
-        Member member = memberRepository.save(Member.fromCompany("email"));
+        Member member = memberRepository.save(Member.createCompanyMember("email"));
         return companyRepository.save(new Company(member, "encodedPassword"));
     }
 

@@ -9,7 +9,6 @@ import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.constant.MemberRole;
 import com.pitchain.common.constant.TokenType;
 import com.pitchain.common.exception.GeneralHandler;
-import com.pitchain.redis.RedisTokenUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
 import java.util.Date;
 import java.util.Optional;
 
@@ -40,8 +38,6 @@ public class TokenUtil {
     private static final String ACCESS_TOKEN_SUBJECT = "AccessToken";
     private static final String REFRESH_TOKEN_SUBJECT = "RefreshToken";
     private static final String BEARER = "Bearer ";
-
-    private final RedisTokenUtil redisTokenUtil;
 
     public String issueAccessToken(Long userId, MemberRole memberRole) {
         return JWT.create()
@@ -68,12 +64,16 @@ public class TokenUtil {
                 .withClaim("role", memberRole.name())
                 .withExpiresAt(new Date(System.currentTimeMillis() + accessTokenExpirationPeriod))
                 .sign(Algorithm.HMAC512(secretKey));
-        saveRefreshToken(userId, refreshToken);
         return refreshToken;
     }
 
-    private void saveRefreshToken(Long userId, String refreshToken) {
-        redisTokenUtil.setRefreshTokenWithExpire(refreshToken, userId, Duration.ofDays(refreshTokenExpirationPeriod));
+    public String issueRefreshTokenWithoutExpiration(Long userId, MemberRole memberRole) {
+        String refreshToken = JWT.create()
+                .withSubject(REFRESH_TOKEN_SUBJECT)
+                .withClaim("id", userId)
+                .withClaim("role", memberRole.name())
+                .sign(Algorithm.HMAC512(secretKey));
+        return refreshToken;
     }
 
     public String reissueAccessToken(String refreshToken) {
@@ -113,4 +113,14 @@ public class TokenUtil {
         }
     }
 
+    public MemberClaims getClaim(String refreshToken) {
+        try {
+            DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC512(secretKey)).build().verify(refreshToken);
+            Long id = decodedJWT.getClaim("id").asLong();
+            MemberRole memberRole = MemberRole.valueOf(decodedJWT.getClaim("role").asString());
+            return new MemberClaims(id, memberRole);
+        } catch (JWTVerificationException e) {
+            throw new GeneralHandler(ErrorStatus._UNAUTHORIZED);
+        }
+    }
 }

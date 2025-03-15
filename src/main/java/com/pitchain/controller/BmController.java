@@ -7,6 +7,7 @@ import com.pitchain.dto.res.BmDetailRes;
 import com.pitchain.jwt.MemberDetails;
 import com.pitchain.service.BmService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,7 +25,7 @@ public class BmController {
     @Operation(summary = "BM 생성")
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public CustomApiResponse createBm(@AuthenticationPrincipal MemberDetails memberDetails,
-                                      @RequestPart CreateBmReq createBmReq,
+                                      @Valid @RequestPart CreateBmReq createBmReq,
                                       @RequestPart(required = false) MultipartFile descImg) { // todo 텍스트 에디터 도입 시 수정 필요
         bmService.createBm(memberDetails, createBmReq, descImg);
         return CustomApiResponse.onSuccess();
@@ -32,8 +33,7 @@ public class BmController {
 
     @Operation(summary = "BM 상세 조회")
     @GetMapping("{bmId}")
-    public CustomApiResponse<BmDetailRes> getBmDetail(@AuthenticationPrincipal MemberDetails memberDetails,
-                                                      @PathVariable("bmId") Long bmId) {
+    public CustomApiResponse<BmDetailRes> getBmDetail(@AuthenticationPrincipal MemberDetails memberDetails, @PathVariable("bmId") Long bmId) {
         BmDetailRes bmDetailRes = bmService.getBmDetail(memberDetails, bmId);
         return CustomApiResponse.onSuccess(bmDetailRes);
     }
@@ -42,7 +42,7 @@ public class BmController {
     @PutMapping(value = "{bmId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public CustomApiResponse<BmDetailRes> updateBm(@AuthenticationPrincipal MemberDetails memberDetails,
                                                    @PathVariable("bmId") Long bmId,
-                                                   @RequestPart UpdateBmReq updateBmReq,
+                                                   @Valid @RequestPart UpdateBmReq updateBmReq,
                                                    @RequestPart(required = false) MultipartFile descImg) {
         bmService.updateBm(memberDetails, bmId, updateBmReq, descImg);
         return CustomApiResponse.onSuccess();
@@ -59,8 +59,7 @@ public class BmController {
 
     @Operation(summary = "BM 삭제")
     @DeleteMapping("{bmId}")
-    public CustomApiResponse deleteBm(@AuthenticationPrincipal MemberDetails memberDetails,
-                                      @PathVariable("bmId") Long bmId) {
+    public CustomApiResponse deleteBm(@AuthenticationPrincipal MemberDetails memberDetails, @PathVariable("bmId") Long bmId) {
         bmService.deleteBm(memberDetails, bmId);
         return CustomApiResponse.onSuccess();
     }
