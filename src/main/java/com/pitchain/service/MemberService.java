@@ -7,7 +7,7 @@ import com.pitchain.dto.req.BaseUpdateMemberReq;
 import com.pitchain.dto.res.BaseMemberProfileRes;
 import com.pitchain.dto.res.LoginRes;
 import com.pitchain.entity.Member;
-import com.pitchain.jwt.MemberClaim;
+import com.pitchain.jwt.MemberClaims;
 import com.pitchain.jwt.MemberDetails;
 import com.pitchain.jwt.TokenUtil;
 import com.pitchain.repository.MemberRepository;
@@ -59,10 +59,10 @@ public class MemberService {
     }
 
     public LoginRes reissueToken(String refreshToken) {
-        MemberClaim memberClaim = tokenUtil.getClaim(refreshToken);
+        MemberClaims memberClaims = tokenUtil.getClaim(refreshToken);
 
-        String newAccessToken = tokenUtil.issueAccessToken(memberClaim.getId(), memberClaim.getMemberRole());
-        String newRefreshToken = tokenUtil.issueRefreshToken(memberClaim.getId(), memberClaim.getMemberRole());
+        String newAccessToken = tokenUtil.issueAccessToken(memberClaims.getId(), memberClaims.getMemberRole());
+        String newRefreshToken = tokenUtil.issueRefreshToken(memberClaims.getId(), memberClaims.getMemberRole());
 
         return new LoginRes(newAccessToken, newRefreshToken);
     }

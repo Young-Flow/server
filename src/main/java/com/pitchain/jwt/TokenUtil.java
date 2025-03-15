@@ -113,12 +113,12 @@ public class TokenUtil {
         }
     }
 
-    public MemberClaim getClaim(String refreshToken) {
+    public MemberClaims getClaim(String refreshToken) {
         try {
             DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC512(secretKey)).build().verify(refreshToken);
             Long id = decodedJWT.getClaim("id").asLong();
             MemberRole memberRole = MemberRole.valueOf(decodedJWT.getClaim("role").asString());
-            return new MemberClaim(id, memberRole);
+            return new MemberClaims(id, memberRole);
         } catch (JWTVerificationException e) {
             throw new GeneralHandler(ErrorStatus._UNAUTHORIZED);
         }

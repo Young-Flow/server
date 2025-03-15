@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class MemberClaim {
+public class MemberClaims {
     private Long id;
     private MemberRole memberRole;
 }
