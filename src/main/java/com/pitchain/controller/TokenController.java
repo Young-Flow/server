@@ -16,13 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class TokenController {
     private final TokenUtil tokenUtil;
 
-    @Operation(summary = "Access Token 발급 / 개발용")
+    @Operation(summary = "Access Token 발급 / 개발용 / 3시간 이후 만료")
     @GetMapping("/dev/access-token")
     public CustomApiResponse<String> issueAccessTokenWithoutExpiration(@RequestParam Long id, @RequestParam MemberRole memberRole) {
         return CustomApiResponse.onSuccess(tokenUtil.issueAccessTokenWithoutExpiration(id, memberRole));
     }
 
-    @Operation(summary = "Refresh Token 발급 / 개발용")
+    @Operation(summary = "Refresh Token 발급 / 개발용 / 3시간 이후 만료")
     @GetMapping("/dev/refresh-token")
     public CustomApiResponse<String> token(@RequestParam Long id, @RequestParam MemberRole memberRole) {
         return CustomApiResponse.onSuccess(tokenUtil.issueRefreshTokenWithoutExpiration(id, memberRole));

@@ -2,13 +2,12 @@ package com.pitchain.dto.res;
 
 import com.pitchain.dto.InvestmentStatusDto;
 import com.pitchain.entity.Bm;
-import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 import java.time.LocalDate;
 
 @Builder
-@Schema(requiredMode = Schema.RequiredMode.REQUIRED)
 public record InvestmentStatusRes(
         long raisedAmount,
         int achievementRate,
@@ -16,10 +15,14 @@ public record InvestmentStatusRes(
         long minimumAmount,
         long maximumAmount,
 
+        @NotNull
         Long valuationCap,
         double pricePerShare,
+        @NotNull
         Integer maxIssuedShare,
+        @NotNull
         Long goalInvestment,
+        @NotNull
         LocalDate deadline
 ) {
     public static InvestmentStatusRes createRes(Bm bm, InvestmentStatusDto investmentStatusDto, int achievementRate) {

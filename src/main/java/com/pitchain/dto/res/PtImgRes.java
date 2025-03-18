@@ -1,13 +1,15 @@
 package com.pitchain.dto.res;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import com.pitchain.common.apiPayload.annotation.S3Url;
+import jakarta.validation.constraints.NotEmpty;
 
-@Schema(requiredMode = Schema.RequiredMode.REQUIRED)
 public record PtImgRes(
         int serialNum,
+        @NotEmpty
+        @S3Url
         String imgURL
 ) {
-    public static PtImgRes createRes(int serialNum, String imgURL) {
-        return new PtImgRes(serialNum, imgURL);
+    public static PtImgRes createRes(int serialNum, String imgKey) {
+        return new PtImgRes(serialNum, imgKey);
     }
 }

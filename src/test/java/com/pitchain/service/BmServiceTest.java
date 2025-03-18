@@ -140,13 +140,10 @@ class BmServiceTest {
 
         List<PtImg> ptImgs = createPtImgs(bm);
         bm.updatePtImgs(ptImgs);
-        for (PtImg ptImg : ptImgs) {
-            when(s3Service.getFileURL(ptImg.getImgKey())).thenReturn("cdn" + ptImg.getImgKey());
-        }
 
         List<PtImgRes> ptImgResList = ptImgs.stream()
                 .map(ptImg -> PtImgRes.createRes(ptImg.getSerialNum(),
-                        s3Service.getFileURL(ptImg.getImgKey())))
+                        ptImg.getImgKey()))
                 .toList();
 
         //when
@@ -155,8 +152,7 @@ class BmServiceTest {
 
         //then
         assertThat(bmDetail.companyId()).isEqualTo(company.getId());
-        System.out.println("bmDetail.companyProfileImgKey() = " + bmDetail.companyProfileImgKey());
-        assertThat(bmDetail.companyProfileImgKey()).isEqualTo(s3Service.getFileURL(company.getMember().getProfileImgKey()));
+        assertThat(bmDetail.companyProfileImgURL()).isEqualTo(company.getMember().getProfileImgKey());
         assertThat(bmDetail.companyName()).isEqualTo(company.getMember().getName());
         assertThat(bmDetail.companyAddress()).isEqualTo(company.getAddress());
 
@@ -165,7 +161,7 @@ class BmServiceTest {
         assertThat(bmDetail.intro()).isEqualTo(bm.getIntro());
         assertThat(bmDetail.mainCategory()).isEqualTo(bm.getMainCategory().getKoreanName());
         assertThat(bmDetail.description()).isEqualTo(bm.getDescription());
-        assertThat(bmDetail.descImgURL()).isEqualTo(s3Service.getFileURL(bm.getDescImgKey()));
+        assertThat(bmDetail.descImgURL()).isEqualTo(bm.getDescImgKey());
         assertThat(bmDetail.bmAddress()).isEqualTo(bm.getAddress());
         assertThat(bmDetail.createdAt()).isEqualTo(bm.getCreatedAt());
         assertThat(bmDetail.longPitchURL()).isEqualTo(bm.getLongPitchURL());
@@ -197,16 +193,16 @@ class BmServiceTest {
         bm.updatePtImgs(ptImgs);
         List<PtImgRes> ptImgResList = ptImgs.stream()
                 .map(ptImg -> PtImgRes.createRes(ptImg.getSerialNum(),
-                        s3Service.getFileURL(ptImg.getImgKey())))
+                        ptImg.getImgKey()))
                 .toList();
 
         //when
-        MemberDetails memberDetails = createCompanyMemberDetails(company);
-        BmDetailRes bmDetail = bmService.getBmDetail(memberDetails, bm.getId());
+        MemberDetails individualMemberDetails = createIndividualMemberDetails(member_01);
+        BmDetailRes bmDetail = bmService.getBmDetail(individualMemberDetails, bm.getId());
 
         //then
         assertThat(bmDetail.companyId()).isEqualTo(company.getId());
-        assertThat(bmDetail.companyProfileImgKey()).isEqualTo(s3Service.getFileURL(company.getMember().getProfileImgKey()));
+        assertThat(bmDetail.companyProfileImgURL()).isEqualTo(company.getMember().getProfileImgKey());
         assertThat(bmDetail.companyName()).isEqualTo(company.getMember().getName());
         assertThat(bmDetail.companyAddress()).isEqualTo(company.getAddress());
 
@@ -215,7 +211,7 @@ class BmServiceTest {
         assertThat(bmDetail.intro()).isEqualTo(bm.getIntro());
         assertThat(bmDetail.mainCategory()).isEqualTo(bm.getMainCategory().getKoreanName());
         assertThat(bmDetail.description()).isEqualTo(bm.getDescription());
-        assertThat(bmDetail.descImgURL()).isEqualTo(s3Service.getFileURL(bm.getDescImgKey()));
+        assertThat(bmDetail.descImgURL()).isEqualTo(bm.getDescImgKey());
         assertThat(bmDetail.bmAddress()).isEqualTo(bm.getAddress());
         assertThat(bmDetail.createdAt()).isEqualTo(bm.getCreatedAt());
         assertThat(bmDetail.longPitchURL()).isEqualTo(bm.getLongPitchURL());
@@ -411,7 +407,7 @@ class BmServiceTest {
         GeneralHandler e_3 = assertThrows(GeneralHandler.class, () -> bmService.updatePtImgs(companyMemberDetails_2, bm.getId(), null));
 
         //then
-        assertThat(e_1.getErrorStatus()).isEqualTo(ErrorStatus.COMPANY_NOT_FOUND);
+        assertThat(e_1.getErrorStatus()).isEqualTo(ErrorStatus.MEMBER_FORBIDDEN);
         assertThat(e_2.getErrorStatus()).isEqualTo(ErrorStatus.BM_NOT_FOUND);
         assertThat(e_3.getErrorStatus()).isEqualTo(ErrorStatus.COMPANY_FORBIDDEN);
     }

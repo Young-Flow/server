@@ -24,21 +24,16 @@ public class MemberService {
     private final S3Service s3Service;
     private final TokenUtil tokenUtil;
     private final MemberRepository memberRepository;
-    private final IndividualProfileService individualDetailService;
-    private final CompanyProfileService companyDetailService;
+    private final MemberProfileServiceFactory memberProfileServiceFactory;
 
     public BaseMemberProfileRes getMyProfile(MemberDetails memberDetails) {
-        return switch (memberDetails.memberRole()) {
-            case INDIVIDUAL -> individualDetailService.getMyProfile(memberDetails);
-            case COMPANY -> companyDetailService.getMyProfile(memberDetails);
-        };
+        MemberProfileService memberProfileService = memberProfileServiceFactory.getMemberProfileService(memberDetails);
+        return memberProfileService.getMyProfile(memberDetails);
     }
 
     public void updateMyProfile(MemberDetails memberDetails, BaseUpdateMemberReq req) {
-        switch (memberDetails.memberRole()) {
-            case INDIVIDUAL -> individualDetailService.updateMyProfile(memberDetails, req);
-            case COMPANY -> companyDetailService.updateMyProfile(memberDetails, req);
-        }
+        MemberProfileService memberProfileService = memberProfileServiceFactory.getMemberProfileService(memberDetails);
+        memberProfileService.updateMyProfile(memberDetails, req);
     }
 
     public void updateProfileImg(MemberDetails memberDetails, MultipartFile profileImg) {

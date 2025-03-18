@@ -6,6 +6,7 @@ import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.controller.UpdatePasswordReq;
 import com.pitchain.dto.req.CreateCompanyReq;
 import com.pitchain.dto.req.LoginCompanyReq;
+import com.pitchain.dto.req.VerifyCompanyReq;
 import com.pitchain.dto.res.LoginRes;
 import com.pitchain.entity.Company;
 import com.pitchain.entity.Member;
@@ -146,6 +147,26 @@ public class CompanyServiceTest {
 
         //then
         assertThat(passwordEncoder.matches(updatedPassword, company.getPassword())).isTrue();
+    }
+
+    @Test
+    void 회사_인증_성공() {
+        //given
+        Company company = saveCompany();
+
+        assertThat(company.getIsVerified()).isFalse();
+
+        MemberDetails companyMemberDetails = createCompanyMemberDetails(company);
+        String companyName = "companyName";
+        VerifyCompanyReq req = new VerifyCompanyReq(companyName);
+
+        //when
+        companyService.verifyCompany(companyMemberDetails, req);
+
+        //then
+        Company foundCompany = companyRepository.findByMemberId(company.getMember().getId()).orElseThrow();
+        assertThat(foundCompany.getIsVerified()).isTrue();
+        assertThat(foundCompany.getMember().getName()).isEqualTo(companyName);
     }
 
 }

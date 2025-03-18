@@ -29,7 +29,6 @@ public class SpService {
     private final SpRepositoryCustom spRepositoryCustom;
     private final SpLikeRepository spLikeRepository;
     private final S3Service s3Service;
-    private final CategoryPrefRepository categoryPrefRepository;
 
     public void createSp(MemberDetails memberDetails, CreateSpReq createSpReq, MultipartFile spVid, MultipartFile thumbnailImg) {
         Company company = entityFacade.getCompany(memberDetails);
@@ -55,10 +54,8 @@ public class SpService {
 
                     Long likeCnt = spLikeRepository.countBySp(sp);
                     List<String> subCategories = bm.getKoreanSubCategories();
-                    String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
-                    String spURL = s3Service.getFileURL(sp.getSpKey());
 
-                    return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories, spURL, thumbnailImgURL);
+                    return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories);
                 })
                 .toList();
     }
@@ -82,10 +79,8 @@ public class SpService {
 
                     Long likeCnt = spLikeRepository.countBySp(sp);
                     List<String> subCategories = bm.getKoreanSubCategories();
-                    String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
-                    String spURL = s3Service.getFileURL(sp.getSpKey());
 
-                    return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories, spURL, thumbnailImgURL);
+                    return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories);
                 })
                 .toList();
 
@@ -101,10 +96,8 @@ public class SpService {
 
         Long likeCnt = spLikeRepository.countBySp(sp);
         List<String> subCategories = bm.getKoreanSubCategories();
-        String thumbnailImgURL = s3Service.getFileURL(sp.getThumbnailImgKey());
-        String spURL = s3Service.getFileURL(sp.getSpKey());
 
-        return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories, spURL, thumbnailImgURL);
+        return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories);
     }
 
     public void updateSp(MemberDetails memberDetails, Long spId, String name, MultipartFile spVid, MultipartFile thumbnailImg) {

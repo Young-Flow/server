@@ -1,11 +1,11 @@
 package com.pitchain.dto.res;
 
+import com.pitchain.common.apiPayload.annotation.S3Url;
 import com.pitchain.dto.SpWithLikeDto;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.Company;
 import com.pitchain.entity.Member;
 import com.pitchain.entity.Sp;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -19,6 +19,7 @@ public record SpDetailRes(
         @NotBlank
         String bmName,
         @NotBlank
+        @S3Url
         String companyProfileImgURL,
         @NotBlank
         String companyName,
@@ -27,6 +28,7 @@ public record SpDetailRes(
         @NotBlank
         String spURL,
         @NotBlank
+        @S3Url
         String thumbnailImgURL,
         @NotNull
         Integer views,
@@ -41,7 +43,7 @@ public record SpDetailRes(
         @NotNull
         Long likeCnt
 ) {
-    public static SpDetailRes createRes(SpWithLikeDto spWithLikeDto, Long likeCnt, List<String> subCategories, String spURL, String thumbnailImgURL) {
+    public static SpDetailRes createRes(SpWithLikeDto spWithLikeDto, Long likeCnt, List<String> subCategories) {
         Sp sp = spWithLikeDto.getSp();
         Bm bm = sp.getBm();
         Company company = bm.getCompany();
@@ -49,11 +51,11 @@ public record SpDetailRes(
         return SpDetailRes.builder()
                 .bmId(sp.getBm().getId())
                 .bmName(bm.getName())
-                .companyProfileImgURL(member.getProfileImgKey())
+                .companyProfileImgURL(member.getProfileImgKey())  //추후에 JSON 직렬화 처리됨
                 .companyName(member.getName())
                 .companyAddress(company.getAddress())
-                .spURL(spURL)
-                .thumbnailImgURL(thumbnailImgURL)
+                .spURL(sp.getSpKey())
+                .thumbnailImgURL(sp.getThumbnailImgKey())  //추후에 JSON 직렬화 처리됨
                 .views(sp.getViews())
                 .name(sp.getName())
                 .mainCategory(bm.getMainCategory().getKoreanName())

@@ -20,22 +20,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class CompanyProfileService implements MemberProfileService {
 
     private final CompanyRepository companyRepository;
-    private final S3Service s3Service;
 
     @Override
     public BaseMemberProfileRes getMyProfile(MemberDetails memberDetails) {
         Company company = getCompany(memberDetails);
         Member member = company.getMember();
-        String profileImgURL = s3Service.getFileURL(member.getProfileImgKey());
-        return CompanyProfileRes.createRes(member, company, profileImgURL);
+        return CompanyProfileRes.createRes(member, company);
     }
 
     @Override
     @Transactional
     public void updateMyProfile(MemberDetails memberDetails, BaseUpdateMemberReq req) {
         Company company = getCompany(memberDetails);
-        Member member = company.getMember();
-        member.updateProfile(req.getEmail(), req.getName(), req.getCountry());
         company.updateAddress(((UpdateCompanyReq) req).getAddress());
     }
 

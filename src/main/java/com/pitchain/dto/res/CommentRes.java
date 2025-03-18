@@ -1,8 +1,11 @@
 package com.pitchain.dto.res;
 
+import com.pitchain.common.apiPayload.annotation.S3Url;
 import com.pitchain.entity.Comment;
 import com.pitchain.entity.Member;
-import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -10,13 +13,19 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-@Schema(requiredMode = Schema.RequiredMode.REQUIRED)
 public class CommentRes extends BaseCommentRes {
+    @NotNull
     private final Long writerId;
+    @NotEmpty
     private final String writerName;
+    @NotEmpty
+    @S3Url
     private final String writerProfileImgURL;
+    @NotEmpty
     private final String content;
+    @Past @NotNull
     private final LocalDateTime createdAt;
+    @Past @NotNull
     private final LocalDateTime updatedAt;
 
     @Builder
@@ -34,7 +43,7 @@ public class CommentRes extends BaseCommentRes {
         this.updatedAt = updatedAt;
     }
 
-    public static CommentRes createRes(Comment comment, List<ReplyCommentRes> replyComments, String writerProfileImgURL) {
+    public static CommentRes createRes(Comment comment, List<ReplyCommentRes> replyComments) {
         Member member = comment.getMember();
         return CommentRes.builder()
                 .commentId(comment.getId())
@@ -42,7 +51,7 @@ public class CommentRes extends BaseCommentRes {
                 .replyComments(replyComments)
                 .writerId(member.getId())
                 .writerName(member.getName())
-                .writerProfileImgURL(writerProfileImgURL)
+                .writerProfileImgURL(member.getProfileImgKey())  //추후에 JSON 직렬화 처리됨
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt())
                 .updatedAt(comment.getUpdatedAt())

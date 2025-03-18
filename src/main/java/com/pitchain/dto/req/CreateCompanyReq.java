@@ -2,12 +2,14 @@ package com.pitchain.dto.req;
 
 import com.pitchain.entity.Company;
 import com.pitchain.entity.Member;
-import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 
-@Schema(requiredMode = Schema.RequiredMode.REQUIRED)
 public record CreateCompanyReq(
+        @NotBlank(message = "이메일은 필수입니다.")
         String email,
+        @NotBlank(message = "비밀번호는 필수입니다.")
         String password,
+        @NotBlank(message = "비밀번호 확인 값은 필수입니다.")
         String passwordConfirmation
 ) {
 

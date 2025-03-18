@@ -39,39 +39,41 @@ public class TokenUtil {
     private static final String REFRESH_TOKEN_SUBJECT = "RefreshToken";
     private static final String BEARER = "Bearer ";
 
-    public String issueAccessToken(Long userId, MemberRole memberRole) {
+    public String issueAccessToken(Long memberId, MemberRole memberRole) {
         return JWT.create()
                 .withSubject(ACCESS_TOKEN_SUBJECT)
-                .withClaim("id", userId)
+                .withClaim("id", memberId)
                 .withClaim("role", memberRole.name())
                 .withExpiresAt(new Date(System.currentTimeMillis() + accessTokenExpirationPeriod))
                 .sign(Algorithm.HMAC512(secretKey));
     }
 
     // todo 프로토타입 시연을 위한 임시 메소드
-    public String issueAccessTokenWithoutExpiration(Long userId, MemberRole memberRole) {
+    public String issueAccessTokenWithoutExpiration(Long memberId, MemberRole memberRole) {
         return JWT.create()
                 .withSubject(ACCESS_TOKEN_SUBJECT)
-                .withClaim("id", userId)
+                .withClaim("id", memberId)
                 .withClaim("role", memberRole.name())
+                .withExpiresAt(new Date(System.currentTimeMillis() + 10800000))  //3시간
                 .sign(Algorithm.HMAC512(secretKey));
     }
 
-    public String issueRefreshToken(Long userId, MemberRole memberRole) {
+    public String issueRefreshToken(Long memberId, MemberRole memberRole) {
         String refreshToken = JWT.create()
                 .withSubject(REFRESH_TOKEN_SUBJECT)
-                .withClaim("id", userId)
+                .withClaim("id", memberId)
                 .withClaim("role", memberRole.name())
                 .withExpiresAt(new Date(System.currentTimeMillis() + accessTokenExpirationPeriod))
                 .sign(Algorithm.HMAC512(secretKey));
         return refreshToken;
     }
 
-    public String issueRefreshTokenWithoutExpiration(Long userId, MemberRole memberRole) {
+    public String issueRefreshTokenWithoutExpiration(Long memberId, MemberRole memberRole) {
         String refreshToken = JWT.create()
                 .withSubject(REFRESH_TOKEN_SUBJECT)
-                .withClaim("id", userId)
+                .withClaim("id", memberId)
                 .withClaim("role", memberRole.name())
+                .withExpiresAt(new Date(System.currentTimeMillis() + 10800000))  //3시간
                 .sign(Algorithm.HMAC512(secretKey));
         return refreshToken;
     }
@@ -84,10 +86,10 @@ public class TokenUtil {
             throw new JWTVerificationException(e.getMessage());
         }
 
-        Long userId = decodedJWT.getClaim("id").asLong();
+        Long memberId = decodedJWT.getClaim("id").asLong();
         MemberRole memberRole = MemberRole.valueOf(decodedJWT.getClaim("role").asString());
 
-        return issueAccessToken(userId, memberRole);
+        return issueAccessToken(memberId, memberRole);
     }
 
     public String extractToken(HttpServletRequest request, TokenType tokenType) {
@@ -109,6 +111,9 @@ public class TokenUtil {
             return JWT.require(Algorithm.HMAC512(secretKey)).build().verify(accessToken);
         } catch (TokenExpiredException e) {
             log.debug("AccessToken is expired: ${}", accessToken);
+            throw new GeneralHandler(ErrorStatus._UNAUTHORIZED);
+        } catch (JWTVerificationException e) {
+            log.debug("AccessToken verification is failed because " + e.getMessage());
             throw new GeneralHandler(ErrorStatus._UNAUTHORIZED);
         }
     }

@@ -1,11 +1,11 @@
 package com.pitchain.dto.res;
 
+import com.pitchain.common.apiPayload.annotation.S3Url;
 import com.pitchain.dto.BmWithScrapDto;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.Company;
 import com.pitchain.entity.Member;
 import com.pitchain.entity.Sp;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
@@ -19,7 +19,8 @@ public record BmDetailRes(
         @NotNull
         Long companyId,
         @NotEmpty
-        String companyProfileImgKey,
+        @S3Url
+        String companyProfileImgURL,
         @NotEmpty
         String companyName,
         @NotEmpty
@@ -38,6 +39,7 @@ public record BmDetailRes(
         @NotEmpty
         String description,
         @NotEmpty
+        @S3Url
         String descImgURL,
         @NotEmpty
         String bmAddress,
@@ -60,7 +62,7 @@ public record BmDetailRes(
 
         return BmDetailRes.builder()
                 .companyId(company.getId())
-                .companyProfileImgKey(member.getProfileImgKey())
+                .companyProfileImgURL(member.getProfileImgKey())  //추후에 JSON 직렬화 처리됨
                 .companyName(member.getName())
                 .companyAddress(company.getAddress())
 
@@ -70,7 +72,7 @@ public record BmDetailRes(
                 .mainCategory(bm.getMainCategory().getKoreanName())
                 .subCategories(subCategories)
                 .description(bm.getDescription())
-                .descImgURL(bm.getDescImgKey())
+                .descImgURL(bm.getDescImgKey())  //추후에 JSON 직렬화 처리됨
                 .bmAddress(bm.getAddress())
                 .createdAt(bm.getCreatedAt())
                 .longPitchURL(bm.getLongPitchURL())
