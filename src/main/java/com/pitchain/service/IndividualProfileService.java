@@ -20,14 +20,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class IndividualProfileService implements MemberProfileService {
 
     private final IndividualRepository individualRepository;
-    private final S3Service s3Service;
 
     @Override
     public BaseMemberProfileRes getMyProfile(MemberDetails memberDetails) {
         Individual individual = getIndividual(memberDetails);
         Member member = individual.getMember();
-        String profileImgURL = s3Service.getFileURL(member.getProfileImgKey());
-        return IndividualProfileRes.createRes(member, individual, profileImgURL);
+        return IndividualProfileRes.createRes(member, individual);
     }
 
     @Override

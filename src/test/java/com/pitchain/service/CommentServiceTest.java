@@ -48,8 +48,6 @@ class CommentServiceTest {
     private CommentService commentService;
     @Autowired
     private CommentRepository commentRepository;
-    @Autowired
-    private S3Service s3Service;
 
     @AfterEach
     void tearDown() {
@@ -176,13 +174,13 @@ class CommentServiceTest {
         assertThat(foundComment.getCommentId()).isEqualTo(parentComment.getId());
         assertThat(foundComment.getWriterId()).isEqualTo(parentComment.getMember().getId());
         assertThat(foundComment.getContent()).isEqualTo(parentComment.getContent());
-        assertThat(foundComment.getWriterProfileImgURL()).isEqualTo(s3Service.getFileURL(parentComment.getMember().getProfileImgKey()));
+        assertThat(foundComment.getWriterProfileImgURL()).isEqualTo(parentComment.getMember().getProfileImgKey());
 
         List<ReplyCommentRes> replyComments = foundComment.getReplyComments();
         ReplyCommentRes replyCommentRes = replyComments.get(0);
         assertThat(replyCommentRes.content()).isEqualTo(replyComment.getContent());
         assertThat(replyCommentRes.writerId()).isEqualTo(replyComment.getMember().getId());
-        assertThat(replyCommentRes.writerProfileImgURL()).isEqualTo(s3Service.getFileURL(replyComment.getMember().getProfileImgKey()));
+        assertThat(replyCommentRes.writerProfileImgURL()).isEqualTo(replyComment.getMember().getProfileImgKey());
     }
 
     @Test
@@ -211,7 +209,7 @@ class CommentServiceTest {
         ReplyCommentRes replyCommentRes = deletedCommentRes.getReplyComments().get(0);
         assertThat(replyCommentRes.commentId()).isEqualTo(replyComment.getId());
         assertThat(replyCommentRes.writerId()).isEqualTo(replyComment.getMember().getId());
-        assertThat(replyCommentRes.writerProfileImgURL()).isEqualTo(s3Service.getFileURL(replyComment.getMember().getProfileImgKey()));
+        assertThat(replyCommentRes.writerProfileImgURL()).isEqualTo(replyComment.getMember().getProfileImgKey());
     }
 
     @Test

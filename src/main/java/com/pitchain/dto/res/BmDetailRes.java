@@ -1,11 +1,12 @@
 package com.pitchain.dto.res;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.pitchain.common.converter.S3UrlSerializer;
 import com.pitchain.dto.BmWithScrapDto;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.Company;
 import com.pitchain.entity.Member;
 import com.pitchain.entity.Sp;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
@@ -19,7 +20,8 @@ public record BmDetailRes(
         @NotNull
         Long companyId,
         @NotEmpty
-        String companyProfileImgKey,
+        @JsonSerialize(using = S3UrlSerializer.class)
+        String companyProfileImgURL,
         @NotEmpty
         String companyName,
         @NotEmpty
@@ -38,6 +40,7 @@ public record BmDetailRes(
         @NotEmpty
         String description,
         @NotEmpty
+        @JsonSerialize(using = S3UrlSerializer.class)
         String descImgURL,
         @NotEmpty
         String bmAddress,
@@ -53,14 +56,14 @@ public record BmDetailRes(
 
         List<PtImgRes> ptImgResList
 ) {
-    public static BmDetailRes createRes(BmWithScrapDto bmWithScrapDto, List<PtImgRes> ptImgResList, long scrapCnt, List<String> subCategories, String descImgURL, String profileImgURL) {
+    public static BmDetailRes createRes(BmWithScrapDto bmWithScrapDto, List<PtImgRes> ptImgResList, long scrapCnt, List<String> subCategories) {
         Bm bm = bmWithScrapDto.getBm();
         Company company = bm.getCompany();
         Member member = company.getMember();
 
         return BmDetailRes.builder()
                 .companyId(company.getId())
-                .companyProfileImgKey(profileImgURL)
+                .companyProfileImgURL(member.getProfileImgKey())
                 .companyName(member.getName())
                 .companyAddress(company.getAddress())
 
@@ -70,7 +73,7 @@ public record BmDetailRes(
                 .mainCategory(bm.getMainCategory().getKoreanName())
                 .subCategories(subCategories)
                 .description(bm.getDescription())
-                .descImgURL(descImgURL)
+                .descImgURL(bm.getDescImgKey())
                 .bmAddress(bm.getAddress())
                 .createdAt(bm.getCreatedAt())
                 .longPitchURL(bm.getLongPitchURL())

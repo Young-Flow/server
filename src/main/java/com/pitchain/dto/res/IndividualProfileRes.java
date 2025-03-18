@@ -12,12 +12,12 @@ public class IndividualProfileRes extends BaseMemberProfileRes {
     @NotNull
     private OauthProvider oauthProvider;
 
-    public IndividualProfileRes(String profileImgURL, String name, String email, MemberRole memberRole, OauthProvider oauthProvider) {
-        super(profileImgURL, name, email, memberRole);
+    public IndividualProfileRes(String profileImgKey, String name, String email, MemberRole memberRole, OauthProvider oauthProvider) {
+        super(profileImgKey, name, email, memberRole);
         this.oauthProvider = oauthProvider;
     }
 
-    public static IndividualProfileRes createRes(Member member, Individual individual, String profileImgURL) {
-        return new IndividualProfileRes(profileImgURL, member.getName(), member.getEmail(), member.getRole(), individual.getOauthProvider());
+    public static IndividualProfileRes createRes(Member member, Individual individual) {
+        return new IndividualProfileRes(member.getProfileImgKey(), member.getName(), member.getEmail(), member.getRole(), individual.getOauthProvider());
     }
 }

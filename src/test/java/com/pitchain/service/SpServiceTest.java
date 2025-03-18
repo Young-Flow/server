@@ -127,16 +127,14 @@ class SpServiceTest {
 
         bm.updateSubCategories(SUB_CATEGORIES);
         List<String> subCategories = bm.getKoreanSubCategories();
-        when(s3Service.getFileURL(sp.getSpKey())).thenReturn("cdn" + sp.getSpKey());
-        when(s3Service.getFileURL(sp.getThumbnailImgKey())).thenReturn("cdn" + sp.getThumbnailImgKey());
 
         //when
         SpDetailRes spDetail = spService.getSpDetail(individualMemberDetails, sp.getId());
 
         //then
         assertThat(spDetail.bmId()).isEqualTo(sp.getBm().getId());
-        assertThat(spDetail.spURL()).isEqualTo(s3Service.getFileURL(sp.getSpKey()));
-        assertThat(spDetail.thumbnailImgURL()).isEqualTo(s3Service.getFileURL(sp.getThumbnailImgKey()));
+        assertThat(spDetail.spURL()).isEqualTo(sp.getSpKey());
+        assertThat(spDetail.thumbnailImgURL()).isEqualTo(sp.getThumbnailImgKey());
         assertThat(spDetail.views()).isEqualTo(sp.getViews());
         assertThat(spDetail.name()).isEqualTo(sp.getName());
         assertThat(spDetail.mainCategory()).isEqualTo(sp.getBm().getMainCategory().getKoreanName());
@@ -152,8 +150,6 @@ class SpServiceTest {
         Sp sp = saveSp(bm);
         spLikeRepository.save(new SpLike(individual, sp));
         spLikeRepository.save(new SpLike(newIndividual, sp));
-        when(s3Service.getFileURL(sp.getSpKey())).thenReturn("cdn" + sp.getSpKey());
-        when(s3Service.getFileURL(sp.getThumbnailImgKey())).thenReturn("cdn" + sp.getThumbnailImgKey());
 
         bm.updateSubCategories(SUB_CATEGORIES);
         List<String> subCategories = bm.getKoreanSubCategories();
@@ -163,8 +159,8 @@ class SpServiceTest {
 
         //then
         assertThat(spDetail.bmId()).isEqualTo(sp.getBm().getId());
-        assertThat(spDetail.spURL()).isEqualTo(s3Service.getFileURL(sp.getSpKey()));
-        assertThat(spDetail.thumbnailImgURL()).isEqualTo(s3Service.getFileURL(sp.getThumbnailImgKey()));
+        assertThat(spDetail.spURL()).isEqualTo(sp.getSpKey());
+        assertThat(spDetail.thumbnailImgURL()).isEqualTo(sp.getThumbnailImgKey());
         assertThat(spDetail.views()).isEqualTo(sp.getViews());
         assertThat(spDetail.name()).isEqualTo(sp.getName());
         assertThat(spDetail.mainCategory()).isEqualTo(sp.getBm().getMainCategory().getKoreanName());

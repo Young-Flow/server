@@ -1,11 +1,12 @@
 package com.pitchain.dto.res;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.pitchain.common.converter.S3UrlSerializer;
 import com.pitchain.dto.SpWithLikeDto;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.Company;
 import com.pitchain.entity.Member;
 import com.pitchain.entity.Sp;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -19,6 +20,7 @@ public record SpDetailRes(
         @NotBlank
         String bmName,
         @NotBlank
+        @JsonSerialize(using = S3UrlSerializer.class)
         String companyProfileImgURL,
         @NotBlank
         String companyName,
@@ -27,6 +29,7 @@ public record SpDetailRes(
         @NotBlank
         String spURL,
         @NotBlank
+        @JsonSerialize(using = S3UrlSerializer.class)
         String thumbnailImgURL,
         @NotNull
         Integer views,
@@ -41,7 +44,7 @@ public record SpDetailRes(
         @NotNull
         Long likeCnt
 ) {
-    public static SpDetailRes createRes(SpWithLikeDto spWithLikeDto, Long likeCnt, List<String> subCategories, String spURL, String thumbnailImgURL) {
+    public static SpDetailRes createRes(SpWithLikeDto spWithLikeDto, Long likeCnt, List<String> subCategories) {
         Sp sp = spWithLikeDto.getSp();
         Bm bm = sp.getBm();
         Company company = bm.getCompany();
@@ -52,8 +55,8 @@ public record SpDetailRes(
                 .companyProfileImgURL(member.getProfileImgKey())
                 .companyName(member.getName())
                 .companyAddress(company.getAddress())
-                .spURL(spURL)
-                .thumbnailImgURL(thumbnailImgURL)
+                .spURL(sp.getSpKey())
+                .thumbnailImgURL(sp.getThumbnailImgKey())
                 .views(sp.getViews())
                 .name(sp.getName())
                 .mainCategory(bm.getMainCategory().getKoreanName())

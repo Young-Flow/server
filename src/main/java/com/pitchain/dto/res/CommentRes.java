@@ -1,5 +1,7 @@
 package com.pitchain.dto.res;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.pitchain.common.converter.S3UrlSerializer;
 import com.pitchain.entity.Comment;
 import com.pitchain.entity.Member;
 import jakarta.validation.constraints.NotEmpty;
@@ -18,6 +20,7 @@ public class CommentRes extends BaseCommentRes {
     @NotEmpty
     private final String writerName;
     @NotEmpty
+    @JsonSerialize(using = S3UrlSerializer.class)
     private final String writerProfileImgURL;
     @NotEmpty
     private final String content;

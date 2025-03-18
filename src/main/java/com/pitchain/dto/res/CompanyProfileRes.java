@@ -14,13 +14,13 @@ public class CompanyProfileRes extends BaseMemberProfileRes {
     @NotNull
     private final Boolean isVerified;
 
-    public CompanyProfileRes(String profileImgURL, String name, String email, MemberRole memberRole, String address, Boolean isVerified) {
-        super(profileImgURL, name, email, memberRole);
+    public CompanyProfileRes(String profileImgKey, String name, String email, MemberRole memberRole, String address, Boolean isVerified) {
+        super(profileImgKey, name, email, memberRole);
         this.address = address;
         this.isVerified = isVerified;
     }
 
-    public static CompanyProfileRes createRes(Member member, Company company, String profileImgURL) {
-        return new CompanyProfileRes(profileImgURL, member.getName(), member.getEmail(), member.getRole(), company.getAddress(), company.IsVerified());
+    public static CompanyProfileRes createRes(Member member, Company company) {
+        return new CompanyProfileRes(member.getProfileImgKey(), member.getName(), member.getEmail(), member.getRole(), company.getAddress(), company.IsVerified());
     }
 }

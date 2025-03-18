@@ -27,7 +27,6 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final BmRepository bmRepository;
     private final MemberRepository memberRepository;
-    private final S3Service s3Service;
 
     @Transactional
     public void addComment(Long bmId, MemberDetails memberDetails, CommentReq.AddCommentReq req) {
@@ -83,14 +82,14 @@ public class CommentService {
                 .map(comment -> {
                     List<ReplyCommentRes> replyCommentResList = comment.getChildComments().stream()
                             .map(childComment -> ReplyCommentRes.createRes(
-                                    childComment, s3Service.getFileURL(childComment.getMember().getProfileImgKey())
+                                    childComment, childComment.getMember().getProfileImgKey()
                             ))
                             .toList();
 
                     if (comment.isDelYN()) {
                         return DeletedCommentRes.createRes(comment, replyCommentResList);
                     }
-                    return CommentRes.createRes(comment, replyCommentResList, s3Service.getFileURL(comment.getMember().getProfileImgKey()));
+                    return CommentRes.createRes(comment, replyCommentResList, comment.getMember().getProfileImgKey());
                 })
                 .toList();
     }
