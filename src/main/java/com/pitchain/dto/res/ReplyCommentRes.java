@@ -35,7 +35,7 @@ public record ReplyCommentRes(
         return ReplyCommentRes.builder()
                 .commentId(comment.getId())
                 .writerId(member.getId())
-                .writerProfileImgURL(writerProfileImgKey)
+                .writerProfileImgURL(writerProfileImgKey)  //추후에 JSON 직렬화 처리됨
                 .writerName(member.getName())
                 .content(comment.getContent())
                 .delYN(comment.isDelYN())

@@ -63,7 +63,7 @@ public record BmDetailRes(
 
         return BmDetailRes.builder()
                 .companyId(company.getId())
-                .companyProfileImgURL(member.getProfileImgKey())
+                .companyProfileImgURL(member.getProfileImgKey())  //추후에 JSON 직렬화 처리됨
                 .companyName(member.getName())
                 .companyAddress(company.getAddress())
 
@@ -73,7 +73,7 @@ public record BmDetailRes(
                 .mainCategory(bm.getMainCategory().getKoreanName())
                 .subCategories(subCategories)
                 .description(bm.getDescription())
-                .descImgURL(bm.getDescImgKey())
+                .descImgURL(bm.getDescImgKey())  //추후에 JSON 직렬화 처리됨
                 .bmAddress(bm.getAddress())
                 .createdAt(bm.getCreatedAt())
                 .longPitchURL(bm.getLongPitchURL())

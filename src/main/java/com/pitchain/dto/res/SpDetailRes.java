@@ -52,11 +52,11 @@ public record SpDetailRes(
         return SpDetailRes.builder()
                 .bmId(sp.getBm().getId())
                 .bmName(bm.getName())
-                .companyProfileImgURL(member.getProfileImgKey())
+                .companyProfileImgURL(member.getProfileImgKey())  //추후에 JSON 직렬화 처리됨
                 .companyName(member.getName())
                 .companyAddress(company.getAddress())
                 .spURL(sp.getSpKey())
-                .thumbnailImgURL(sp.getThumbnailImgKey())
+                .thumbnailImgURL(sp.getThumbnailImgKey())  //추후에 JSON 직렬화 처리됨
                 .views(sp.getViews())
                 .name(sp.getName())
                 .mainCategory(bm.getMainCategory().getKoreanName())

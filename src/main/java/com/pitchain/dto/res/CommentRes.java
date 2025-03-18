@@ -52,7 +52,7 @@ public class CommentRes extends BaseCommentRes {
                 .replyComments(replyComments)
                 .writerId(member.getId())
                 .writerName(member.getName())
-                .writerProfileImgURL(member.getProfileImgKey())
+                .writerProfileImgURL(member.getProfileImgKey())  //추후에 JSON 직렬화 처리됨
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt())
                 .updatedAt(comment.getUpdatedAt())

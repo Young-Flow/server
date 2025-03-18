@@ -20,7 +20,7 @@ public abstract class BaseMemberProfileRes {
     private final MemberRole memberRole;
 
     protected BaseMemberProfileRes(String profileImgKey, String name, String email, MemberRole memberRole) {
-        this.profileImgURL = profileImgKey;
+        this.profileImgURL = profileImgKey;  //추후에 JSON 직렬화 처리됨
         this.name = name;
         this.email = email;
         this.memberRole = memberRole;
