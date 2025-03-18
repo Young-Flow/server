@@ -1,7 +1,6 @@
 package com.pitchain.dto.res;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.pitchain.common.converter.S3UrlSerializer;
+import com.pitchain.common.apiPayload.annotation.S3Url;
 import com.pitchain.dto.BmWithScrapDto;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.Company;
@@ -20,7 +19,7 @@ public record BmDetailRes(
         @NotNull
         Long companyId,
         @NotEmpty
-        @JsonSerialize(using = S3UrlSerializer.class)
+        @S3Url
         String companyProfileImgURL,
         @NotEmpty
         String companyName,
@@ -40,7 +39,7 @@ public record BmDetailRes(
         @NotEmpty
         String description,
         @NotEmpty
-        @JsonSerialize(using = S3UrlSerializer.class)
+        @S3Url
         String descImgURL,
         @NotEmpty
         String bmAddress,
