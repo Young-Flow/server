@@ -4,13 +4,12 @@ import com.pitchain.common.constant.MemberRole;
 import com.pitchain.common.constant.OauthProvider;
 import com.pitchain.entity.Individual;
 import com.pitchain.entity.Member;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
-@Schema(requiredMode = Schema.RequiredMode.REQUIRED)
 public class IndividualProfileRes extends BaseMemberProfileRes {
+    @NotNull
     private OauthProvider oauthProvider;
 
     public IndividualProfileRes(String profileImgURL, String name, String email, MemberRole memberRole, OauthProvider oauthProvider) {

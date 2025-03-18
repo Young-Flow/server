@@ -6,6 +6,7 @@ import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.controller.UpdatePasswordReq;
 import com.pitchain.dto.req.CreateCompanyReq;
 import com.pitchain.dto.req.LoginCompanyReq;
+import com.pitchain.dto.req.VerifyCompanyReq;
 import com.pitchain.dto.res.LoginRes;
 import com.pitchain.entity.Company;
 import com.pitchain.entity.Member;
@@ -66,6 +67,13 @@ public class CompanyService {
 
         String encodedNewPassword = passwordEncoder.encode(req.newPassword());
         company.updatePassword(encodedNewPassword);
+    }
+
+    public void verifyCompany(MemberDetails memberDetails, VerifyCompanyReq req) {
+        Company company = entityFacade.getCompany(memberDetails);
+
+        company.getMember().updateName(req.companyName());
+        company.verifyCompany();
     }
 
     private static void verifyEmailConflict(Optional<Member> optionalMember) {

@@ -1,12 +1,15 @@
 package com.pitchain.dto.req;
 
-import com.pitchain.common.constant.Country;
 import com.pitchain.common.constant.MemberRole;
-import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.annotation.Nullable;
+import lombok.Getter;
 
-@Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+@Getter
 public class UpdateIndividualReq extends BaseUpdateMemberReq {
-    public UpdateIndividualReq(String email, String name, Country country, MemberRole memberRole) {
-        super(memberRole, email, name, country);
+    @Nullable
+    private final String name;
+    public UpdateIndividualReq(String name, MemberRole memberRole) {
+        super(memberRole);
+        this.name = name;
     }
 }

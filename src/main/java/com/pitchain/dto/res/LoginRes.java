@@ -1,16 +1,15 @@
 package com.pitchain.dto.res;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-@Schema(requiredMode = Schema.RequiredMode.REQUIRED)
 public class LoginRes {
-    @Schema(required = true)
+    @NotBlank
     private String accessToken;
-    @Schema(required = true)
+    @NotBlank
     private String refreshToken;
 
     public static LoginRes createRes(String accessToken, String refreshToken) {

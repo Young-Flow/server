@@ -201,8 +201,8 @@ class BmServiceTest {
                 .toList();
 
         //when
-        MemberDetails memberDetails = createCompanyMemberDetails(company);
-        BmDetailRes bmDetail = bmService.getBmDetail(memberDetails, bm.getId());
+        MemberDetails individualMemberDetails = createIndividualMemberDetails(member_01);
+        BmDetailRes bmDetail = bmService.getBmDetail(individualMemberDetails, bm.getId());
 
         //then
         assertThat(bmDetail.companyId()).isEqualTo(company.getId());
@@ -411,7 +411,7 @@ class BmServiceTest {
         GeneralHandler e_3 = assertThrows(GeneralHandler.class, () -> bmService.updatePtImgs(companyMemberDetails_2, bm.getId(), null));
 
         //then
-        assertThat(e_1.getErrorStatus()).isEqualTo(ErrorStatus.COMPANY_NOT_FOUND);
+        assertThat(e_1.getErrorStatus()).isEqualTo(ErrorStatus.MEMBER_FORBIDDEN);
         assertThat(e_2.getErrorStatus()).isEqualTo(ErrorStatus.BM_NOT_FOUND);
         assertThat(e_3.getErrorStatus()).isEqualTo(ErrorStatus.COMPANY_FORBIDDEN);
     }

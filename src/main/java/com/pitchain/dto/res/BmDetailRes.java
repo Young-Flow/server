@@ -53,14 +53,14 @@ public record BmDetailRes(
 
         List<PtImgRes> ptImgResList
 ) {
-    public static BmDetailRes createRes(BmWithScrapDto bmWithScrapDto, List<PtImgRes> ptImgResList, long scrapCnt, List<String> subCategories) {
+    public static BmDetailRes createRes(BmWithScrapDto bmWithScrapDto, List<PtImgRes> ptImgResList, long scrapCnt, List<String> subCategories, String descImgURL, String profileImgURL) {
         Bm bm = bmWithScrapDto.getBm();
         Company company = bm.getCompany();
         Member member = company.getMember();
 
         return BmDetailRes.builder()
                 .companyId(company.getId())
-                .companyProfileImgKey(member.getProfileImgKey())
+                .companyProfileImgKey(profileImgURL)
                 .companyName(member.getName())
                 .companyAddress(company.getAddress())
 
@@ -70,7 +70,7 @@ public record BmDetailRes(
                 .mainCategory(bm.getMainCategory().getKoreanName())
                 .subCategories(subCategories)
                 .description(bm.getDescription())
-                .descImgURL(bm.getDescImgKey())
+                .descImgURL(descImgURL)
                 .bmAddress(bm.getAddress())
                 .createdAt(bm.getCreatedAt())
                 .longPitchURL(bm.getLongPitchURL())

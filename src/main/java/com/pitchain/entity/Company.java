@@ -51,6 +51,10 @@ public class Company {
         this.password = encodedNewPassword;
     }
 
+    public void verifyCompany() {
+        this.isVerified = true;
+    }
+
     public Boolean IsVerified() {
         return isVerified;
     }

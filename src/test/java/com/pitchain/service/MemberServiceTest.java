@@ -1,11 +1,13 @@
 package com.pitchain.service;
 
-import com.pitchain.common.constant.Country;
+import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.constant.MemberRole;
 import com.pitchain.common.constant.OauthProvider;
 import com.pitchain.common.constant.S3UploadTarget;
+import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.dto.req.UpdateCompanyReq;
 import com.pitchain.dto.req.UpdateIndividualReq;
+import com.pitchain.dto.res.CompanyProfileRes;
 import com.pitchain.dto.res.IndividualProfileRes;
 import com.pitchain.entity.Company;
 import com.pitchain.entity.Individual;
@@ -25,6 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.in;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles("test")
@@ -68,6 +72,29 @@ class MemberServiceTest {
     }
 
     @Test
+    void 내_정보_조회_성공_회사인_경우() {
+        //given
+        Company company = saveCompany();
+        Member member = company.getMember();
+        MemberDetails companyMemberDetails = createCompanyMemberDetails(company);
+
+        //when
+        CompanyProfileRes companyProfileRes = (CompanyProfileRes) memberService.getMyProfile(companyMemberDetails);
+        String profileImgURL = s3Service.getFileURL(member.getProfileImgKey());
+
+        //then
+        List<Member> members = memberRepository.findAll();
+        assertThat(members.size()).isEqualTo(1);
+
+        Member findMember = members.get(0);
+        Company foundCompany = companyRepository.findByMemberId(findMember.getId()).orElseThrow();
+        assertThat(companyProfileRes.getMemberRole()).isEqualTo(findMember.getRole());
+        assertThat(companyProfileRes.getAddress()).isEqualTo(foundCompany.getAddress());
+        assertThat(companyProfileRes.getProfileImgURL()).isEqualTo(profileImgURL);
+        assertThat(companyProfileRes.getName()).isEqualTo(findMember.getName());
+    }
+
+    @Test
     void 이메일_중복_확인_중복인_경우() {
         //given
         Company company = saveCompany();
@@ -84,7 +111,6 @@ class MemberServiceTest {
     void 이메일_중복_확인_중복이_아닌_경우() {
         //given
         Company company = saveCompany();
-        Member member = company.getMember();
         String newEmail = "newEmail";
 
         //when
@@ -100,16 +126,12 @@ class MemberServiceTest {
         Company company = saveCompany();
         MemberDetails companyMemberDetails = createCompanyMemberDetails(company);
 
-        UpdateCompanyReq baseUpdateMemberReq = new UpdateCompanyReq("newEmail", "newName", Country.USA, "address", MemberRole.COMPANY);
+        UpdateCompanyReq baseUpdateMemberReq = new UpdateCompanyReq("address", MemberRole.COMPANY);
 
         //when
         memberService.updateMyProfile(companyMemberDetails, baseUpdateMemberReq);
 
         //then
-        Member findMember = memberRepository.findById(company.getMember().getId()).orElseThrow();
-        assertThat(findMember.getName()).isEqualTo(baseUpdateMemberReq.getName());
-        assertThat(findMember.getEmail()).isEqualTo(baseUpdateMemberReq.getEmail());
-        assertThat(findMember.getCountry()).isEqualTo(baseUpdateMemberReq.getCountry());
         assertThat(company.getAddress()).isEqualTo(baseUpdateMemberReq.getAddress());
     }
 
@@ -120,7 +142,7 @@ class MemberServiceTest {
         Member member = individual.getMember();
         MemberDetails individualMemberDetails = createIndividualMemberMemberDetails(member);
 
-        UpdateIndividualReq updateMemberReq = new UpdateIndividualReq("newEmail", "newName", Country.USA, MemberRole.INDIVIDUAL);
+        UpdateIndividualReq updateMemberReq = new UpdateIndividualReq( "newName", MemberRole.INDIVIDUAL);
 
         //when
         memberService.updateMyProfile(individualMemberDetails, updateMemberReq);
@@ -128,8 +150,6 @@ class MemberServiceTest {
         //then
         Member findMember = memberRepository.findById(individual.getMember().getId()).orElseThrow();
         assertThat(findMember.getName()).isEqualTo(updateMemberReq.getName());
-        assertThat(findMember.getEmail()).isEqualTo(updateMemberReq.getEmail());
-        assertThat(findMember.getCountry()).isEqualTo(updateMemberReq.getCountry());
     }
 
     @Test

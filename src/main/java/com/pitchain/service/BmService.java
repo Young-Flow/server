@@ -53,11 +53,13 @@ public class BmService {
         long scrapCnt = bmScrapRepository.countByBm(bm);
         List<PtImgRes> ptImgResList = getPtImgResList(bmId);
         List<String> subCategories = bm.getKoreanSubCategories();
+        String descImgURL = s3Service.getFileURL(bm.getDescImgKey());
+        String profileImgURL = s3Service.getFileURL(member.getProfileImgKey());
 
         myBmHistoryRepository.findByMemberAndBm(member, bm)
                 .orElseGet(() -> myBmHistoryRepository.save(new MyBmHistory(member, bm)));
 
-        return BmDetailRes.createRes(bmWithScrapDto, ptImgResList, scrapCnt, subCategories);
+        return BmDetailRes.createRes(bmWithScrapDto, ptImgResList, scrapCnt, subCategories, descImgURL, profileImgURL);
     }
 
     public void updateBm(MemberDetails memberDetails, Long bmId, UpdateBmReq updateBmReq, MultipartFile descImg) {
@@ -99,7 +101,7 @@ public class BmService {
     private List<PtImgRes> getPtImgResList(Long bmId) {
         List<PtImg> ptImgs = bmRepository.getPtImgsByBmId(bmId);
         List<PtImgRes> ptImgResList = ptImgs.stream()
-                .map(ptImg -> PtImgRes.createRes(ptImg.getSerialNum(), ptImg.getImgKey()))
+                .map(ptImg -> PtImgRes.createRes(ptImg.getSerialNum(), s3Service.getFileURL(ptImg.getImgKey())))
                 .toList();
         return ptImgResList;
     }

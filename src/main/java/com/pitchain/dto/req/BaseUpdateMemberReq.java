@@ -2,7 +2,6 @@ package com.pitchain.dto.req;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.pitchain.common.constant.Country;
 import com.pitchain.common.constant.MemberRole;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -14,17 +13,11 @@ import lombok.Getter;
 })
 @Getter
 public abstract class BaseUpdateMemberReq {
-    @NotNull
+    @NotNull(message = "회원 역할은 필수입니다.")
     private final MemberRole memberRole;
-    private final String email;
-    private final String name;
-    private final Country country;
 
-    public BaseUpdateMemberReq(MemberRole memberRole, String email, String name, Country country) {
+    public BaseUpdateMemberReq(MemberRole memberRole) {
         this.memberRole = memberRole;
-        this.email = email;
-        this.name = name;
-        this.country = country;
     }
 
 }

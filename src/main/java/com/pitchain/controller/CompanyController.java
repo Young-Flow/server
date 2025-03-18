@@ -3,6 +3,7 @@ package com.pitchain.controller;
 import com.pitchain.common.apiPayload.dto.CustomApiResponse;
 import com.pitchain.dto.req.CreateCompanyReq;
 import com.pitchain.dto.req.LoginCompanyReq;
+import com.pitchain.dto.req.VerifyCompanyReq;
 import com.pitchain.dto.res.LoginRes;
 import com.pitchain.jwt.MemberDetails;
 import com.pitchain.service.CompanyService;
@@ -36,6 +37,13 @@ public class CompanyController {
     @PutMapping("/passwords")
     public CustomApiResponse<Void> updatePassword(@AuthenticationPrincipal MemberDetails memberDetails, @RequestBody UpdatePasswordReq req) {
         companyService.updatePassword(memberDetails, req);
+        return CustomApiResponse.onSuccess();
+    }
+
+    @Operation(summary = "회사 인증")
+    @PostMapping("/verify")
+    public CustomApiResponse<Void> verifyCompany(@AuthenticationPrincipal MemberDetails memberDetails, @RequestBody VerifyCompanyReq req) {
+        companyService.verifyCompany(memberDetails, req);
         return CustomApiResponse.onSuccess();
     }
 }

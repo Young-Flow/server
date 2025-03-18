@@ -1,6 +1,5 @@
 package com.pitchain.entity;
 
-import com.pitchain.common.constant.Country;
 import com.pitchain.common.constant.MemberRole;
 import com.pitchain.common.constant.SubCategory;
 import jakarta.persistence.*;
@@ -29,10 +28,6 @@ public class Member {
     private String profileImgKey;
 
     private String name;
-
-    @Enumerated(EnumType.STRING)
-    @Builder.Default
-    private Country country = Country.ROK;
 
     @OneToMany(mappedBy = "member")
     @Builder.Default
@@ -77,10 +72,12 @@ public class Member {
         this.profileImgKey = profileImgKey;
     }
 
-    public void updateProfile(String email, String name, Country country) {
-        this.email = email;
+    public void updateProfile(String name) {
+        updateName(name);
+    }
+
+    public void updateName(String name) {
         this.name = name;
-        this.country = country;
     }
 
     public void addCategoryPref(List<SubCategory> subCategories) {

@@ -34,8 +34,6 @@ public class CompanyProfileService implements MemberProfileService {
     @Transactional
     public void updateMyProfile(MemberDetails memberDetails, BaseUpdateMemberReq req) {
         Company company = getCompany(memberDetails);
-        Member member = company.getMember();
-        member.updateProfile(req.getEmail(), req.getName(), req.getCountry());
         company.updateAddress(((UpdateCompanyReq) req).getAddress());
     }
 

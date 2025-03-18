@@ -1,10 +1,10 @@
 package com.pitchain.dto.res;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
 
-@Schema(requiredMode = Schema.RequiredMode.REQUIRED)
 public record PtImgRes(
         int serialNum,
+        @NotEmpty
         String imgURL
 ) {
     public static PtImgRes createRes(int serialNum, String imgURL) {

@@ -4,6 +4,7 @@ import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
 import com.pitchain.common.constant.MemberRole;
 import com.pitchain.common.exception.GeneralHandler;
 import com.pitchain.dto.req.BaseUpdateMemberReq;
+import com.pitchain.dto.req.UpdateIndividualReq;
 import com.pitchain.dto.res.BaseMemberProfileRes;
 import com.pitchain.dto.res.IndividualProfileRes;
 import com.pitchain.entity.Individual;
@@ -34,7 +35,7 @@ public class IndividualProfileService implements MemberProfileService {
     public void updateMyProfile(MemberDetails memberDetails, BaseUpdateMemberReq req) {
         Individual individual = getIndividual(memberDetails);
         Member member = individual.getMember();
-        member.updateProfile(req.getEmail(), req.getName(), req.getCountry());
+        member.updateProfile(((UpdateIndividualReq) req).getName());
     }
 
     private Individual getIndividual(MemberDetails memberDetails) {

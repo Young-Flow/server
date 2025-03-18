@@ -3,17 +3,18 @@ package com.pitchain.dto.res;
 import com.pitchain.common.constant.MemberRole;
 import com.pitchain.entity.Company;
 import com.pitchain.entity.Member;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
-@Schema(requiredMode = Schema.RequiredMode.REQUIRED)
 public class CompanyProfileRes extends BaseMemberProfileRes {
+    @NotEmpty
     private final String address;
-    private final boolean isVerified;
+    @NotNull
+    private final Boolean isVerified;
 
-    public CompanyProfileRes(String profileImgURL, String name, String email, MemberRole memberRole, String address, boolean isVerified) {
+    public CompanyProfileRes(String profileImgURL, String name, String email, MemberRole memberRole, String address, Boolean isVerified) {
         super(profileImgURL, name, email, memberRole);
         this.address = address;
         this.isVerified = isVerified;
