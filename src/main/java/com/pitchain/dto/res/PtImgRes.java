@@ -10,7 +10,7 @@ public record PtImgRes(
         @JsonSerialize(using = S3UrlSerializer.class)
         String imgURL
 ) {
-    public static PtImgRes createRes(int serialNum, String imgURL) {
-        return new PtImgRes(serialNum, imgURL);
+    public static PtImgRes createRes(int serialNum, String imgKey) {
+        return new PtImgRes(serialNum, imgKey);
     }
 }

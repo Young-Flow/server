@@ -89,7 +89,7 @@ public class CommentService {
                     if (comment.isDelYN()) {
                         return DeletedCommentRes.createRes(comment, replyCommentResList);
                     }
-                    return CommentRes.createRes(comment, replyCommentResList, comment.getMember().getProfileImgKey());
+                    return CommentRes.createRes(comment, replyCommentResList);
                 })
                 .toList();
     }

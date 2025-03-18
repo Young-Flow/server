@@ -19,8 +19,8 @@ public abstract class BaseMemberProfileRes {
     @NotNull
     private final MemberRole memberRole;
 
-    protected BaseMemberProfileRes(String profileImgURL, String name, String email, MemberRole memberRole) {
-        this.profileImgURL = profileImgURL;
+    protected BaseMemberProfileRes(String profileImgKey, String name, String email, MemberRole memberRole) {
+        this.profileImgURL = profileImgKey;
         this.name = name;
         this.email = email;
         this.memberRole = memberRole;

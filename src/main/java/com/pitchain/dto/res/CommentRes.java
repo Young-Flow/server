@@ -44,7 +44,7 @@ public class CommentRes extends BaseCommentRes {
         this.updatedAt = updatedAt;
     }
 
-    public static CommentRes createRes(Comment comment, List<ReplyCommentRes> replyComments, String writerProfileImgURL) {
+    public static CommentRes createRes(Comment comment, List<ReplyCommentRes> replyComments) {
         Member member = comment.getMember();
         return CommentRes.builder()
                 .commentId(comment.getId())
@@ -52,7 +52,7 @@ public class CommentRes extends BaseCommentRes {
                 .replyComments(replyComments)
                 .writerId(member.getId())
                 .writerName(member.getName())
-                .writerProfileImgURL(writerProfileImgURL)
+                .writerProfileImgURL(member.getProfileImgKey())
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt())
                 .updatedAt(comment.getUpdatedAt())

@@ -30,12 +30,12 @@ public record ReplyCommentRes(
         @Past @NotNull
         LocalDateTime updatedAt
 ) {
-    public static ReplyCommentRes createRes(Comment comment, String writerProfileImgURL) {
+    public static ReplyCommentRes createRes(Comment comment, String writerProfileImgKey) {
         Member member = comment.getMember();
         return ReplyCommentRes.builder()
                 .commentId(comment.getId())
                 .writerId(member.getId())
-                .writerProfileImgURL(writerProfileImgURL)
+                .writerProfileImgURL(writerProfileImgKey)
                 .writerName(member.getName())
                 .content(comment.getContent())
                 .delYN(comment.isDelYN())
