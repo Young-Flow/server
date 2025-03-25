@@ -20,6 +20,7 @@ public class Individual extends BaseEntity {
 
     private String socialId;
 
+    @Enumerated(EnumType.STRING)
     private OauthProvider oauthProvider;
 
     @OneToOne(fetch = FetchType.LAZY)
