@@ -55,7 +55,7 @@ public class GlobalExceptionHandler {
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("ConstraintViolationException 추출 도중 에러 발생"));
 
-        HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         CustomResponse customResponse = CustomResponse.onFailure(httpStatus.name(), errorMessage);
 
         return ResponseEntity
