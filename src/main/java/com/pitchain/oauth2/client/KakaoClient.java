@@ -1,8 +1,8 @@
 package com.pitchain.oauth2.client;
 
-import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
+import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.OauthProvider;
-import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.common.exception.GeneralException;
 import com.pitchain.oauth2.member.KakaoMemberInfo;
 import com.pitchain.oauth2.member.OauthMemberInfo;
 import com.pitchain.oauth2.param.OauthParams;
@@ -66,7 +66,7 @@ public class KakaoClient implements OauthClient{
 
         if (kakaoToken == null) {
             log.error("kakao token을 정상적으로 가져오지 못했습니다.");
-            throw new GeneralHandler(ErrorStatus._BAD_REQUEST);
+            throw new GeneralException(ErrorStatus._BAD_REQUEST);
         }
 
         return kakaoToken.getAccess_token();

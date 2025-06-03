@@ -1,6 +1,5 @@
 package com.pitchain.controller;
 
-import com.pitchain.common.apiPayload.dto.CustomApiResponse;
 import com.pitchain.jwt.MemberDetails;
 import com.pitchain.service.SpLikeService;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +17,8 @@ public class SpLikeController {
     private final SpLikeService spLikeService;
 
     @PostMapping("/{spId}/like")
-    public CustomApiResponse toggleLikeSp(@PathVariable("spId") Long spId,
-                                          @AuthenticationPrincipal MemberDetails memberDetails) {
+    public void toggleLikeSp(@PathVariable("spId") Long spId,
+                             @AuthenticationPrincipal MemberDetails memberDetails) {
         spLikeService.toggleLikeSp(spId, memberDetails);
-        return CustomApiResponse.onSuccess();
     }
 }

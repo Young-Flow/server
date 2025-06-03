@@ -1,7 +1,7 @@
 package com.pitchain.common.constant;
 
-import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
-import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.common.apiPayload.ErrorStatus;
+import com.pitchain.common.exception.GeneralException;
 
 public enum MemberRole {
     COMPANY, INDIVIDUAL;
@@ -10,7 +10,7 @@ public enum MemberRole {
         try {
             return MemberRole.valueOf(role.toUpperCase());
         } catch (IllegalArgumentException | NullPointerException e) {
-            throw new GeneralHandler(ErrorStatus.INVALID_MEMBER_ROLE);
+            throw new GeneralException(ErrorStatus.INVALID_MEMBER_ROLE);
         }
     }
 }

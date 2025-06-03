@@ -1,6 +1,7 @@
 package com.pitchain.common.apiPayload.annotation;
 
-import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
+
+import com.pitchain.common.apiPayload.ErrorStatus;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

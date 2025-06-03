@@ -1,8 +1,8 @@
 package com.pitchain.service;
 
-import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
+import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.S3UploadTarget;
-import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.common.exception.GeneralException;
 import io.awspring.cloud.s3.ObjectMetadata;
 import io.awspring.cloud.s3.S3Exception;
 import io.awspring.cloud.s3.S3Operations;
@@ -40,9 +40,9 @@ public class S3Service {
             validateMimeType(file, target);
             fileKey = upload(file, target);
         } catch (IOException e) {
-            throw new GeneralHandler(ErrorStatus.FAIL_STREAM_CONVERT);
+            throw new GeneralException(ErrorStatus.FAIL_STREAM_CONVERT);
         } catch (S3Exception e) {
-            throw new GeneralHandler(ErrorStatus.FAIL_S3_UPLOAD);
+            throw new GeneralException(ErrorStatus.FAIL_S3_UPLOAD);
         }
         return fileKey;
     }
@@ -56,7 +56,7 @@ public class S3Service {
 
     private static void validateMimeType(MultipartFile file, S3UploadTarget target) {
         if (!target.isValidMimeType(file.getContentType())) {
-            throw new GeneralHandler(ErrorStatus.INVALID_MIME_TYPE);
+            throw new GeneralException(ErrorStatus.INVALID_MIME_TYPE);
         }
     }
 
@@ -95,7 +95,7 @@ public class S3Service {
         try {
             s3Operations.deleteObject(bucket, fileKey);
         } catch (Exception e) {
-            throw new GeneralHandler(ErrorStatus.INVALID_BUCKET_URL);
+            throw new GeneralException(ErrorStatus.INVALID_BUCKET_URL);
         }
     }
 

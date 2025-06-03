@@ -1,7 +1,7 @@
 package com.pitchain.common.constant;
 
-import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
-import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.common.apiPayload.ErrorStatus;
+import com.pitchain.common.exception.GeneralException;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -118,6 +118,6 @@ public enum SubCategory {
         return Arrays.stream(values())
                 .filter(val -> koreanName.equals(val.koreanName))
                 .findFirst()
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.SUB_CATEGORY_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.SUB_CATEGORY_NOT_FOUND));
     }
 }

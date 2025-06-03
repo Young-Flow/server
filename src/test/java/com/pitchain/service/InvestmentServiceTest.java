@@ -1,9 +1,9 @@
 package com.pitchain.service;
 
-import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
+import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.MainCategory;
 import com.pitchain.common.constant.MemberRole;
-import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.common.exception.GeneralException;
 import com.pitchain.dto.res.InvestmentStatusRes;
 import com.pitchain.entity.*;
 import com.pitchain.jwt.MemberDetails;
@@ -73,8 +73,8 @@ class InvestmentServiceTest {
         MemberDetails invalidIndividualMemberDetails = new MemberDetails(Long.MAX_VALUE, MemberRole.INDIVIDUAL);
 
         //when
-        GeneralHandler error1 = Assertions.assertThrows(GeneralHandler.class, () -> investmentService.addInvestment(invalidId, individualMemberDetails, amount));
-        GeneralHandler error2 = Assertions.assertThrows(GeneralHandler.class, () -> investmentService.addInvestment(bm.getId(), invalidIndividualMemberDetails, amount));
+        GeneralException error1 = Assertions.assertThrows(GeneralException.class, () -> investmentService.addInvestment(invalidId, individualMemberDetails, amount));
+        GeneralException error2 = Assertions.assertThrows(GeneralException.class, () -> investmentService.addInvestment(bm.getId(), invalidIndividualMemberDetails, amount));
 
         //then
         assertThat(error1.getErrorStatus()).isEqualTo(ErrorStatus.BM_NOT_FOUND);

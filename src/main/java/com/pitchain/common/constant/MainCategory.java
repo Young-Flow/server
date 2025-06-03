@@ -1,7 +1,7 @@
 package com.pitchain.common.constant;
 
-import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
-import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.common.apiPayload.ErrorStatus;
+import com.pitchain.common.exception.GeneralException;
 
 import java.util.Arrays;
 
@@ -34,6 +34,6 @@ public enum MainCategory {
         return Arrays.stream(values())
                 .filter(val -> koreanName.equals(val.koreanName))
                 .findFirst()
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MAIN_CATEGORY_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MAIN_CATEGORY_NOT_FOUND));
     }
 }

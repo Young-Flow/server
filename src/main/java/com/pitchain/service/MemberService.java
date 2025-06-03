@@ -1,8 +1,8 @@
 package com.pitchain.service;
 
-import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
+import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.S3UploadTarget;
-import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.common.exception.GeneralException;
 import com.pitchain.dto.req.BaseUpdateMemberReq;
 import com.pitchain.dto.res.BaseMemberProfileRes;
 import com.pitchain.dto.res.LoginRes;
@@ -38,7 +38,7 @@ public class MemberService {
 
     public void updateProfileImg(MemberDetails memberDetails, MultipartFile profileImg) {
         Member member = memberRepository.findById(memberDetails.id())
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
         if (member.hasProfileImg()) {
             s3Service.deleteImg(member.getProfileImgKey());

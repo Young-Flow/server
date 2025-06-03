@@ -1,8 +1,8 @@
 package com.pitchain.service;
 
-import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
+import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.SubCategory;
-import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.common.exception.GeneralException;
 import com.pitchain.entity.Member;
 import com.pitchain.jwt.MemberDetails;
 import com.pitchain.repository.MemberRepository;
@@ -21,7 +21,7 @@ public class BmPrefService {
 
     public void createCategoryPref(MemberDetails memberDetails, List<String> subCategoriesInKorean) {
         Member member = memberRepository.findById(memberDetails.id())
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
         List<SubCategory> subCategories = subCategoriesInKorean.stream()
                 .map(SubCategory::from)

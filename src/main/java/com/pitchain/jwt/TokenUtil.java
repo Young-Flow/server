@@ -5,10 +5,10 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
+import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.MemberRole;
 import com.pitchain.common.constant.TokenType;
-import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.common.exception.GeneralException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -111,10 +111,10 @@ public class TokenUtil {
             return JWT.require(Algorithm.HMAC512(secretKey)).build().verify(accessToken);
         } catch (TokenExpiredException e) {
             log.debug("AccessToken is expired: ${}", accessToken);
-            throw new GeneralHandler(ErrorStatus._UNAUTHORIZED);
+            throw new GeneralException(ErrorStatus._UNAUTHORIZED);
         } catch (JWTVerificationException e) {
             log.debug("AccessToken verification is failed because " + e.getMessage());
-            throw new GeneralHandler(ErrorStatus._UNAUTHORIZED);
+            throw new GeneralException(ErrorStatus._UNAUTHORIZED);
         }
     }
 
@@ -125,7 +125,7 @@ public class TokenUtil {
             MemberRole memberRole = MemberRole.valueOf(decodedJWT.getClaim("role").asString());
             return new MemberClaims(id, memberRole);
         } catch (JWTVerificationException e) {
-            throw new GeneralHandler(ErrorStatus._UNAUTHORIZED);
+            throw new GeneralException(ErrorStatus._UNAUTHORIZED);
         }
     }
 }

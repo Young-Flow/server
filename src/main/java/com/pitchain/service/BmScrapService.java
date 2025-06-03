@@ -1,7 +1,7 @@
 package com.pitchain.service;
 
-import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
-import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.common.apiPayload.ErrorStatus;
+import com.pitchain.common.exception.GeneralException;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.BmScrap;
 import com.pitchain.entity.Member;
@@ -24,9 +24,9 @@ public class BmScrapService {
     @Transactional
     public void toggleScrapBm(Long bmId, MemberDetails memberDetails) {
         Member member = memberRepository.findById(memberDetails.id())
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
         Bm bm = bmRepository.findById(bmId)
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.BM_NOT_FOUND));
 
         if (isScraped(member, bm)) {
             cancelScrap(member, bm);

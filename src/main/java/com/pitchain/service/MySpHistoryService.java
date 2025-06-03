@@ -1,7 +1,7 @@
 package com.pitchain.service;
 
-import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
-import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.common.apiPayload.ErrorStatus;
+import com.pitchain.common.exception.GeneralException;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.Member;
 import com.pitchain.entity.MySpHistory;
@@ -24,9 +24,9 @@ public class MySpHistoryService {
     @Transactional
     public void saveMySpHistory(MemberDetails memberDetails, Long bmId, int viewTime) {
         Member member = memberRepository.findById(memberDetails.id())
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
         Bm bm = bmRepository.findById(bmId)
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.BM_NOT_FOUND));
 
         mySpHistoryRepository.findByMemberAndBm(member, bm)
                 .ifPresentOrElse(
