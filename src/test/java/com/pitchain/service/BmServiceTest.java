@@ -3,8 +3,8 @@ package com.pitchain.service;
 import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.*;
 import com.pitchain.common.exception.GeneralException;
-import com.pitchain.dto.req.CreateBmReq;
-import com.pitchain.dto.req.UpdateBmReq;
+import com.pitchain.dto.req.BmCreateReq;
+import com.pitchain.dto.req.BmUpdateReq;
 import com.pitchain.dto.res.BmDetailRes;
 import com.pitchain.dto.res.PtImgRes;
 import com.pitchain.entity.*;
@@ -102,14 +102,14 @@ class BmServiceTest {
         Company company = saveCompany();
         MemberDetails companyMemberDetails = createCompanyMemberDetails(company);
 
-        CreateBmReq createBmReq = new CreateBmReq(company.getId(), NAME, MAIN_CATEGORY, SUB_CATEGORIES,
+        BmCreateReq bmCreateReq = new BmCreateReq(company.getId(), NAME, MAIN_CATEGORY, SUB_CATEGORIES,
                 INTRO, DESCRIPTION, ADDRESS, VALUATION_CAP, GOAL_INVESTMENT, MAX_ISSUED_SHARE, DEADLINE, LONG_PITCH_URL);
 
         when(s3Service.uploadFile(DESC_IMG, S3UploadTarget.COMPANY_DESC))
                 .thenReturn(DESC_IMG_KEY);
 
         //when
-        bmService.createBm(companyMemberDetails, createBmReq, DESC_IMG);
+        bmService.createBm(companyMemberDetails, bmCreateReq, DESC_IMG);
 
         //then
         List<Bm> all = bmRepository.findAll();
@@ -261,7 +261,7 @@ class BmServiceTest {
         final LocalDate updatedDeadline = LocalDate.now().plusDays(30);
         final String updatedLongPitchURL = "updated_bm_long_pitch_url";
 
-        UpdateBmReq updateBmReq = new UpdateBmReq(updatedName, updatedMainCategory,
+        BmUpdateReq bmUpdateReq = new BmUpdateReq(updatedName, updatedMainCategory,
                 updatedSubCategories, updatedIntro, updatedDescription, updatedAddress, updatedValuationCap,
                 updatedGoalInvestment, updatedMaxIssuedShare, updatedDeadline, updatedLongPitchURL
         );
@@ -270,7 +270,7 @@ class BmServiceTest {
                 .thenReturn(updatedDescImgKey);
 
         //when
-        bmService.updateBm(companyMemberDetails, bm.getId(), updateBmReq, DESC_IMG);
+        bmService.updateBm(companyMemberDetails, bm.getId(), bmUpdateReq, DESC_IMG);
 
         //then
         Bm updatedBm = bmRepository.findById(bm.getId()).orElseThrow();
@@ -308,7 +308,7 @@ class BmServiceTest {
         final LocalDate UPDATED_DEADLINE = LocalDate.now().plusDays(30);
         final String UPDATED_LONG_PITCH_URL = "updated_bm_long_pitch_url";
 
-        UpdateBmReq updateBmReq = new UpdateBmReq(UPDATED_NAME, UPDATED_MAIN_CATEGORY,
+        BmUpdateReq bmUpdateReq = new BmUpdateReq(UPDATED_NAME, UPDATED_MAIN_CATEGORY,
                 UPDATED_SUB_CATEGORIES, UPDATED_INTRO, UPDATED_DESCRIPTION,
                 UPDATED_ADDRESS, UPDATED_VALUATION_CAP, UPDATED_GOAL_INVESTMENT,
                 UPDATED_MAX_ISSUED_SHARE, UPDATED_DEADLINE, UPDATED_LONG_PITCH_URL
@@ -323,9 +323,9 @@ class BmServiceTest {
         MemberDetails individualMemberDetails = createIndividualMemberDetails(individual);
 
         //when
-        GeneralException e_1 = assertThrows(GeneralException.class, () -> bmService.updateBm(individualMemberDetails, bm.getId(), updateBmReq, null));
-        GeneralException e_2 = assertThrows(GeneralException.class, () -> bmService.updateBm(companyMemberDetails_01, invalidId, updateBmReq, null));
-        GeneralException e_3 = assertThrows(GeneralException.class, () -> bmService.updateBm(companyMemberDetails_02, bm.getId(), updateBmReq, null));
+        GeneralException e_1 = assertThrows(GeneralException.class, () -> bmService.updateBm(individualMemberDetails, bm.getId(), bmUpdateReq, null));
+        GeneralException e_2 = assertThrows(GeneralException.class, () -> bmService.updateBm(companyMemberDetails_01, invalidId, bmUpdateReq, null));
+        GeneralException e_3 = assertThrows(GeneralException.class, () -> bmService.updateBm(companyMemberDetails_02, bm.getId(), bmUpdateReq, null));
 
         //then
         assertThat(e_1.getErrorStatus()).isEqualTo(ErrorStatus.MEMBER_FORBIDDEN);

@@ -3,8 +3,8 @@ package com.pitchain.service;
 import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.MemberRole;
 import com.pitchain.common.exception.GeneralException;
-import com.pitchain.dto.req.BaseUpdateMemberReq;
-import com.pitchain.dto.req.UpdateCompanyReq;
+import com.pitchain.dto.req.BaseMemberUpdateReq;
+import com.pitchain.dto.req.CompanyUpdateReq;
 import com.pitchain.dto.res.BaseMemberProfileRes;
 import com.pitchain.dto.res.CompanyProfileRes;
 import com.pitchain.entity.Company;
@@ -30,9 +30,9 @@ public class CompanyProfileService implements MemberProfileService {
 
     @Override
     @Transactional
-    public void updateMyProfile(MemberDetails memberDetails, BaseUpdateMemberReq req) {
+    public void updateMyProfile(MemberDetails memberDetails, BaseMemberUpdateReq req) {
         Company company = getCompany(memberDetails);
-        company.updateAddress(((UpdateCompanyReq) req).getAddress());
+        company.updateAddress(((CompanyUpdateReq) req).getAddress());
     }
 
     private Company getCompany(MemberDetails memberDetails) {

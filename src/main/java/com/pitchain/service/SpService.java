@@ -7,7 +7,7 @@ import com.pitchain.common.entity.InfinityScrollRes;
 import com.pitchain.common.exception.GeneralException;
 import com.pitchain.common.util.InfinityScrollUtil;
 import com.pitchain.dto.SpWithLikeDto;
-import com.pitchain.dto.req.CreateSpReq;
+import com.pitchain.dto.req.SpCreateReq;
 import com.pitchain.dto.res.SpDetailRes;
 import com.pitchain.entity.*;
 import com.pitchain.jwt.MemberDetails;
@@ -30,16 +30,16 @@ public class SpService {
     private final SpLikeRepository spLikeRepository;
     private final S3Service s3Service;
 
-    public void createSp(MemberDetails memberDetails, CreateSpReq createSpReq, MultipartFile spVid, MultipartFile thumbnailImg) {
+    public void createSp(MemberDetails memberDetails, SpCreateReq spCreateReq, MultipartFile spVid, MultipartFile thumbnailImg) {
         Company company = entityFacade.getCompany(memberDetails);
-        Bm bm = entityFacade.getBm(createSpReq.bmId());
+        Bm bm = entityFacade.getBm(spCreateReq.bmId());
 
         String spOriginKey = s3Service.uploadFile(spVid, S3UploadTarget.COMPANY_VIDEO);
 
         String spKey = createSpM3U8Key(spOriginKey);
         String thumbnailImgKey = s3Service.uploadFile(thumbnailImg, S3UploadTarget.COMPANY_THUMBNAIL);
 
-        Sp sp = new Sp(bm, spKey, thumbnailImgKey, createSpReq.name());
+        Sp sp = new Sp(bm, spKey, thumbnailImgKey, spCreateReq.name());
         spRepository.save(sp);
     }
 

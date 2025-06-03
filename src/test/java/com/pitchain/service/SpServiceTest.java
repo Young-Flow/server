@@ -2,7 +2,7 @@ package com.pitchain.service;
 
 import com.pitchain.common.constant.*;
 import com.pitchain.common.entity.InfinityScrollRes;
-import com.pitchain.dto.req.CreateSpReq;
+import com.pitchain.dto.req.SpCreateReq;
 import com.pitchain.dto.res.SpDetailRes;
 import com.pitchain.entity.*;
 import com.pitchain.jwt.MemberDetails;
@@ -101,7 +101,7 @@ class SpServiceTest {
     @Test
     void SP_생성_성공() {
         //given
-        CreateSpReq createSpReq = new CreateSpReq(bm.getId(), SP_NAME);
+        SpCreateReq spCreateReq = new SpCreateReq(bm.getId(), SP_NAME);
 
         when(s3Service.uploadFile(SP_VID, S3UploadTarget.COMPANY_VIDEO))
                 .thenReturn(SP_VID.getOriginalFilename());
@@ -109,7 +109,7 @@ class SpServiceTest {
                 .thenReturn(THUMBNAIL_IMG.getOriginalFilename());
 
         //when
-        spService.createSp(companyMemberDetails, createSpReq, SP_VID, THUMBNAIL_IMG);
+        spService.createSp(companyMemberDetails, spCreateReq, SP_VID, THUMBNAIL_IMG);
 
         //then
         List<Sp> all = spRepository.findAll();

@@ -1,7 +1,7 @@
 package com.pitchain.controller;
 
 import com.pitchain.common.entity.InfinityScrollRes;
-import com.pitchain.dto.req.CreateSpReq;
+import com.pitchain.dto.req.SpCreateReq;
 import com.pitchain.dto.res.SpDetailRes;
 import com.pitchain.jwt.MemberDetails;
 import com.pitchain.service.SpService;
@@ -25,10 +25,10 @@ public class SpController {
     @Operation(summary = "SP 생성")
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public void createSp(@AuthenticationPrincipal MemberDetails memberDetails,
-                         @Valid @RequestPart CreateSpReq createSpReq,
+                         @Valid @RequestPart SpCreateReq spCreateReq,
                          @RequestPart MultipartFile spVideo,
                          @RequestPart MultipartFile thumbnailImg) {
-        spService.createSp(memberDetails, createSpReq, spVideo, thumbnailImg);
+        spService.createSp(memberDetails, spCreateReq, spVideo, thumbnailImg);
     }
 
     @Operation(summary = "SP 리스트 조회")

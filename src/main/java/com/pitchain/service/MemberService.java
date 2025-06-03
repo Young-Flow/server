@@ -3,7 +3,7 @@ package com.pitchain.service;
 import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.S3UploadTarget;
 import com.pitchain.common.exception.GeneralException;
-import com.pitchain.dto.req.BaseUpdateMemberReq;
+import com.pitchain.dto.req.BaseMemberUpdateReq;
 import com.pitchain.dto.res.BaseMemberProfileRes;
 import com.pitchain.dto.res.LoginRes;
 import com.pitchain.entity.Member;
@@ -31,7 +31,7 @@ public class MemberService {
         return memberProfileService.getMyProfile(memberDetails);
     }
 
-    public void updateMyProfile(MemberDetails memberDetails, BaseUpdateMemberReq req) {
+    public void updateMyProfile(MemberDetails memberDetails, BaseMemberUpdateReq req) {
         MemberProfileService memberProfileService = memberProfileServiceFactory.getMemberProfileService(memberDetails);
         memberProfileService.updateMyProfile(memberDetails, req);
     }

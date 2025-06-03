@@ -4,9 +4,9 @@ import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.MemberRole;
 import com.pitchain.common.exception.GeneralException;
 import com.pitchain.controller.UpdatePasswordReq;
-import com.pitchain.dto.req.CreateCompanyReq;
-import com.pitchain.dto.req.LoginCompanyReq;
-import com.pitchain.dto.req.VerifyCompanyReq;
+import com.pitchain.dto.req.CompanyCreateReq;
+import com.pitchain.dto.req.CompanyLoginReq;
+import com.pitchain.dto.req.CompanyVerifyReq;
 import com.pitchain.dto.res.LoginRes;
 import com.pitchain.entity.Company;
 import com.pitchain.entity.Member;
@@ -32,7 +32,7 @@ public class CompanyService {
     private final PasswordEncoder passwordEncoder;
     private final TokenUtil tokenUtil;
 
-    public void createCompany(CreateCompanyReq req) {
+    public void createCompany(CompanyCreateReq req) {
         Optional<Member> optionalCompany = memberRepository.findByEmail(req.email());
         verifyEmailConflict(optionalCompany);
         confirmPassword(req.password(), req.passwordConfirmation());
@@ -45,7 +45,7 @@ public class CompanyService {
         companyRepository.save(company);
     }
 
-    public LoginRes loginCompany(LoginCompanyReq req) {
+    public LoginRes loginCompany(CompanyLoginReq req) {
         Member member = memberRepository.findByEmail(req.email())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
@@ -69,7 +69,7 @@ public class CompanyService {
         company.updatePassword(encodedNewPassword);
     }
 
-    public void verifyCompany(MemberDetails memberDetails, VerifyCompanyReq req) {
+    public void verifyCompany(MemberDetails memberDetails, CompanyVerifyReq req) {
         Company company = entityFacade.getCompany(memberDetails);
 
         company.getMember().updateName(req.companyName());

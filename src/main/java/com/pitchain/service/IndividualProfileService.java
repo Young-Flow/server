@@ -3,8 +3,8 @@ package com.pitchain.service;
 import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.MemberRole;
 import com.pitchain.common.exception.GeneralException;
-import com.pitchain.dto.req.BaseUpdateMemberReq;
-import com.pitchain.dto.req.UpdateIndividualReq;
+import com.pitchain.dto.req.BaseMemberUpdateReq;
+import com.pitchain.dto.req.IndividualUpdateReq;
 import com.pitchain.dto.res.BaseMemberProfileRes;
 import com.pitchain.dto.res.IndividualProfileRes;
 import com.pitchain.entity.Individual;
@@ -30,10 +30,10 @@ public class IndividualProfileService implements MemberProfileService {
 
     @Override
     @Transactional
-    public void updateMyProfile(MemberDetails memberDetails, BaseUpdateMemberReq req) {
+    public void updateMyProfile(MemberDetails memberDetails, BaseMemberUpdateReq req) {
         Individual individual = getIndividual(memberDetails);
         Member member = individual.getMember();
-        member.updateProfile(((UpdateIndividualReq) req).getName());
+        member.updateProfile(((IndividualUpdateReq) req).getName());
     }
 
     private Individual getIndividual(MemberDetails memberDetails) {

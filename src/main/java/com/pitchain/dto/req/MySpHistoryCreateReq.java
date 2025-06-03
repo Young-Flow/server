@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 
 @Getter
-public class SaveMySpHistoryReq {
+public class MySpHistoryCreateReq {
     @NotNull(message = "BM ID는 필수입니다.")
     private Long bmId;
 

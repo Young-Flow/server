@@ -1,11 +1,10 @@
 package com.pitchain.service;
 
-import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.MemberRole;
 import com.pitchain.common.constant.OauthProvider;
 import com.pitchain.common.constant.S3UploadTarget;
-import com.pitchain.dto.req.UpdateCompanyReq;
-import com.pitchain.dto.req.UpdateIndividualReq;
+import com.pitchain.dto.req.CompanyUpdateReq;
+import com.pitchain.dto.req.IndividualUpdateReq;
 import com.pitchain.dto.res.CompanyProfileRes;
 import com.pitchain.dto.res.IndividualProfileRes;
 import com.pitchain.entity.Company;
@@ -124,7 +123,7 @@ class MemberServiceTest {
         Company company = saveCompany();
         MemberDetails companyMemberDetails = createCompanyMemberDetails(company);
 
-        UpdateCompanyReq baseUpdateMemberReq = new UpdateCompanyReq("address", MemberRole.COMPANY);
+        CompanyUpdateReq baseUpdateMemberReq = new CompanyUpdateReq("address", MemberRole.COMPANY);
 
         //when
         memberService.updateMyProfile(companyMemberDetails, baseUpdateMemberReq);
@@ -140,7 +139,7 @@ class MemberServiceTest {
         Member member = individual.getMember();
         MemberDetails individualMemberDetails = createIndividualMemberMemberDetails(member);
 
-        UpdateIndividualReq updateMemberReq = new UpdateIndividualReq( "newName", MemberRole.INDIVIDUAL);
+        IndividualUpdateReq updateMemberReq = new IndividualUpdateReq( "newName", MemberRole.INDIVIDUAL);
 
         //when
         memberService.updateMyProfile(individualMemberDetails, updateMemberReq);

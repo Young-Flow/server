@@ -2,7 +2,7 @@ package com.pitchain.controller;
 
 import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.apiPayload.annotation.ErrorApiResponse;
-import com.pitchain.dto.req.BaseUpdateMemberReq;
+import com.pitchain.dto.req.BaseMemberUpdateReq;
 import com.pitchain.dto.res.BaseMemberProfileRes;
 import com.pitchain.dto.res.LoginRes;
 import com.pitchain.jwt.MemberDetails;
@@ -31,7 +31,7 @@ public class MemberController {
     @Operation(summary = "나의 프로필 수정", description = "memberRole 입력 필수")
     @PutMapping
     public void updateMyProfile(@AuthenticationPrincipal MemberDetails memberDetails,
-                                @RequestBody @Valid BaseUpdateMemberReq req) {
+                                @RequestBody @Valid BaseMemberUpdateReq req) {
         memberService.updateMyProfile(memberDetails, req);
     }
 

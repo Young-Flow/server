@@ -5,11 +5,11 @@ import jakarta.annotation.Nullable;
 import lombok.Getter;
 
 @Getter
-public class UpdateCompanyReq extends BaseUpdateMemberReq {
+public class CompanyUpdateReq extends BaseMemberUpdateReq {
     @Nullable
     private final String address;
 
-    public UpdateCompanyReq(String address, MemberRole memberRole) {
+    public CompanyUpdateReq(String address, MemberRole memberRole) {
         super(memberRole);
         this.address = address;
     }

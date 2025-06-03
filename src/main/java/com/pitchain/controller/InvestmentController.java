@@ -1,6 +1,6 @@
 package com.pitchain.controller;
 
-import com.pitchain.dto.req.AddInvestmentReq;
+import com.pitchain.dto.req.InvestmentAddReq;
 import com.pitchain.dto.res.InvestmentStatusRes;
 import com.pitchain.jwt.MemberDetails;
 import com.pitchain.service.InvestmentService;
@@ -19,7 +19,7 @@ public class InvestmentController {
     @PostMapping("/{bmId}/investments")
     public void addInvestment(@PathVariable("bmId") Long bmId,
                               @AuthenticationPrincipal MemberDetails memberDetails,
-                              @Valid @RequestBody AddInvestmentReq req) {
+                              @Valid @RequestBody InvestmentAddReq req) {
         long amount = req.getAmount();
         investmentService.addInvestment(bmId, memberDetails, amount);
     }

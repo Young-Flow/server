@@ -4,8 +4,8 @@ import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.S3UploadTarget;
 import com.pitchain.common.exception.GeneralException;
 import com.pitchain.dto.BmWithScrapDto;
-import com.pitchain.dto.req.CreateBmReq;
-import com.pitchain.dto.req.UpdateBmReq;
+import com.pitchain.dto.req.BmCreateReq;
+import com.pitchain.dto.req.BmUpdateReq;
 import com.pitchain.dto.res.BmDetailRes;
 import com.pitchain.dto.res.PtImgRes;
 import com.pitchain.entity.*;
@@ -32,7 +32,7 @@ public class BmService {
     private final MyBmHistoryRepository myBmHistoryRepository;
     private final S3Service s3Service;
 
-    public void createBm(MemberDetails memberDetails, CreateBmReq createBmReq, MultipartFile descImg) {
+    public void createBm(MemberDetails memberDetails, BmCreateReq bmCreateReq, MultipartFile descImg) {
         Company company = entityFacade.getCompany(memberDetails);
 
         String descImgKey = s3Service.uploadFile(descImg, S3UploadTarget.COMPANY_DESC);
@@ -60,7 +60,7 @@ public class BmService {
         return BmDetailRes.createRes(bmWithScrapDto, ptImgResList, scrapCnt, subCategories);
     }
 
-    public void updateBm(MemberDetails memberDetails, Long bmId, UpdateBmReq updateBmReq, MultipartFile descImg) {
+    public void updateBm(MemberDetails memberDetails, Long bmId, BmUpdateReq bmUpdateReq, MultipartFile descImg) {
         Company company = entityFacade.getCompany(memberDetails);
         Bm bm = entityFacade.getBm(bmId);
 
@@ -68,9 +68,9 @@ public class BmService {
 
         String descImgKey = s3Service.uploadFile(descImg, S3UploadTarget.COMPANY_DESC);
 
-        bm.updateSubCategories(updateBmReq.subCategories());
+        bm.updateSubCategories(bmUpdateReq.subCategories());
 
-        Bm updateBm = updateBmReq.createBm(descImgKey);
+        Bm updateBm = bmUpdateReq.createBm(descImgKey);
         bm.update(updateBm);
     }
 

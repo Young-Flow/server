@@ -5,10 +5,10 @@ import jakarta.annotation.Nullable;
 import lombok.Getter;
 
 @Getter
-public class UpdateIndividualReq extends BaseUpdateMemberReq {
+public class IndividualUpdateReq extends BaseMemberUpdateReq {
     @Nullable
     private final String name;
-    public UpdateIndividualReq(String name, MemberRole memberRole) {
+    public IndividualUpdateReq(String name, MemberRole memberRole) {
         super(memberRole);
         this.name = name;
     }
