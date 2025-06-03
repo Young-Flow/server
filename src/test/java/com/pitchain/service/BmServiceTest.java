@@ -1,8 +1,8 @@
 package com.pitchain.service;
 
-import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
+import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.*;
-import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.common.exception.GeneralException;
 import com.pitchain.dto.req.CreateBmReq;
 import com.pitchain.dto.req.UpdateBmReq;
 import com.pitchain.dto.res.BmDetailRes;
@@ -233,8 +233,8 @@ class BmServiceTest {
         MemberDetails invalidMemberDetails = new MemberDetails(Long.MAX_VALUE, MemberRole.INDIVIDUAL);
 
         //when
-        GeneralHandler e_1 = assertThrows(GeneralHandler.class, () -> bmService.getBmDetail(invalidMemberDetails, invalidId));
-        GeneralHandler e_2 = assertThrows(GeneralHandler.class, () -> bmService.getBmDetail(memberDetails, invalidId));
+        GeneralException e_1 = assertThrows(GeneralException.class, () -> bmService.getBmDetail(invalidMemberDetails, invalidId));
+        GeneralException e_2 = assertThrows(GeneralException.class, () -> bmService.getBmDetail(memberDetails, invalidId));
 
         //then
         assertThat(e_1.getErrorStatus()).isEqualTo(ErrorStatus.MEMBER_NOT_FOUND);
@@ -323,9 +323,9 @@ class BmServiceTest {
         MemberDetails individualMemberDetails = createIndividualMemberDetails(individual);
 
         //when
-        GeneralHandler e_1 = assertThrows(GeneralHandler.class, () -> bmService.updateBm(individualMemberDetails, bm.getId(), updateBmReq, null));
-        GeneralHandler e_2 = assertThrows(GeneralHandler.class, () -> bmService.updateBm(companyMemberDetails_01, invalidId, updateBmReq, null));
-        GeneralHandler e_3 = assertThrows(GeneralHandler.class, () -> bmService.updateBm(companyMemberDetails_02, bm.getId(), updateBmReq, null));
+        GeneralException e_1 = assertThrows(GeneralException.class, () -> bmService.updateBm(individualMemberDetails, bm.getId(), updateBmReq, null));
+        GeneralException e_2 = assertThrows(GeneralException.class, () -> bmService.updateBm(companyMemberDetails_01, invalidId, updateBmReq, null));
+        GeneralException e_3 = assertThrows(GeneralException.class, () -> bmService.updateBm(companyMemberDetails_02, bm.getId(), updateBmReq, null));
 
         //then
         assertThat(e_1.getErrorStatus()).isEqualTo(ErrorStatus.MEMBER_FORBIDDEN);
@@ -402,9 +402,9 @@ class BmServiceTest {
 
         //when
         bmService.updatePtImgs(companyMemberDetails_1, bm.getId(), null);
-        GeneralHandler e_1 = assertThrows(GeneralHandler.class, () -> bmService.updatePtImgs(individualMemberDetails, bm.getId(), null));
-        GeneralHandler e_2 = assertThrows(GeneralHandler.class, () -> bmService.updatePtImgs(companyMemberDetails_1, invalidId, null));
-        GeneralHandler e_3 = assertThrows(GeneralHandler.class, () -> bmService.updatePtImgs(companyMemberDetails_2, bm.getId(), null));
+        GeneralException e_1 = assertThrows(GeneralException.class, () -> bmService.updatePtImgs(individualMemberDetails, bm.getId(), null));
+        GeneralException e_2 = assertThrows(GeneralException.class, () -> bmService.updatePtImgs(companyMemberDetails_1, invalidId, null));
+        GeneralException e_3 = assertThrows(GeneralException.class, () -> bmService.updatePtImgs(companyMemberDetails_2, bm.getId(), null));
 
         //then
         assertThat(e_1.getErrorStatus()).isEqualTo(ErrorStatus.MEMBER_FORBIDDEN);
@@ -442,9 +442,9 @@ class BmServiceTest {
         MemberDetails individualMemberDetails = createIndividualMemberDetails(individual);
 
         //when
-        GeneralHandler e_1 = assertThrows(GeneralHandler.class, () -> bmService.deleteBm(individualMemberDetails, bm.getId()));
-        GeneralHandler e_2 = assertThrows(GeneralHandler.class, () -> bmService.deleteBm(companyMemberDetails_1, invalidId));
-        GeneralHandler e_3 = assertThrows(GeneralHandler.class, () -> bmService.deleteBm(companyMemberDetails_2, bm.getId()));
+        GeneralException e_1 = assertThrows(GeneralException.class, () -> bmService.deleteBm(individualMemberDetails, bm.getId()));
+        GeneralException e_2 = assertThrows(GeneralException.class, () -> bmService.deleteBm(companyMemberDetails_1, invalidId));
+        GeneralException e_3 = assertThrows(GeneralException.class, () -> bmService.deleteBm(companyMemberDetails_2, bm.getId()));
 
         //then
         assertThat(e_1.getErrorStatus()).isEqualTo(ErrorStatus.MEMBER_FORBIDDEN);

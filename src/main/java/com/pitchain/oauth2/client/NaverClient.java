@@ -1,8 +1,8 @@
 package com.pitchain.oauth2.client;
 
-import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
+import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.OauthProvider;
-import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.common.exception.GeneralException;
 import com.pitchain.oauth2.member.NaverMemberInfo;
 import com.pitchain.oauth2.member.OauthMemberInfo;
 import com.pitchain.oauth2.param.OauthParams;
@@ -15,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @Slf4j
 @Component
@@ -65,7 +64,7 @@ public class NaverClient implements OauthClient {
 
         if (naverToken == null) {
             log.error("naver token을 정상적으로 가져오지 못했습니다.");
-            throw new GeneralHandler(ErrorStatus._BAD_REQUEST);
+            throw new GeneralException(ErrorStatus._BAD_REQUEST);
         }
         return naverToken.getAccess_token();
     }

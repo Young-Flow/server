@@ -1,17 +1,14 @@
-package com.pitchain.common.apiPayload.dto;
+package com.pitchain.common.apiPayload;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 
+@AllArgsConstructor
 @Getter
-@Builder
-public class ResponseDTO {
-
-    private final boolean isSuccess;
+public class ErrorResponseDTO {
     private final HttpStatus httpStatus;
     private final String code;
     private final String message;
-
 }

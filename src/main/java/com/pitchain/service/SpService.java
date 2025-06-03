@@ -1,10 +1,10 @@
 package com.pitchain.service;
 
-import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
+import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.MainCategory;
 import com.pitchain.common.constant.S3UploadTarget;
 import com.pitchain.common.entity.InfinityScrollRes;
-import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.common.exception.GeneralException;
 import com.pitchain.common.util.InfinityScrollUtil;
 import com.pitchain.dto.SpWithLikeDto;
 import com.pitchain.dto.req.CreateSpReq;
@@ -90,7 +90,7 @@ public class SpService {
     @Transactional(readOnly = true)
     public SpDetailRes getSpDetail(MemberDetails memberDetails, Long spId) {
         SpWithLikeDto spWithLikeDto = spRepository.findSpWithLike(memberDetails.id(), spId)
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.SP_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.SP_NOT_FOUND));
         Sp sp = spWithLikeDto.getSp();
         Bm bm = sp.getBm();
 
@@ -127,7 +127,7 @@ public class SpService {
 
     private static void validateSpOwner(Sp sp, Company company) {
         if (!sp.isOwner(company.getId())) {
-            throw new GeneralHandler(ErrorStatus.COMPANY_FORBIDDEN);
+            throw new GeneralException(ErrorStatus.COMPANY_FORBIDDEN);
         }
     }
 

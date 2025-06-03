@@ -1,7 +1,7 @@
 package com.pitchain.service;
 
-import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
-import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.common.apiPayload.ErrorStatus;
+import com.pitchain.common.exception.GeneralException;
 import com.pitchain.entity.Member;
 import com.pitchain.entity.Sp;
 import com.pitchain.entity.SpLike;
@@ -22,9 +22,9 @@ public class SpLikeService {
     @Transactional
     public void toggleLikeSp(Long spId, MemberDetails memberDetails) {
         Member member = memberRepository.findById(memberDetails.id())
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
         Sp sp = spRepository.findById(spId)
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.SP_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.SP_NOT_FOUND));
 
         if (isLiked(member, sp)) {
             cancelLike(member, sp);

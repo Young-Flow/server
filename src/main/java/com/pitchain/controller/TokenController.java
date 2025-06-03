@@ -1,6 +1,5 @@
 package com.pitchain.controller;
 
-import com.pitchain.common.apiPayload.dto.CustomApiResponse;
 import com.pitchain.common.constant.MemberRole;
 import com.pitchain.jwt.TokenUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,13 +17,13 @@ public class TokenController {
 
     @Operation(summary = "Access Token 발급 / 개발용 / 3시간 이후 만료")
     @GetMapping("/dev/access-token")
-    public CustomApiResponse<String> issueAccessTokenWithoutExpiration(@RequestParam Long id, @RequestParam MemberRole memberRole) {
-        return CustomApiResponse.onSuccess(tokenUtil.issueAccessTokenWithoutExpiration(id, memberRole));
+    public String issueAccessTokenWithoutExpiration(@RequestParam Long id, @RequestParam MemberRole memberRole) {
+        return tokenUtil.issueAccessTokenWithoutExpiration(id, memberRole);
     }
 
     @Operation(summary = "Refresh Token 발급 / 개발용 / 3시간 이후 만료")
     @GetMapping("/dev/refresh-token")
-    public CustomApiResponse<String> token(@RequestParam Long id, @RequestParam MemberRole memberRole) {
-        return CustomApiResponse.onSuccess(tokenUtil.issueRefreshTokenWithoutExpiration(id, memberRole));
+    public String token(@RequestParam Long id, @RequestParam MemberRole memberRole) {
+        return tokenUtil.issueRefreshTokenWithoutExpiration(id, memberRole);
     }
 }

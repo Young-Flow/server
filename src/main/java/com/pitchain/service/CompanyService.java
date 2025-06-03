@@ -1,8 +1,8 @@
 package com.pitchain.service;
 
-import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
+import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.MemberRole;
-import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.common.exception.GeneralException;
 import com.pitchain.controller.UpdatePasswordReq;
 import com.pitchain.dto.req.CreateCompanyReq;
 import com.pitchain.dto.req.LoginCompanyReq;
@@ -47,10 +47,10 @@ public class CompanyService {
 
     public LoginRes loginCompany(LoginCompanyReq req) {
         Member member = memberRepository.findByEmail(req.email())
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
         Company company = companyRepository.findByMemberId(member.getId())
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.COMPANY_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.COMPANY_NOT_FOUND));
 
         verifyPassword(req.password(), company.getPassword());
 
@@ -78,16 +78,16 @@ public class CompanyService {
 
     private static void verifyEmailConflict(Optional<Member> optionalMember) {
         if (optionalMember.isPresent())
-            throw new GeneralHandler(ErrorStatus.COMPANY_EMAIL_CONFLICT);
+            throw new GeneralException(ErrorStatus.COMPANY_EMAIL_CONFLICT);
     }
 
     private void confirmPassword(String password, String passwordConfirmation) {
         if (!password.equals(passwordConfirmation))
-            throw new GeneralHandler(ErrorStatus.COMPANY_PASSWORD_UNCONFIRMED);
+            throw new GeneralException(ErrorStatus.COMPANY_PASSWORD_UNCONFIRMED);
     }
 
     private void verifyPassword(String inputPassword, String encodedPassword) {
         if (!passwordEncoder.matches(inputPassword, encodedPassword))
-            throw new GeneralHandler(ErrorStatus.COMPANY_PASSWORD_NOT_MATCHED);
+            throw new GeneralException(ErrorStatus.COMPANY_PASSWORD_NOT_MATCHED);
     }
 }

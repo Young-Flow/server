@@ -1,8 +1,8 @@
 package com.pitchain.service;
 
-import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
+import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.MemberRole;
-import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.common.exception.GeneralException;
 import com.pitchain.dto.req.BaseUpdateMemberReq;
 import com.pitchain.dto.req.UpdateCompanyReq;
 import com.pitchain.dto.res.BaseMemberProfileRes;
@@ -37,10 +37,10 @@ public class CompanyProfileService implements MemberProfileService {
 
     private Company getCompany(MemberDetails memberDetails) {
         if (memberDetails.memberRole().equals(MemberRole.INDIVIDUAL)) {
-            throw new GeneralHandler(ErrorStatus.MEMBER_FORBIDDEN);
+            throw new GeneralException(ErrorStatus.MEMBER_FORBIDDEN);
         }
 
         return companyRepository.findByMemberId(memberDetails.id())
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.COMPANY_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.COMPANY_NOT_FOUND));
     }
 }

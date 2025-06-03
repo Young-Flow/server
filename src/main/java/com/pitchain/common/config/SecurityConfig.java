@@ -1,6 +1,5 @@
 package com.pitchain.common.config;
 
-import com.pitchain.common.exception.ExceptionHandlerFilter;
 import com.pitchain.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -28,7 +27,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final ExceptionHandlerFilter exceptionHandlerFilter;
 
     public static final String[] whitelist = {
             "/oauth**",
@@ -50,7 +48,6 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable);
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        http.addFilterBefore(exceptionHandlerFilter, JwtAuthenticationFilter.class);
         return http.build();
     }
 

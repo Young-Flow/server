@@ -1,6 +1,5 @@
 package com.pitchain.controller;
 
-import com.pitchain.common.apiPayload.dto.CustomApiResponse;
 import com.pitchain.dto.req.OauthLoginReq;
 import com.pitchain.dto.res.LoginRes;
 import com.pitchain.service.OauthService;
@@ -26,8 +25,8 @@ public class OauthController {
             "GOOGLE: https://accounts.google.com/o/oauth2/v2/auth?client_id=811738095331-ogbk4dfq2bg5ojo6gf9u3oa4iob80glb.apps.googleusercontent.com&redirect_uri=http://localhost:5173/sign/google/callback&response_type=code&scope=email%20profile"
     )
     @PostMapping("/login")
-    public CustomApiResponse<LoginRes> socialLogin(@Valid @RequestBody OauthLoginReq req) {
-        LoginRes memberByOauthLogin = oauthService.getMemberByOauthLogin(req);
-        return CustomApiResponse.onSuccess(memberByOauthLogin);
+    public LoginRes socialLogin(@Valid @RequestBody OauthLoginReq req) {
+        LoginRes loginRes = oauthService.getMemberByOauthLogin(req);
+        return loginRes;
     }
 }

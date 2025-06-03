@@ -1,7 +1,7 @@
 package com.pitchain.controller;
 
-import com.pitchain.common.apiPayload.dto.CustomApiResponse;
 import com.pitchain.dto.req.AddInvestmentReq;
+import com.pitchain.dto.res.InvestmentStatusRes;
 import com.pitchain.jwt.MemberDetails;
 import com.pitchain.service.InvestmentService;
 import jakarta.validation.Valid;
@@ -17,16 +17,16 @@ public class InvestmentController {
     private final InvestmentService investmentService;
 
     @PostMapping("/{bmId}/investments")
-    public CustomApiResponse<AddInvestmentReq> addInvestment(@PathVariable("bmId") Long bmId,
-                                                             @AuthenticationPrincipal MemberDetails memberDetails,
-                                                             @Valid @RequestBody AddInvestmentReq req) {
+    public void addInvestment(@PathVariable("bmId") Long bmId,
+                              @AuthenticationPrincipal MemberDetails memberDetails,
+                              @Valid @RequestBody AddInvestmentReq req) {
         long amount = req.getAmount();
         investmentService.addInvestment(bmId, memberDetails, amount);
-        return CustomApiResponse.onSuccess();
     }
 
     @GetMapping("/{bmId}/investment")
-    public CustomApiResponse getInvestmentStatus(@PathVariable("bmId") Long bmId) {
-        return CustomApiResponse.onSuccess(investmentService.getInvestmentStatus(bmId));
+    public InvestmentStatusRes getInvestmentStatus(@PathVariable("bmId") Long bmId) {
+        InvestmentStatusRes investmentStatusRes = investmentService.getInvestmentStatus(bmId);
+        return investmentStatusRes;
     }
 }

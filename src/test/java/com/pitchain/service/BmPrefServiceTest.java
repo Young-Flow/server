@@ -1,9 +1,9 @@
 package com.pitchain.service;
 
-import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
+import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.MemberRole;
 import com.pitchain.common.constant.SubCategory;
-import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.common.exception.GeneralException;
 import com.pitchain.entity.CategoryPref;
 import com.pitchain.entity.Member;
 import com.pitchain.jwt.MemberDetails;
@@ -57,7 +57,7 @@ class BmPrefServiceTest {
         List<String> subCategories = List.of(SubCategory.BEVERAGE_COFFEE.getKoreanName(), randomSubCategoryInKorean);
 
         //when
-        GeneralHandler error = assertThrows(GeneralHandler.class, () -> bmPrefService.createCategoryPref(memberDetails, subCategories));
+        GeneralException error = assertThrows(GeneralException.class, () -> bmPrefService.createCategoryPref(memberDetails, subCategories));
 
         //then
         assertThat(error.getErrorStatus()).isEqualTo(ErrorStatus.SUB_CATEGORY_NOT_FOUND);

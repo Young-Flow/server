@@ -1,8 +1,8 @@
 package com.pitchain.service;
 
-import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
+import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.MemberRole;
-import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.common.exception.GeneralException;
 import com.pitchain.controller.UpdatePasswordReq;
 import com.pitchain.dto.req.CreateCompanyReq;
 import com.pitchain.dto.req.LoginCompanyReq;
@@ -79,7 +79,7 @@ public class CompanyServiceTest {
         CreateCompanyReq req = new CreateCompanyReq(COMPANY_EMAIL, COMPANY_PASSWORD, COMPANY_PASSWORD_CONFIRMATION);
 
         //when
-        GeneralHandler e = assertThrows(GeneralHandler.class, () -> companyService.createCompany(req));
+        GeneralException e = assertThrows(GeneralException.class, () -> companyService.createCompany(req));
 
         //then
         assertThat(e.getErrorStatus()).isEqualTo(ErrorStatus.COMPANY_EMAIL_CONFLICT);
@@ -92,7 +92,7 @@ public class CompanyServiceTest {
         CreateCompanyReq req = new CreateCompanyReq(COMPANY_EMAIL, COMPANY_PASSWORD, wrongPasswordConfirmation);
 
         //when
-        GeneralHandler e = assertThrows(GeneralHandler.class, () -> companyService.createCompany(req));
+        GeneralException e = assertThrows(GeneralException.class, () -> companyService.createCompany(req));
 
         //then
         assertThat(e.getErrorStatus()).isEqualTo(ErrorStatus.COMPANY_PASSWORD_UNCONFIRMED);
@@ -125,8 +125,8 @@ public class CompanyServiceTest {
         String invalidPassword = "invalidPassword";
 
         //when
-        GeneralHandler e_1 = assertThrows(GeneralHandler.class, () -> companyService.loginCompany(new LoginCompanyReq(invalidEmail, COMPANY_PASSWORD)));
-        GeneralHandler e_2 = assertThrows(GeneralHandler.class, () -> companyService.loginCompany(new LoginCompanyReq(COMPANY_EMAIL, invalidPassword)));
+        GeneralException e_1 = assertThrows(GeneralException.class, () -> companyService.loginCompany(new LoginCompanyReq(invalidEmail, COMPANY_PASSWORD)));
+        GeneralException e_2 = assertThrows(GeneralException.class, () -> companyService.loginCompany(new LoginCompanyReq(COMPANY_EMAIL, invalidPassword)));
 
         //then
         assertThat(e_1.getErrorStatus()).isEqualTo(ErrorStatus.MEMBER_NOT_FOUND);

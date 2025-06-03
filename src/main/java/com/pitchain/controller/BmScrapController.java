@@ -1,6 +1,5 @@
 package com.pitchain.controller;
 
-import com.pitchain.common.apiPayload.dto.CustomApiResponse;
 import com.pitchain.jwt.MemberDetails;
 import com.pitchain.service.BmScrapService;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +17,8 @@ public class BmScrapController {
     private final BmScrapService bmScrapService;
 
     @PostMapping("/{bmId}/scrap")
-    public CustomApiResponse toggleScrapBm(@PathVariable("bmId") Long bmId,
-                                           @AuthenticationPrincipal MemberDetails memberDetails) {
+    public void toggleScrapBm(@PathVariable("bmId") Long bmId,
+                              @AuthenticationPrincipal MemberDetails memberDetails) {
         bmScrapService.toggleScrapBm(bmId, memberDetails);
-        return CustomApiResponse.onSuccess();
     }
 }

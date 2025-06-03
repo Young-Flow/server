@@ -1,7 +1,7 @@
 package com.pitchain.service;
 
-import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
-import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.common.apiPayload.ErrorStatus;
+import com.pitchain.common.exception.GeneralException;
 import com.pitchain.dto.req.CommentReq;
 import com.pitchain.dto.res.BaseCommentRes;
 import com.pitchain.dto.res.CommentRes;
@@ -31,9 +31,9 @@ public class CommentService {
     @Transactional
     public void addComment(Long bmId, MemberDetails memberDetails, CommentReq.AddCommentReq req) {
         Member member = memberRepository.findById(memberDetails.id()).orElseThrow(() ->
-                new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+                new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
         Bm bm = bmRepository.findById(bmId).orElseThrow(() ->
-                new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
+                new GeneralException(ErrorStatus.BM_NOT_FOUND));
 
         String content = req.getContent();
         Long parentCommentId = req.getParentCommentId();
@@ -47,7 +47,7 @@ public class CommentService {
 
     private void addReplyComment(Member member, Bm bm, String content, Long parentCommentId) {
         Comment parentComment = commentRepository.findById(parentCommentId).orElseThrow(() ->
-                new GeneralHandler(ErrorStatus.COMMENT_NOT_FOUND));
+                new GeneralException(ErrorStatus.COMMENT_NOT_FOUND));
 
         Comment comment = Comment.builder()
                 .member(member)
@@ -72,9 +72,9 @@ public class CommentService {
     @Transactional(readOnly = true)
     public List<? extends BaseCommentRes> getComments(Long bmId, MemberDetails memberDetails) {
         Member member = memberRepository.findById(memberDetails.id()).orElseThrow(() ->
-                new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+                new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
         Bm bm = bmRepository.findById(bmId).orElseThrow(() ->
-                new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
+                new GeneralException(ErrorStatus.BM_NOT_FOUND));
 
         List<Comment> comments = commentRepository.findByBm(bm);
 
@@ -97,9 +97,9 @@ public class CommentService {
     @Transactional
     public void modifyComment(Long commentId, MemberDetails memberDetails, CommentReq.ModifyCommentReq req) {
         Member member = memberRepository.findById(memberDetails.id()).orElseThrow(() ->
-                new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+                new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
         Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
-                new GeneralHandler(ErrorStatus.COMMENT_NOT_FOUND));
+                new GeneralException(ErrorStatus.COMMENT_NOT_FOUND));
 
         Member commentWriter = comment.getMember();
         validateWriter(member, commentWriter);
@@ -111,9 +111,9 @@ public class CommentService {
     @Transactional
     public void removeComment(Long commentId, MemberDetails memberDetails) {
         Member member = memberRepository.findById(memberDetails.id()).orElseThrow(() ->
-                new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+                new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
         Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
-                new GeneralHandler(ErrorStatus.COMMENT_NOT_FOUND));
+                new GeneralException(ErrorStatus.COMMENT_NOT_FOUND));
 
         Member commentWriter = comment.getMember();
         validateWriter(member, commentWriter);
@@ -132,7 +132,7 @@ public class CommentService {
 
     private static void validateWriter(Member member, Member commentWriter) {
         if (!commentWriter.equals(member)) {
-            throw new GeneralHandler(ErrorStatus.MEMBER_FORBIDDEN);
+            throw new GeneralException(ErrorStatus.MEMBER_FORBIDDEN);
         }
     }
 

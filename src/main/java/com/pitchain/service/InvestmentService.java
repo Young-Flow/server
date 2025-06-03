@@ -1,8 +1,8 @@
 package com.pitchain.service;
 
-import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
+import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.MemberRole;
-import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.common.exception.GeneralException;
 import com.pitchain.dto.InvestmentStatusDto;
 import com.pitchain.dto.res.InvestmentStatusRes;
 import com.pitchain.entity.Bm;
@@ -27,12 +27,12 @@ public class InvestmentService {
 
     public void addInvestment(Long bmId, MemberDetails memberDetails, long amount) {
         if (memberDetails.memberRole().equals(MemberRole.COMPANY))
-            throw new GeneralHandler(ErrorStatus.COMPANY_FORBIDDEN);
+            throw new GeneralException(ErrorStatus.COMPANY_FORBIDDEN);
 
         Member member = memberRepository.findById(memberDetails.id())
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
-        Bm bm = bmRepository.findById(bmId).orElseThrow(() -> new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
+        Bm bm = bmRepository.findById(bmId).orElseThrow(() -> new GeneralException(ErrorStatus.BM_NOT_FOUND));
         Investment investment = Investment.builder()
                 .member(member)
                 .bm(bm)
@@ -45,7 +45,7 @@ public class InvestmentService {
     @Transactional(readOnly = true)
     public InvestmentStatusRes getInvestmentStatus(Long bmId) {
         Bm bm = bmRepository.findById(bmId)
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.BM_NOT_FOUND));
 
         InvestmentStatusDto investmentStatusDto = investmentRepository.findInvestmentStatusByBm(bm);
         int achievementRate = getAchievementRate(bm.getGoalInvestment(), investmentStatusDto.getRaisedAmount());

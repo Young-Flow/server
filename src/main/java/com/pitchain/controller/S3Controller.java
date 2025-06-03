@@ -1,6 +1,5 @@
 package com.pitchain.controller;
 
-import com.pitchain.common.apiPayload.dto.CustomApiResponse;
 import com.pitchain.common.constant.S3UploadTarget;
 import com.pitchain.service.S3Service;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,23 +16,21 @@ public class S3Controller {
 
     @Operation(summary = "파일(이미지, 동영상) 저장 / 개발용")
     @PostMapping(value = "/s3", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public CustomApiResponse<String> uploadFile(@RequestPart MultipartFile file,
-                                                @RequestParam S3UploadTarget s3UploadTarget) {
+    public String uploadFile(@RequestPart MultipartFile file,
+                             @RequestParam S3UploadTarget s3UploadTarget) {
         String fileKey = s3Service.uploadFile(file, s3UploadTarget);
-        return CustomApiResponse.onSuccess(fileKey);
+        return fileKey;
     }
 
     @Operation(summary = "파일(이미지) 삭제 / 개발용")
     @DeleteMapping("/s3/images")
-    public CustomApiResponse deleteImg(@RequestParam String fileKey) {
+    public void deleteImg(@RequestParam String fileKey) {
         s3Service.deleteImg(fileKey);
-        return CustomApiResponse.onSuccess();
     }
 
     @Operation(summary = "파일(동영상) 삭제 / 개발용")
     @DeleteMapping("/s3/videos")
-    public CustomApiResponse deleteVid(@RequestParam String fileKey) {
+    public void deleteVid(@RequestParam String fileKey) {
         s3Service.deleteVid(fileKey);
-        return CustomApiResponse.onSuccess();
     }
 }

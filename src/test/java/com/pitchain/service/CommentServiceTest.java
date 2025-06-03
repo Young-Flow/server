@@ -1,9 +1,9 @@
 package com.pitchain.service;
 
-import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
+import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.MainCategory;
 import com.pitchain.common.constant.MemberRole;
-import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.common.exception.GeneralException;
 import com.pitchain.dto.req.CommentReq;
 import com.pitchain.dto.res.BaseCommentRes;
 import com.pitchain.dto.res.CommentRes;
@@ -258,9 +258,9 @@ class CommentServiceTest {
         modifyCommentReq.setContent("댓글 내용");
 
         //when
-        GeneralHandler error1 = Assertions.assertThrows(GeneralHandler.class, () -> commentService.modifyComment(commentId, invalidIndividualMemberDetails1, modifyCommentReq));
-        GeneralHandler error2 = Assertions.assertThrows(GeneralHandler.class, () -> commentService.modifyComment(invalidId, individualMemberDetails, modifyCommentReq));
-        GeneralHandler error3 = Assertions.assertThrows(GeneralHandler.class, () -> commentService.modifyComment(commentId, invalidIndividualMemberDetails2, modifyCommentReq));
+        GeneralException error1 = Assertions.assertThrows(GeneralException.class, () -> commentService.modifyComment(commentId, invalidIndividualMemberDetails1, modifyCommentReq));
+        GeneralException error2 = Assertions.assertThrows(GeneralException.class, () -> commentService.modifyComment(invalidId, individualMemberDetails, modifyCommentReq));
+        GeneralException error3 = Assertions.assertThrows(GeneralException.class, () -> commentService.modifyComment(commentId, invalidIndividualMemberDetails2, modifyCommentReq));
 
         //then
         assertThat(error1.getErrorStatus()).isEqualTo(ErrorStatus.MEMBER_FORBIDDEN);
@@ -328,9 +328,9 @@ class CommentServiceTest {
         MemberDetails invalidIndividualMemberDetails2 = new MemberDetails(Long.MAX_VALUE, MemberRole.INDIVIDUAL);
 
         //when
-        GeneralHandler error1 = Assertions.assertThrows(GeneralHandler.class, () -> commentService.removeComment(commentId, invalidIndividualMemberDetails1));
-        GeneralHandler error2 = Assertions.assertThrows(GeneralHandler.class, () -> commentService.removeComment(invalidId, individualMemberDetails));
-        GeneralHandler error3 = Assertions.assertThrows(GeneralHandler.class, () -> commentService.removeComment(commentId, invalidIndividualMemberDetails2));
+        GeneralException error1 = Assertions.assertThrows(GeneralException.class, () -> commentService.removeComment(commentId, invalidIndividualMemberDetails1));
+        GeneralException error2 = Assertions.assertThrows(GeneralException.class, () -> commentService.removeComment(invalidId, individualMemberDetails));
+        GeneralException error3 = Assertions.assertThrows(GeneralException.class, () -> commentService.removeComment(commentId, invalidIndividualMemberDetails2));
 
         //then
         assertThat(error1.getErrorStatus()).isEqualTo(ErrorStatus.MEMBER_FORBIDDEN);

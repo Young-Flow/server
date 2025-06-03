@@ -1,8 +1,8 @@
 package com.pitchain.service;
 
-import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
+import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.S3UploadTarget;
-import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.common.exception.GeneralException;
 import com.pitchain.dto.BmWithScrapDto;
 import com.pitchain.dto.req.CreateBmReq;
 import com.pitchain.dto.req.UpdateBmReq;
@@ -47,7 +47,7 @@ public class BmService {
         Member member = entityFacade.getMember(memberDetails.id());
 
         BmWithScrapDto bmWithScrapDto = bmRepository.getBmWithScrapDto(member.getId(), bmId)
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.BM_NOT_FOUND));
         Bm bm = bmWithScrapDto.getBm();
 
         long scrapCnt = bmScrapRepository.countByBm(bm);
@@ -77,7 +77,7 @@ public class BmService {
     public void updatePtImgs(MemberDetails memberDetails, Long bmId, List<String> uploadPtImgKeys) {
         Company company = entityFacade.getCompany(memberDetails);
         Bm bm = bmRepository.getByIdWithPtImgs(bmId)
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.BM_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.BM_NOT_FOUND));
 
         validateBmOwner(bm, company);
 
@@ -121,6 +121,6 @@ public class BmService {
 
     private static void validateBmOwner(Bm bm, Company company) {
         if (!bm.isOwner(company.getId()))
-            throw new GeneralHandler(ErrorStatus.COMPANY_FORBIDDEN);
+            throw new GeneralException(ErrorStatus.COMPANY_FORBIDDEN);
     }
 }

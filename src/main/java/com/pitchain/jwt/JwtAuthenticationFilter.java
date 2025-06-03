@@ -1,10 +1,10 @@
 package com.pitchain.jwt;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.pitchain.common.apiPayload.statusEnums.ErrorStatus;
+import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.MemberRole;
 import com.pitchain.common.constant.TokenType;
-import com.pitchain.common.exception.GeneralHandler;
+import com.pitchain.common.exception.GeneralException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -46,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = tokenUtil.extractToken(request, TokenType.ACCESS_TOKEN);
 
         if (token == null)
-            throw new GeneralHandler(ErrorStatus.MISSING_ACCESS_TOKEN);
+            throw new GeneralException(ErrorStatus.TOKEN_MISSING);
 
         DecodedJWT decodedJWT = tokenUtil.decodedJWT(token);
         Long id = decodedJWT.getClaim("id").asLong();
