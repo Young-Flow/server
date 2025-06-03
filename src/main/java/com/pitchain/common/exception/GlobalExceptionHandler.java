@@ -53,7 +53,7 @@ public class GlobalExceptionHandler {
         String errorMessage = e.getConstraintViolations().stream()
                 .map(constraintViolation -> constraintViolation.getMessage())
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("ConstraintViolationException 추출 도중 에러 발생"));
+                .orElse("ConstraintViolationException(제약 조건 위반 오류)가 발생했습니다.");
 
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         CustomResponse customResponse = CustomResponse.onFailure(httpStatus.name(), errorMessage);
