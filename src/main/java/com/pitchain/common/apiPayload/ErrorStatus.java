@@ -11,56 +11,55 @@ import java.util.Locale;
 public enum ErrorStatus implements ResponseStatus {
 
     // common
-    _BAD_REQUEST(HttpStatus.BAD_REQUEST, "COMMON400", "common.bad-request"),
-    _UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "COMMON401", "common.unauthorized"),
-    _FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON403", "common.forbidden"),
-    _INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON500", "common.internal-server-error"),
-
+    _BAD_REQUEST(HttpStatus.BAD_REQUEST, "COMMON_400_1", "common.bad-request"),
+    _UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "COMMON_401_1", "common.unauthorized"),
+    _FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON_403_1", "common.forbidden"),
+    _INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON_500_1", "common.internal-server-error"),
 
     // jwt
-    TOKEN_MISSING(HttpStatus.BAD_REQUEST, "TOKEN4001", "token.missing"),
-    TOKEN_UNVERIFIED(HttpStatus.UNAUTHORIZED, "TOKEN4011", "token.unverified"),
+    TOKEN_MISSING(HttpStatus.BAD_REQUEST, "TOKEN_400_1", "token.missing"),
+    TOKEN_UNVERIFIED(HttpStatus.UNAUTHORIZED, "TOKEN_401_1", "token.unverified"),
 
     // member
-    INVALID_MEMBER_ROLE(HttpStatus.BAD_REQUEST, "MEMBER4001", "member.invalid-role"),
-    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER4041", "member.not-found"),
-    MEMBER_FORBIDDEN(HttpStatus.FORBIDDEN, "MEMBER4031", "member.forbidden"),
-    MEMBER_EMAIL_CONFLICT(HttpStatus.CONFLICT, "MEMBER4091", "member.email-conflict"),
+    INVALID_MEMBER_ROLE(HttpStatus.BAD_REQUEST, "MEMBER_400_1", "member.invalid-role"),
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER_404_1", "member.not-found"),
+    MEMBER_FORBIDDEN(HttpStatus.FORBIDDEN, "MEMBER_403_1", "member.forbidden"),
+    MEMBER_EMAIL_CONFLICT(HttpStatus.CONFLICT, "MEMBER_409_1", "member.email-conflict"),
 
     // individual
-    INDIVIDUAL_NOT_FOUND(HttpStatus.NOT_FOUND, "INDIVIDUAL4041", "individual.not-found"),
+    INDIVIDUAL_NOT_FOUND(HttpStatus.NOT_FOUND, "INDIVIDUAL_404_1", "individual.not-found"),
 
-    // company,
-    COMPANY_PASSWORD_UNCONFIRMED(HttpStatus.BAD_REQUEST, "COMPANY4001", "company.password-unconfirmed"),
-    COMPANY_FORBIDDEN(HttpStatus.FORBIDDEN, "COMPANY4031", "company.forbidden"),
-    COMPANY_PASSWORD_NOT_MATCHED(HttpStatus.FORBIDDEN, "COMPANY4032", "company.password-not-matched"),
-    COMPANY_NOT_FOUND(HttpStatus.NOT_FOUND, "COMPANY4041", "company.not-found"),
+    // company
+    COMPANY_PASSWORD_UNCONFIRMED(HttpStatus.BAD_REQUEST, "COMPANY_400_1", "company.password-unconfirmed"),
+    COMPANY_FORBIDDEN(HttpStatus.FORBIDDEN, "COMPANY_403_1", "company.forbidden"),
+    COMPANY_PASSWORD_NOT_MATCHED(HttpStatus.FORBIDDEN, "COMPANY_403_2", "company.password-not-matched"),
+    COMPANY_NOT_FOUND(HttpStatus.NOT_FOUND, "COMPANY_404_1", "company.not-found"),
 
     // bm
-    BM_NOT_FOUND(HttpStatus.NOT_FOUND, "BM4041", "bm.not-found"),
+    BM_NOT_FOUND(HttpStatus.NOT_FOUND, "BM_404_1", "bm.not-found"),
 
     // main category
-    MAIN_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "MAIN_CATEGORY4041", "main-category.not-found"),
+    MAIN_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "MAIN_CATEGORY_404_1", "main-category.not-found"),
 
     // subCategory
-    SUB_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "SUB_CATEGORY4041", "sub-category.not-found"),
+    SUB_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "SUB_CATEGORY_404_1", "sub-category.not-found"),
 
     // sp
-    SP_NOT_FOUND(HttpStatus.NOT_FOUND, "SP4041", "sp.not-found"),
+    SP_NOT_FOUND(HttpStatus.NOT_FOUND, "SP_404_1", "sp.not-found"),
 
     // comment
-    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENT4041", "comment.not-found"),
+    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENT_404_1", "comment.not-found"),
 
     // categoryPref
-    CATEGORY_PREF_NOT_FOUND(HttpStatus.NOT_FOUND, "CATEGORY_PREF4041", "category-pref.not-found"),
+    CATEGORY_PREF_NOT_FOUND(HttpStatus.NOT_FOUND, "CATEGORY_PREF_404_1", "category-pref.not-found"),
 
     // S3
-    FAIL_S3_UPLOAD(HttpStatus.BAD_REQUEST, "S3_4001", "s3.fail-upload"),
-    INVALID_BUCKET_URL(HttpStatus.BAD_REQUEST, "S3_4002", "s3.invalid-bucket-url"),
+    FAIL_S3_UPLOAD(HttpStatus.BAD_REQUEST, "S3_400_1", "s3.fail-upload"),
+    INVALID_BUCKET_URL(HttpStatus.BAD_REQUEST, "S3_400_2", "s3.invalid-bucket-url"),
 
     // file
-    INVALID_MIME_TYPE(HttpStatus.BAD_REQUEST, "FILE4001", "file.invalid-mime-type"),
-    FAIL_STREAM_CONVERT(HttpStatus.BAD_REQUEST, "FILE4002", "file.fail-stream-convert")
+    INVALID_MIME_TYPE(HttpStatus.BAD_REQUEST, "FILE_400_1", "file.invalid-mime-type"),
+    FAIL_STREAM_CONVERT(HttpStatus.BAD_REQUEST, "FILE_400_2", "file.fail-stream-convert")
 
     ;
 
