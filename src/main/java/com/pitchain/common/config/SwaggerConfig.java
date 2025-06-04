@@ -9,7 +9,11 @@ import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.media.*;
+import io.swagger.v3.oas.models.media.Content;
+import io.swagger.v3.oas.models.media.MediaType;
+import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.media.StringSchema;
+import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
@@ -95,7 +99,7 @@ public class SwaggerConfig {
                         .addProperty("code", new StringSchema()._default(code))
                         .addProperty("message", new StringSchema()._default(description))
         ));
-        responses.put(code, new io.swagger.v3.oas.models.responses.ApiResponse()
+        responses.put(code, new ApiResponse()
                 .description(description)
                 .content(errorContent));
     }
