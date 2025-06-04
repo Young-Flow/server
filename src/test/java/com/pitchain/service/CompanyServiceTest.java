@@ -82,7 +82,7 @@ public class CompanyServiceTest {
         GeneralException e = assertThrows(GeneralException.class, () -> companyService.createCompany(req));
 
         //then
-        assertThat(e.getErrorStatus()).isEqualTo(ErrorStatus.COMPANY_EMAIL_CONFLICT);
+        assertThat(e.getErrorStatus()).isEqualTo(ErrorStatus.MEMBER_EMAIL_CONFLICT);
     }
 
     @Test

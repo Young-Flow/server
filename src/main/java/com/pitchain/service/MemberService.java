@@ -50,7 +50,7 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public boolean isDuplicatedEmail(String email) {
-        return memberRepository.findByEmail(email).isPresent();
+        return memberRepository.existsByEmail(email);
     }
 
     public LoginRes reissueToken(String refreshToken) {
@@ -60,5 +60,29 @@ public class MemberService {
         String newRefreshToken = tokenUtil.issueRefreshToken(memberClaims.getId(), memberClaims.getMemberRole());
 
         return new LoginRes(newAccessToken, newRefreshToken);
+    }
+
+    @Transactional(readOnly = true)
+    public void validateEmailConflict(String email) {
+        if (memberRepository.existsByEmail(email))
+            throw new GeneralException(ErrorStatus.MEMBER_EMAIL_CONFLICT);
+    }
+
+    @Transactional
+    public Member saveCompanyMember(String email) {
+        Member member = Member.createCompanyMember(email);
+        return memberRepository.save(member);
+    }
+
+    @Transactional(readOnly = true)
+    public Member findByEmail(String email) {
+        return memberRepository.findByEmail(email)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+    }
+
+    @Transactional
+    public Member saveIndividualMember(String email, String nickname) {
+        Member member = Member.createIndividualMember(email, nickname);
+        return memberRepository.save(member);
     }
 }

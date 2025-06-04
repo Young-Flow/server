@@ -47,21 +47,21 @@ public class Bm extends BaseEntity {
     @JoinColumn(name = "company_id")
     private Company company;
 
-    @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BmSubCategory> subCategories = new ArrayList<>();
-
-    @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY)
-    private List<Investment> investments = new ArrayList<>();
-
-    @OrderBy("id ASC")
-    @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Sp> sps = new ArrayList<>();
-
-    @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PtImg> ptImgs = new ArrayList<>();
-
-    @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY)
-    private List<Comment> comments = new ArrayList<>();
+//    @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<BmSubCategory> subCategories = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY)
+//    private List<Investment> investments = new ArrayList<>();
+//
+//    @OrderBy("id ASC")
+//    @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Sp> sps = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<PtImg> ptImgs = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY)
+//    private List<Comment> comments = new ArrayList<>();
 
     public double getPricePerShare() {
         return (double) valuationCap / maxIssuedShare;
@@ -90,24 +90,6 @@ public class Bm extends BaseEntity {
         return this.company.getId().equals(companyId);
     }
 
-    public void updatePtImgs(List<PtImg> ptImgs) {
-        if (ptImgs == null)
-            ptImgs = new ArrayList<>();
-
-        this.ptImgs.clear();
-        this.ptImgs.addAll(ptImgs);
-    }
-
-    public void addSubCategories(List<SubCategory> subCategories) {
-        for (SubCategory subCategory : subCategories) {
-            this.subCategories.add(new BmSubCategory(this, subCategory));
-        }
-    }
-
-    public void updateSubCategories(List<SubCategory> subCategories) {
-        this.subCategories.clear();
-        addSubCategories(subCategories);
-    }
 
     public void update(Bm updateBm) {
         this.name = updateBm.getName();
@@ -123,9 +105,4 @@ public class Bm extends BaseEntity {
         this.longPitchURL = updateBm.getLongPitchURL();
     }
 
-    public List<String> getKoreanSubCategories() {
-        return this.subCategories.stream()
-                .map(bmSubCategory -> bmSubCategory.getSubCategory().getKoreanName())
-                .toList();
-    }
 }

@@ -55,7 +55,7 @@ public record BmDetailRes(
 
         List<PtImgRes> ptImgResList
 ) {
-    public static BmDetailRes createRes(BmWithScrapDto bmWithScrapDto, List<PtImgRes> ptImgResList, long scrapCnt, List<String> subCategories) {
+    public static BmDetailRes createRes(BmWithScrapDto bmWithScrapDto, List<PtImgRes> ptImgResList, long scrapCnt, List<String> subCategories, List<String> spURLs) {
         Bm bm = bmWithScrapDto.getBm();
         Company company = bm.getCompany();
         Member member = company.getMember();
@@ -78,7 +78,7 @@ public record BmDetailRes(
                 .longPitchURL(bm.getLongPitchURL())
                 .isScraped(bmWithScrapDto.isScraped())
                 .scrapCnt(scrapCnt)
-                .spURLs(bm.getSps().stream().map(Sp::getSpKey).toList())
+                .spURLs(spURLs)
 
                 .ptImgResList(ptImgResList)
                 .build();

@@ -25,15 +25,18 @@ import java.util.Optional;
 public class OauthService {
     private final RequestOauthInfoService requestOauthInfoService;
     private final TokenUtil tokenUtil;
-    private final MemberRepository memberRepository;
-    private final IndividualRepository individualRepository;
+    private final MemberService memberService;
+    private final IndividualService individualService;
 
     public LoginRes getMemberByOauthLogin(OauthLoginReq req) {
         OauthMemberInfo oauthMemberInfo = requestOauthInfo(req);
 
-        Optional<Individual> optionalInvestor = individualRepository.findByOauthProviderAndSocialId(oauthMemberInfo.getOauthProvider(), oauthMemberInfo.getSocialId());
-        if (optionalInvestor.isPresent()) {
-            return handleMember(optionalInvestor.get());
+        Optional<Individual> optionalIndividual = individualService.findByOauthProviderAndSocialId(
+                oauthMemberInfo.getOauthProvider(), oauthMemberInfo.getSocialId()
+        );
+
+        if (optionalIndividual.isPresent()) {
+            return handleMember(optionalIndividual.get());
         }
 
         return handleGuest(oauthMemberInfo);
@@ -45,11 +48,9 @@ public class OauthService {
     }
 
     private LoginRes handleGuest(OauthMemberInfo oauthMemberInfo) {
-        Member member = Member.createIndividualMember(oauthMemberInfo.getEmail(), oauthMemberInfo.getNickname());
-        memberRepository.save(member);
+        Member member = memberService.saveIndividualMember(oauthMemberInfo.getEmail(), oauthMemberInfo.getNickname());
 
-        Individual individual = Individual.of(member, oauthMemberInfo.getSocialId(), oauthMemberInfo.getOauthProvider());
-        individualRepository.save(individual);
+        individualService.saveIndividual(member.getId(), oauthMemberInfo.getSocialId(), oauthMemberInfo.getOauthProvider());
         return createLoginRes(member.getId());
     }
 

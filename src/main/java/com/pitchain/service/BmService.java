@@ -11,36 +11,36 @@ import com.pitchain.dto.res.PtImgRes;
 import com.pitchain.entity.*;
 import com.pitchain.jwt.MemberDetails;
 import com.pitchain.repository.BmRepository;
-import com.pitchain.repository.BmScrapRepository;
 import com.pitchain.repository.EntityFacade;
-import com.pitchain.repository.MyBmHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
 @Transactional
 @Service
 public class BmService {
-    private final EntityFacade entityFacade;
     private final BmRepository bmRepository;
-    private final BmScrapRepository bmScrapRepository;
-    private final MyBmHistoryRepository myBmHistoryRepository;
+    private final EntityFacade entityFacade;
+    private final BmScrapService bmScrapService;
+    private final BmSubcategoryService bmSubcategoryService;
+    private final MyBmHistoryService myBmHistoryService;
+    private final PtImgService ptImgService;
     private final S3Service s3Service;
+    private final SpService spService;
 
     public void createBm(MemberDetails memberDetails, BmCreateReq bmCreateReq, MultipartFile descImg) {
         Company company = entityFacade.getCompany(memberDetails);
 
         String descImgKey = s3Service.uploadFile(descImg, S3UploadTarget.COMPANY_DESC);
 
-        Bm newBm = createBmReq.createBm(company, descImgKey);
-        newBm.addSubCategories(createBmReq.subCategories());
-
+        Bm newBm = bmCreateReq.createBm(company, descImgKey);
         bmRepository.save(newBm);
+
+        bmSubcategoryService.saveAll(newBm.getId(), bmCreateReq.subCategories());
     }
 
     public BmDetailRes getBmDetail(MemberDetails memberDetails, Long bmId) {
@@ -50,14 +50,31 @@ public class BmService {
                 .orElseThrow(() -> new GeneralException(ErrorStatus.BM_NOT_FOUND));
         Bm bm = bmWithScrapDto.getBm();
 
-        long scrapCnt = bmScrapRepository.countByBm(bm);
-        List<PtImgRes> ptImgResList = getPtImgResList(bmId);
-        List<String> subCategories = bm.getKoreanSubCategories();
+        long scrapCnt = bmScrapService.countByBm(bm.getId());
 
-        myBmHistoryRepository.findByMemberAndBm(member, bm)
-                .orElseGet(() -> myBmHistoryRepository.save(new MyBmHistory(member, bm)));
+        List<PtImg> ptImgs = ptImgService.getPtImgsByBmId(bm.getId());
+        List<PtImgRes> ptImgResList = ptImgs.stream()
+                .map(ptImg -> PtImgRes.createRes(ptImg.getSerialNum(), ptImg.getImgKey()))
+                .toList();
 
-        return BmDetailRes.createRes(bmWithScrapDto, ptImgResList, scrapCnt, subCategories);
+        List<BmSubCategory> bmSubCategories = bmSubcategoryService.getBmSubCategoryByBmId(bmId);
+        List<String> subcategoriesInKorean = convertToKoreanName(bmSubCategories);
+
+        List<Sp> sps = spService.getSpsByBmId(bm.getId());
+        List<String> spURLs = sps.stream()
+                .map(Sp::getSpKey)
+                .toList();
+
+        myBmHistoryService.saveMyBmHistory(member, bm);
+
+        return BmDetailRes.createRes(bmWithScrapDto, ptImgResList, scrapCnt, subcategoriesInKorean, spURLs);
+    }
+
+    private static List<String> convertToKoreanName(List<BmSubCategory> bmSubCategories) {
+        List<String> subcategoriesInKorean = bmSubCategories.stream()
+                .map(bmSubCategory -> bmSubCategory.getSubCategory().getKoreanName())
+                .toList();
+        return subcategoriesInKorean;
     }
 
     public void updateBm(MemberDetails memberDetails, Long bmId, BmUpdateReq bmUpdateReq, MultipartFile descImg) {
@@ -68,7 +85,7 @@ public class BmService {
 
         String descImgKey = s3Service.uploadFile(descImg, S3UploadTarget.COMPANY_DESC);
 
-        bm.updateSubCategories(bmUpdateReq.subCategories());
+        bmSubcategoryService.update(bm.getId(), bmUpdateReq.subCategories());
 
         Bm updateBm = bmUpdateReq.createBm(descImgKey);
         bm.update(updateBm);
@@ -81,10 +98,7 @@ public class BmService {
 
         validateBmOwner(bm, company);
 
-        deletePtImgs(bm);
-        List<PtImg> uploadedPtImgs = uploadPtImgs(uploadPtImgKeys, bm);
-
-        bm.updatePtImgs(uploadedPtImgs);
+        ptImgService.update(bm.getId(), uploadPtImgKeys);
     }
 
     public void deleteBm(MemberDetails memberDetails, Long bmId) {
@@ -96,28 +110,6 @@ public class BmService {
         bmRepository.delete(bm);
     }
 
-    private List<PtImgRes> getPtImgResList(Long bmId) {
-        List<PtImg> ptImgs = bmRepository.getPtImgsByBmId(bmId);
-        List<PtImgRes> ptImgResList = ptImgs.stream()
-                .map(ptImg -> PtImgRes.createRes(ptImg.getSerialNum(), ptImg.getImgKey()))
-                .toList();
-        return ptImgResList;
-    }
-
-    private void deletePtImgs(Bm bm) {
-        List<PtImg> ptImgs = bm.getPtImgs();
-        ptImgs.forEach(pi -> s3Service.deleteImg(pi.getImgKey()));
-    }
-
-    private List<PtImg> uploadPtImgs(List<String> ptImgKeys, Bm bm) {
-        List<PtImg> uploadPtImgs = new ArrayList<>();
-        for (int serialNum = 0; ptImgKeys != null && serialNum < ptImgKeys.size(); serialNum++) {
-            String uploadFileKey = ptImgKeys.get(serialNum);
-            PtImg ptImg = new PtImg(bm, serialNum, uploadFileKey);
-            uploadPtImgs.add(ptImg);
-        }
-        return uploadPtImgs;
-    }
 
     private static void validateBmOwner(Bm bm, Company company) {
         if (!bm.isOwner(company.getId()))

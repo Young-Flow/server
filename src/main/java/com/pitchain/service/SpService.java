@@ -27,7 +27,9 @@ public class SpService {
     private final EntityFacade entityFacade;
     private final SpRepository spRepository;
     private final SpRepositoryCustom spRepositoryCustom;
-    private final SpLikeRepository spLikeRepository;
+//    private final SpLikeRepository spLikeRepository;
+    private final BmSubcategoryService bmSubcategoryService;
+    private final SpLikeService spLikeService;
     private final S3Service s3Service;
 
     public void createSp(MemberDetails memberDetails, SpCreateReq spCreateReq, MultipartFile spVid, MultipartFile thumbnailImg) {
@@ -52,12 +54,20 @@ public class SpService {
                     Sp sp = spWithLikeDto.getSp();
                     Bm bm = sp.getBm();
 
-                    Long likeCnt = spLikeRepository.countBySp(sp);
-                    List<String> subCategories = bm.getKoreanSubCategories();
+                    Long likeCnt = spLikeService.countBySpId(sp.getId());
+                    List<BmSubCategory> bmSubCategories = bmSubcategoryService.getBmSubCategoryByBmId(bm.getId());
+                    List<String> subCategories = convertToKoreanName(bmSubCategories);
 
                     return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories);
                 })
                 .toList();
+    }
+
+    private static List<String> convertToKoreanName(List<BmSubCategory> bmSubCategories) {
+        List<String> subcategoriesInKorean = bmSubCategories.stream()
+                .map(bmSubCategory -> bmSubCategory.getSubCategory().getKoreanName())
+                .toList();
+        return subcategoriesInKorean;
     }
 
     @Transactional(readOnly = true)
@@ -77,8 +87,9 @@ public class SpService {
                     Sp sp = spWithLikeDto.getSp();
                     Bm bm = sp.getBm();
 
-                    Long likeCnt = spLikeRepository.countBySp(sp);
-                    List<String> subCategories = bm.getKoreanSubCategories();
+                    Long likeCnt = spLikeService.countBySpId(sp.getId());
+                    List<BmSubCategory> bmSubCategories = bmSubcategoryService.getBmSubCategoryByBmId(bm.getId());
+                    List<String> subCategories = convertToKoreanName(bmSubCategories);
 
                     return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories);
                 })
@@ -94,8 +105,9 @@ public class SpService {
         Sp sp = spWithLikeDto.getSp();
         Bm bm = sp.getBm();
 
-        Long likeCnt = spLikeRepository.countBySp(sp);
-        List<String> subCategories = bm.getKoreanSubCategories();
+        Long likeCnt = spLikeService.countBySpId(sp.getId());
+        List<BmSubCategory> bmSubCategories = bmSubcategoryService.getBmSubCategoryByBmId(bm.getId());
+        List<String> subCategories = convertToKoreanName(bmSubCategories);
 
         return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories);
     }
@@ -138,5 +150,11 @@ public class SpService {
 
     public String removeFileExtension(String originalFileName) {
         return originalFileName.split("\\.")[0];
+    }
+
+    @Transactional(readOnly = true)
+    public List<Sp> getSpsByBmId(Long bmId) {
+        Bm bm = entityFacade.getBm(bmId);
+        return spRepository.findAllByBmId(bm.getId());
     }
 }

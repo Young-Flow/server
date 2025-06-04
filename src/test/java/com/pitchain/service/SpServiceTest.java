@@ -41,6 +41,8 @@ class SpServiceTest {
     @Autowired
     private SpLikeRepository spLikeRepository;
     @Autowired
+    private BmSubCategoryRepository bmSubCategoryRepository;
+    @Autowired
     private CompanyRepository companyRepository;
 
     private Member saveIndividual() {
@@ -125,8 +127,10 @@ class SpServiceTest {
         //given
         Sp sp = saveSp(bm);
 
-        bm.updateSubCategories(SUB_CATEGORIES);
-        List<String> subCategories = bm.getKoreanSubCategories();
+        for (SubCategory subCategory : SUB_CATEGORIES) {
+            BmSubCategory bmSubCategory = BmSubCategory.create(bm, subCategory);
+            bmSubCategoryRepository.save(bmSubCategory);
+        }
 
         //when
         SpDetailRes spDetail = spService.getSpDetail(individualMemberDetails, sp.getId());
@@ -138,7 +142,7 @@ class SpServiceTest {
         assertThat(spDetail.views()).isEqualTo(sp.getViews());
         assertThat(spDetail.name()).isEqualTo(sp.getName());
         assertThat(spDetail.mainCategory()).isEqualTo(sp.getBm().getMainCategory().getKoreanName());
-        assertThat(spDetail.subCategories()).isEqualTo(subCategories);
+        assertThat(spDetail.subCategories()).isEqualTo(SUB_CATEGORIES.stream().map(SubCategory::getKoreanName).toList());
         assertThat(spDetail.isLiked()).isEqualTo(false);
         assertThat(spDetail.likeCnt()).isEqualTo(0L);
     }
@@ -151,8 +155,10 @@ class SpServiceTest {
         spLikeRepository.save(new SpLike(individual, sp));
         spLikeRepository.save(new SpLike(newIndividual, sp));
 
-        bm.updateSubCategories(SUB_CATEGORIES);
-        List<String> subCategories = bm.getKoreanSubCategories();
+        for (SubCategory subCategory : SUB_CATEGORIES) {
+            BmSubCategory bmSubCategory = BmSubCategory.create(bm, subCategory);
+            bmSubCategoryRepository.save(bmSubCategory);
+        }
 
         //when
         SpDetailRes spDetail = spService.getSpDetail(individualMemberDetails, sp.getId());
@@ -164,7 +170,7 @@ class SpServiceTest {
         assertThat(spDetail.views()).isEqualTo(sp.getViews());
         assertThat(spDetail.name()).isEqualTo(sp.getName());
         assertThat(spDetail.mainCategory()).isEqualTo(sp.getBm().getMainCategory().getKoreanName());
-        assertThat(spDetail.subCategories()).isEqualTo(subCategories);
+        assertThat(spDetail.subCategories()).isEqualTo(SUB_CATEGORIES.stream().map(SubCategory::getKoreanName).toList());
         assertThat(spDetail.isLiked()).isEqualTo(true);
         assertThat(spDetail.likeCnt()).isEqualTo(2L);
     }

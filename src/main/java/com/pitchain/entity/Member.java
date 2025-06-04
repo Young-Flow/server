@@ -29,26 +29,6 @@ public class Member {
 
     private String name;
 
-    @OneToMany(mappedBy = "member")
-    @Builder.Default
-    private List<Comment> comments = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member")
-    @Builder.Default
-    private List<BmScrap> bmScraps = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member")
-    @Builder.Default
-    private List<SpLike> spLikes = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<CategoryPref> categoryPrefs = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member")
-    @Builder.Default
-    private List<Investment> investments = new ArrayList<>();
-
     public static Member createIndividualMember(String email, String name) {
         return Member.builder()
                 .role(MemberRole.INDIVIDUAL)
@@ -78,12 +58,6 @@ public class Member {
 
     public void updateName(String name) {
         this.name = name;
-    }
-
-    public void addCategoryPref(List<SubCategory> subCategories) {
-        for (SubCategory subCategory : subCategories) {
-            this.categoryPrefs.add(new CategoryPref(this, subCategory));
-        }
     }
 
     public Member(String email) {

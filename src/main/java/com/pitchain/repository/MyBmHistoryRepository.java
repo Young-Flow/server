@@ -10,5 +10,5 @@ import java.util.Optional;
 
 @Repository
 public interface MyBmHistoryRepository extends JpaRepository<MyBmHistory, Long> {
-    Optional<MyBmHistory> findByMemberAndBm(Member member, Bm bm);
+    boolean existsByMemberAndBm(Member member, Bm bm);
 }

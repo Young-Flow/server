@@ -25,16 +25,16 @@ public enum ErrorStatus implements ResponseStatus {
     INVALID_MEMBER_ROLE(HttpStatus.BAD_REQUEST, "MEMBER4001", "member.invalid-role"),
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER4041", "member.not-found"),
     MEMBER_FORBIDDEN(HttpStatus.FORBIDDEN, "MEMBER4031", "member.forbidden"),
+    MEMBER_EMAIL_CONFLICT(HttpStatus.CONFLICT, "MEMBER4091", "member.email-conflict"),
 
     // individual
     INDIVIDUAL_NOT_FOUND(HttpStatus.NOT_FOUND, "INDIVIDUAL4041", "individual.not-found"),
 
-    // company
+    // company,
     COMPANY_PASSWORD_UNCONFIRMED(HttpStatus.BAD_REQUEST, "COMPANY4001", "company.password-unconfirmed"),
     COMPANY_FORBIDDEN(HttpStatus.FORBIDDEN, "COMPANY4031", "company.forbidden"),
     COMPANY_PASSWORD_NOT_MATCHED(HttpStatus.FORBIDDEN, "COMPANY4032", "company.password-not-matched"),
     COMPANY_NOT_FOUND(HttpStatus.NOT_FOUND, "COMPANY4041", "company.not-found"),
-    COMPANY_EMAIL_CONFLICT(HttpStatus.CONFLICT, "COMPANY4091", "company.email-conflict"),
 
     // bm
     BM_NOT_FOUND(HttpStatus.NOT_FOUND, "BM4041", "bm.not-found"),

@@ -1,15 +1,20 @@
 package com.pitchain.service;
 
 import com.pitchain.common.apiPayload.ErrorStatus;
-import com.pitchain.common.constant.*;
+import com.pitchain.common.constant.MainCategory;
+import com.pitchain.common.constant.MemberRole;
+import com.pitchain.common.constant.S3UploadTarget;
+import com.pitchain.common.constant.SubCategory;
 import com.pitchain.common.exception.GeneralException;
 import com.pitchain.dto.req.BmCreateReq;
 import com.pitchain.dto.req.BmUpdateReq;
 import com.pitchain.dto.res.BmDetailRes;
-import com.pitchain.dto.res.PtImgRes;
 import com.pitchain.entity.*;
 import com.pitchain.jwt.MemberDetails;
-import com.pitchain.repository.*;
+import com.pitchain.repository.BmRepository;
+import com.pitchain.repository.BmScrapRepository;
+import com.pitchain.repository.CompanyRepository;
+import com.pitchain.repository.MemberRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -39,8 +44,6 @@ class BmServiceTest {
     private MemberRepository memberRepository;
     @Autowired
     private BmScrapRepository bmScrapRepository;
-    @Autowired
-    private MyBmHistoryRepository myBmHistoryRepository;
     @Autowired
     private CompanyRepository companyRepository;
 
@@ -117,7 +120,6 @@ class BmServiceTest {
 
         assertThat(bm.getName()).isEqualTo(NAME);
         assertThat(bm.getMainCategory()).isEqualTo(MAIN_CATEGORY);
-        assertThat(bm.getKoreanSubCategories()).isEqualTo(SUB_CATEGORIES.stream().map(SubCategory::getKoreanName).toList());
         assertThat(bm.getIntro()).isEqualTo(INTRO);
         assertThat(bm.getDescription()).isEqualTo(DESCRIPTION);
         assertThat(bm.getDescImgKey()).isEqualTo(DESC_IMG_KEY);
@@ -134,17 +136,6 @@ class BmServiceTest {
         //given
         Company company = saveCompany();
         Bm bm = saveBm(company);
-
-        bm.updateSubCategories(SUB_CATEGORIES);
-        List<String> subCategories = bm.getKoreanSubCategories();
-
-        List<PtImg> ptImgs = createPtImgs(bm);
-        bm.updatePtImgs(ptImgs);
-
-        List<PtImgRes> ptImgResList = ptImgs.stream()
-                .map(ptImg -> PtImgRes.createRes(ptImg.getSerialNum(),
-                        ptImg.getImgKey()))
-                .toList();
 
         //when
         MemberDetails memberDetails = createCompanyMemberDetails(company);
@@ -166,12 +157,6 @@ class BmServiceTest {
         assertThat(bmDetail.createdAt()).isEqualTo(bm.getCreatedAt());
         assertThat(bmDetail.longPitchURL()).isEqualTo(bm.getLongPitchURL());
         assertThat(bmDetail.isScraped()).isFalse();
-        assertThat(bmDetail.scrapCnt()).isEqualTo(0);
-        assertThat(bmDetail.subCategories()).isEqualTo(subCategories);
-
-        assertThat(bmDetail.ptImgResList()).isEqualTo(ptImgResList);
-
-        assertThat(myBmHistoryRepository.findByMemberAndBm(company.getMember(), bm).get()).isNotNull();
     }
 
     @Test
@@ -185,16 +170,6 @@ class BmServiceTest {
         Bm bm = saveBm(company);
         bmScrapRepository.save(new BmScrap(member_01, bm));
         bmScrapRepository.save(new BmScrap(member_02, bm));
-
-        bm.updateSubCategories(SUB_CATEGORIES);
-        List<String> subCategories = bm.getKoreanSubCategories();
-
-        List<PtImg> ptImgs = createPtImgs(bm);
-        bm.updatePtImgs(ptImgs);
-        List<PtImgRes> ptImgResList = ptImgs.stream()
-                .map(ptImg -> PtImgRes.createRes(ptImg.getSerialNum(),
-                        ptImg.getImgKey()))
-                .toList();
 
         //when
         MemberDetails individualMemberDetails = createIndividualMemberDetails(member_01);
@@ -217,11 +192,6 @@ class BmServiceTest {
         assertThat(bmDetail.longPitchURL()).isEqualTo(bm.getLongPitchURL());
         assertThat(bmDetail.isScraped()).isTrue();
         assertThat(bmDetail.scrapCnt()).isEqualTo(2);
-        assertThat(bmDetail.subCategories()).isEqualTo(subCategories);
-
-        assertThat(bmDetail.ptImgResList()).isEqualTo(ptImgResList);
-
-        assertThat(myBmHistoryRepository.findByMemberAndBm(member_01, bm).get()).isNotNull();
     }
 
     @Test
@@ -277,7 +247,6 @@ class BmServiceTest {
 
         assertThat(updatedBm.getName()).isEqualTo(updatedName);
         assertThat(updatedBm.getMainCategory()).isEqualTo(updatedMainCategory);
-        assertThat(updatedBm.getKoreanSubCategories()).isEqualTo(updatedSubCategories.stream().map(SubCategory::getKoreanName).toList());
         assertThat(updatedBm.getIntro()).isEqualTo(updatedIntro);
         assertThat(updatedBm.getDescription()).isEqualTo(updatedDescription);
         assertThat(updatedBm.getDescImgKey()).isEqualTo(updatedDescImgKey);
@@ -326,85 +295,6 @@ class BmServiceTest {
         GeneralException e_1 = assertThrows(GeneralException.class, () -> bmService.updateBm(individualMemberDetails, bm.getId(), bmUpdateReq, null));
         GeneralException e_2 = assertThrows(GeneralException.class, () -> bmService.updateBm(companyMemberDetails_01, invalidId, bmUpdateReq, null));
         GeneralException e_3 = assertThrows(GeneralException.class, () -> bmService.updateBm(companyMemberDetails_02, bm.getId(), bmUpdateReq, null));
-
-        //then
-        assertThat(e_1.getErrorStatus()).isEqualTo(ErrorStatus.MEMBER_FORBIDDEN);
-        assertThat(e_2.getErrorStatus()).isEqualTo(ErrorStatus.BM_NOT_FOUND);
-        assertThat(e_3.getErrorStatus()).isEqualTo(ErrorStatus.COMPANY_FORBIDDEN);
-    }
-
-    @Test
-    void BM_PT_IMG_추가_성공() {
-        //given
-        Company company = saveCompany();
-        Bm bm = saveBm(company);
-        MemberDetails companyMemberDetails = createCompanyMemberDetails(company);
-
-        List<String> ptImgs = List.of("imgKey1", "imgKey2", "imgKey3");
-
-        //when
-        bmService.updatePtImgs(companyMemberDetails, bm.getId(), ptImgs);
-
-        //then
-        Bm updatedBm = bmRepository.findById(bm.getId()).orElseThrow();
-        List<PtImg> updatedPtImgs = updatedBm.getPtImgs();
-
-        assertThat(updatedPtImgs).hasSize(ptImgs.size());
-        for (int i = 0; i < ptImgs.size(); i++) {
-            assertThat(updatedPtImgs.get(i).getSerialNum()).isEqualTo(i);
-            assertThat(updatedPtImgs.get(i).getBm().getId()).isEqualTo(updatedBm.getId());
-            assertThat(updatedPtImgs.get(i).getImgKey()).isEqualTo("imgKey" + (i + 1));
-        }
-    }
-
-    @Test
-    void BM_PT_IMG_수정_성공() {
-        //given
-        Company company = saveCompany();
-        Bm bm = saveBm(company);
-        MemberDetails companyMemberDetails = createCompanyMemberDetails(company);
-
-        bm.updatePtImgs(List.of(
-                new PtImg(bm, 0, "origin_img_0.png"),
-                new PtImg(bm, 1, "origin_img_1.png")
-        ));
-
-        List<String> updatePtImgKeys = List.of("imgKey1", "imgKey2", "imgKey3");
-
-        //when
-        bmService.updatePtImgs(companyMemberDetails, bm.getId(), updatePtImgKeys);
-
-        //then
-        Bm updatedBm = bmRepository.findById(bm.getId()).orElseThrow();
-        List<PtImg> updatedPtImgs = updatedBm.getPtImgs();
-
-        assertThat(updatedPtImgs).hasSize(updatePtImgKeys.size());
-        for (int i = 0; i < updatePtImgKeys.size(); i++) {
-            assertThat(updatedPtImgs.get(i).getSerialNum()).isEqualTo(i);
-            assertThat(updatedPtImgs.get(i).getBm().getId()).isEqualTo(updatedBm.getId());
-            assertThat(updatedPtImgs.get(i).getImgKey()).isEqualTo("imgKey" + (i + 1));
-        }
-    }
-
-    @Test
-    void BM_PT_IMG_수정_실패() {
-        //given
-        Company company_1 = saveCompany();
-        MemberDetails companyMemberDetails_1 = createCompanyMemberDetails(company_1);
-
-        Company company_2 = saveCompany();
-        MemberDetails companyMemberDetails_2 = createCompanyMemberDetails(company_2);
-        Bm bm = saveBm(company_1);
-
-        Long invalidId = Long.MAX_VALUE;
-        Member individual = saveIndividual();
-        MemberDetails individualMemberDetails = createIndividualMemberDetails(individual);
-
-        //when
-        bmService.updatePtImgs(companyMemberDetails_1, bm.getId(), null);
-        GeneralException e_1 = assertThrows(GeneralException.class, () -> bmService.updatePtImgs(individualMemberDetails, bm.getId(), null));
-        GeneralException e_2 = assertThrows(GeneralException.class, () -> bmService.updatePtImgs(companyMemberDetails_1, invalidId, null));
-        GeneralException e_3 = assertThrows(GeneralException.class, () -> bmService.updatePtImgs(companyMemberDetails_2, bm.getId(), null));
 
         //then
         assertThat(e_1.getErrorStatus()).isEqualTo(ErrorStatus.MEMBER_FORBIDDEN);

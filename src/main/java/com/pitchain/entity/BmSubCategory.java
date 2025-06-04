@@ -24,9 +24,10 @@ public class BmSubCategory {
     @Column(nullable = false)
     private SubCategory subCategory;
 
-    public BmSubCategory(Bm bm, SubCategory subCategory) {
-        this.bm = bm;
-        this.subCategory = subCategory;
+    public static BmSubCategory create(Bm bm, SubCategory subCategory) {
+        BmSubCategory bmSubCategory = new BmSubCategory();
+        bmSubCategory.bm = bm;
+        bmSubCategory.subCategory = subCategory;
+        return bmSubCategory;
     }
-
 }
