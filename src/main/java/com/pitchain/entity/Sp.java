@@ -26,7 +26,7 @@ public class Sp extends BaseEntity {
     @Column(nullable = false)
     private String thumbnailImgKey;
 
-    private int views;
+    private int views = 0;
 
     @Column(nullable = false)
     private String name;
@@ -37,6 +37,16 @@ public class Sp extends BaseEntity {
         this.thumbnailImgKey = thumbnailImgKey;
         this.name = name;
         this.views = 0;
+    }
+
+    public static Sp of(Bm bm, String spKey, String thumbnailImgKey, String name) {
+        Sp sp = new Sp();
+        sp.bm = bm;
+        sp.spKey = spKey;
+        sp.thumbnailImgKey = thumbnailImgKey;
+        sp.name = name;
+        sp.views = 0;
+        return sp;
     }
 
     public boolean isOwner(Long companyId) {
