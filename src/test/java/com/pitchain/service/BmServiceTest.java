@@ -13,8 +13,7 @@ import com.pitchain.entity.*;
 import com.pitchain.jwt.MemberDetails;
 import com.pitchain.repository.BmRepository;
 import com.pitchain.repository.BmScrapRepository;
-import com.pitchain.repository.CompanyRepository;
-import com.pitchain.repository.MemberRepository;
+import com.pitchain.util.EntitySaver;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,11 +40,9 @@ class BmServiceTest {
     @Autowired
     private BmRepository bmRepository;
     @Autowired
-    private MemberRepository memberRepository;
-    @Autowired
     private BmScrapRepository bmScrapRepository;
     @Autowired
-    private CompanyRepository companyRepository;
+    private EntitySaver entitySaver;
 
     private static final String NAME = "bm_name";
     private static final MainCategory MAIN_CATEGORY = MainCategory.FOOD;
@@ -63,46 +60,20 @@ class BmServiceTest {
     private static final MockMultipartFile DESC_IMG = new MockMultipartFile(
             "description", "description.png", "image/png", "test data 2".getBytes());
 
-    private Member saveIndividual() {
-        return memberRepository.save(Member.createIndividualMember("email", "name"));
-    }
-
     private MemberDetails createIndividualMemberDetails(Member member) {
         return new MemberDetails(member.getId(), MemberRole.INDIVIDUAL);
     }
 
-    private Company saveCompany() {
-        Member member = memberRepository.save(Member.createCompanyMember("email"));
-        return companyRepository.save(new Company(member, "encodedPassword"));
-    }
 
     private MemberDetails createCompanyMemberDetails(Company company) {
         return new MemberDetails(company.getMember().getId(), MemberRole.COMPANY);
     }
 
-    private Bm saveBm(Company company) {
-        Bm bm = Bm.create(
-                company, NAME, MAIN_CATEGORY,
-                INTRO, DESCRIPTION, DESC_IMG_KEY, ADDRESS,
-                VALUATION_CAP, GOAL_INVESTMENT, MAX_ISSUED_SHARE,
-                DEADLINE, LONG_PITCH_URL
-        );
-
-        return bmRepository.save(bm);
-    }
-
-    private List<PtImg> createPtImgs(Bm bm) {
-        return List.of(
-                new PtImg(bm, 1, "fake_01.jpg"),
-                new PtImg(bm, 2, "fake_02.jpg"),
-                new PtImg(bm, 3, "fake_03.jpg")
-        );
-    }
-
     @Test
     void BM_생성_성공() {
         //given
-        Company company = saveCompany();
+        Member companyMember = entitySaver.saveCompanyMember();
+        Company company = entitySaver.saveCompany(companyMember);
         MemberDetails companyMemberDetails = createCompanyMemberDetails(company);
 
         BmCreateReq bmCreateReq = new BmCreateReq(company.getId(), NAME, MAIN_CATEGORY, SUB_CATEGORIES,
@@ -134,8 +105,9 @@ class BmServiceTest {
     @Test
     void BM_조회_성공_좋아요_없음() {
         //given
-        Company company = saveCompany();
-        Bm bm = saveBm(company);
+        Member companyMember = entitySaver.saveCompanyMember();
+        Company company = entitySaver.saveCompany(companyMember);
+        Bm bm = entitySaver.saveBm(company);
 
         //when
         MemberDetails memberDetails = createCompanyMemberDetails(company);
@@ -162,17 +134,18 @@ class BmServiceTest {
     @Test
     void BM_조회_성공_좋아요_존재() {
         //given
-        Member member_01 = saveIndividual();
-        Member member_02 = saveIndividual();
+        Member individual_01 = entitySaver.saveIndividualMember();
+        Member individual_02 = entitySaver.saveIndividualMember();
 
-        Company company = saveCompany();
+        Member companyMember = entitySaver.saveCompanyMember();
+        Company company = entitySaver.saveCompany(companyMember);
+        Bm bm = entitySaver.saveBm(company);
 
-        Bm bm = saveBm(company);
-        bmScrapRepository.save(new BmScrap(member_01, bm));
-        bmScrapRepository.save(new BmScrap(member_02, bm));
+        bmScrapRepository.save(new BmScrap(individual_01, bm));
+        bmScrapRepository.save(new BmScrap(individual_02, bm));
 
         //when
-        MemberDetails individualMemberDetails = createIndividualMemberDetails(member_01);
+        MemberDetails individualMemberDetails = createIndividualMemberDetails(individual_01);
         BmDetailRes bmDetail = bmService.getBmDetail(individualMemberDetails, bm.getId());
 
         //then
@@ -197,9 +170,10 @@ class BmServiceTest {
     @Test
     void BM_조회_실패() {
         //given
-        Member member = saveIndividual();
+        Member individual = entitySaver.saveIndividualMember();
+
         Long invalidId = Long.MAX_VALUE;
-        MemberDetails memberDetails = createIndividualMemberDetails(member);
+        MemberDetails memberDetails = createIndividualMemberDetails(individual);
         MemberDetails invalidMemberDetails = new MemberDetails(Long.MAX_VALUE, MemberRole.INDIVIDUAL);
 
         //when
@@ -214,8 +188,10 @@ class BmServiceTest {
     @Test
     void BM_수정_성공() {
         //given
-        Company company = saveCompany();
-        Bm bm = saveBm(company);
+        Member companyMember = entitySaver.saveCompanyMember();
+        Company company = entitySaver.saveCompany(companyMember);
+        Bm bm = entitySaver.saveBm(company);
+
         MemberDetails companyMemberDetails = createCompanyMemberDetails(company);
 
         final String updatedName = "updated_bm_name";
@@ -261,9 +237,11 @@ class BmServiceTest {
     @Test
     void BM_수정_실패() {
         //given
-        Company company_01 = saveCompany();
-        Bm bm = saveBm(company_01);
-        MemberDetails companyMemberDetails_01 = createCompanyMemberDetails(company_01);
+        Member companyMember_1 = entitySaver.saveCompanyMember();
+        Company company_1 = entitySaver.saveCompany(companyMember_1);
+        Bm bm = entitySaver.saveBm(company_1);
+
+        MemberDetails companyMemberDetails_01 = createCompanyMemberDetails(company_1);
 
         final String UPDATED_NAME = "update_bm_name";
         final MainCategory UPDATED_MAIN_CATEGORY = MainCategory.COMMUNICATION_SECURITY_DATA;
@@ -285,10 +263,11 @@ class BmServiceTest {
 
         Long invalidId = Long.MAX_VALUE;
 
-        Company company_02 = saveCompany();
-        MemberDetails companyMemberDetails_02 = createCompanyMemberDetails(company_02);
+        Member companyMember_2 = entitySaver.saveCompanyMember();
+        Company company_2 = entitySaver.saveCompany(companyMember_2);
+        MemberDetails companyMemberDetails_02 = createCompanyMemberDetails(company_2);
 
-        Member individual = saveIndividual();
+        Member individual = entitySaver.saveIndividualMember();
         MemberDetails individualMemberDetails = createIndividualMemberDetails(individual);
 
         //when
@@ -305,8 +284,10 @@ class BmServiceTest {
     @Test
     void BM_삭제_성공() {
         //given
-        Company company = saveCompany();
-        Bm bm = saveBm(company);
+        Member companyMember = entitySaver.saveCompanyMember();
+        Company company = entitySaver.saveCompany(companyMember);
+        Bm bm = entitySaver.saveBm(company);
+
         MemberDetails companyMemberDetails = createCompanyMemberDetails(company);
 
         //when
@@ -320,15 +301,17 @@ class BmServiceTest {
     @Test
     void BM_삭제_실패() {
         //given
-        Company company_1 = saveCompany();
+        Member companyMember_1 = entitySaver.saveCompanyMember();
+        Company company_1 = entitySaver.saveCompany(companyMember_1);
         MemberDetails companyMemberDetails_1 = createCompanyMemberDetails(company_1);
+        Bm bm = entitySaver.saveBm(company_1);
 
-        Company company_2 = saveCompany();
+        Member companyMember_2 = entitySaver.saveCompanyMember();
+        Company company_2 = entitySaver.saveCompany(companyMember_2);
         MemberDetails companyMemberDetails_2 = createCompanyMemberDetails(company_2);
-        Bm bm = saveBm(company_1);
 
         Long invalidId = Long.MAX_VALUE;
-        Member individual = saveIndividual();
+        Member individual = entitySaver.saveIndividualMember();
         MemberDetails individualMemberDetails = createIndividualMemberDetails(individual);
 
         //when

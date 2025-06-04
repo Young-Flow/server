@@ -1,12 +1,12 @@
 package com.pitchain.service;
 
 import com.pitchain.common.constant.MemberRole;
-import com.pitchain.common.constant.OauthProvider;
 import com.pitchain.common.constant.S3UploadTarget;
 import com.pitchain.dto.req.CompanyUpdateReq;
 import com.pitchain.dto.req.IndividualUpdateReq;
 import com.pitchain.dto.res.CompanyProfileRes;
 import com.pitchain.dto.res.IndividualProfileRes;
+import com.pitchain.entity.Bm;
 import com.pitchain.entity.Company;
 import com.pitchain.entity.Individual;
 import com.pitchain.entity.Member;
@@ -14,6 +14,7 @@ import com.pitchain.jwt.MemberDetails;
 import com.pitchain.repository.CompanyRepository;
 import com.pitchain.repository.IndividualRepository;
 import com.pitchain.repository.MemberRepository;
+import com.pitchain.util.EntitySaver;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles("test")
@@ -43,11 +43,14 @@ class MemberServiceTest {
     private CompanyRepository companyRepository;
     @Autowired
     private IndividualRepository individualRepository;
+    @Autowired
+    private EntitySaver entitySaver;
 
     @Test
     void 내_정보_조회_성공_개인인_경우() {
         //given
-        Individual individual = saveIndividual();
+        Member individualMember = entitySaver.saveIndividualMember();
+        Individual individual = entitySaver.saveIndividual(individualMember);
         Member member = individual.getMember();
         MemberDetails individualMemberDetails = createIndividualMemberMemberDetails(member);
 
@@ -71,7 +74,9 @@ class MemberServiceTest {
     @Test
     void 내_정보_조회_성공_회사인_경우() {
         //given
-        Company company = saveCompany();
+        Member companyMember = entitySaver.saveCompanyMember();
+        Company company = entitySaver.saveCompany(companyMember);
+
         Member member = company.getMember();
         MemberDetails companyMemberDetails = createCompanyMemberDetails(company);
 
@@ -94,7 +99,8 @@ class MemberServiceTest {
     @Test
     void 이메일_중복_확인_중복인_경우() {
         //given
-        Company company = saveCompany();
+        Member companyMember = entitySaver.saveCompanyMember();
+        Company company = entitySaver.saveCompany(companyMember);
         Member member = company.getMember();
 
         //when
@@ -107,7 +113,10 @@ class MemberServiceTest {
     @Test
     void 이메일_중복_확인_중복이_아닌_경우() {
         //given
-        Company company = saveCompany();
+        Member companyMember = entitySaver.saveCompanyMember();
+        Company company = entitySaver.saveCompany(companyMember);
+        Bm bm = entitySaver.saveBm(company);
+
         String newEmail = "newEmail";
 
         //when
@@ -120,7 +129,9 @@ class MemberServiceTest {
     @Test
     void 나의_정보_수정_성공_회사인_경우() {
         //given
-        Company company = saveCompany();
+        Member companyMember = entitySaver.saveCompanyMember();
+        Company company = entitySaver.saveCompany(companyMember);
+
         MemberDetails companyMemberDetails = createCompanyMemberDetails(company);
 
         CompanyUpdateReq baseUpdateMemberReq = new CompanyUpdateReq("address", MemberRole.COMPANY);
@@ -135,11 +146,13 @@ class MemberServiceTest {
     @Test
     void 나의_정보_수정_성공_개인인_경우() {
         //given
-        Individual individual = saveIndividual();
+        Member individualMember = entitySaver.saveIndividualMember();
+        Individual individual = entitySaver.saveIndividual(individualMember);
         Member member = individual.getMember();
+
         MemberDetails individualMemberDetails = createIndividualMemberMemberDetails(member);
 
-        IndividualUpdateReq updateMemberReq = new IndividualUpdateReq( "newName", MemberRole.INDIVIDUAL);
+        IndividualUpdateReq updateMemberReq = new IndividualUpdateReq("newName", MemberRole.INDIVIDUAL);
 
         //when
         memberService.updateMyProfile(individualMemberDetails, updateMemberReq);
@@ -152,7 +165,9 @@ class MemberServiceTest {
     @Test
     void 프로필_이미지_수정_성공() {
         //given
-        Company company = saveCompany();
+        Member companyMember = entitySaver.saveCompanyMember();
+        Company company = entitySaver.saveCompany(companyMember);
+
         MemberDetails companyMemberDetails = createCompanyMemberDetails(company);
 
         MockMultipartFile newLogoImg = new MockMultipartFile(
@@ -169,19 +184,9 @@ class MemberServiceTest {
         assertThat(findMember.getProfileImgKey()).isEqualTo(newLogoImgKey);
     }
 
-    private Individual saveIndividual() {
-        Member member = memberRepository.save(Member.createIndividualMember("email", "name"));
-        Individual individual = Individual.of(member, "socailId", OauthProvider.KAKAO);
-        return individualRepository.save(individual);
-    }
 
     private MemberDetails createIndividualMemberMemberDetails(Member member) {
         return new MemberDetails(member.getId(), MemberRole.INDIVIDUAL);
-    }
-
-    private Company saveCompany() {
-        Member member = memberRepository.save(Member.createCompanyMember("email"));
-        return companyRepository.save(new Company(member, "encodedPassword"));
     }
 
     private MemberDetails createCompanyMemberDetails(Company company) {
