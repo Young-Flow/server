@@ -87,7 +87,7 @@ public class SpLikeServiceTest {
 
 
     private Bm saveBm(Company company) {
-        return bmRepository.save(new Bm(company, "bmName", MainCategory.FOOD, "bmIntro", "bmDescription",
+        return bmRepository.save(Bm.create(company, "bmName", MainCategory.FOOD, "bmIntro", "bmDescription",
                 "bmDescriptionImg", "companyAddress", 100000L, 1000L, 1000, LocalDate.now(), "longPitchUrl"));
     }
 

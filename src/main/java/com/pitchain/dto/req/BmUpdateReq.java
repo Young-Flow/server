@@ -33,19 +33,4 @@ public record BmUpdateReq(
         LocalDate deadline,
         String longPitchURL
 ) {
-    public Bm createBm(String descImgKey) {
-        return Bm.builder()
-                .name(name)
-                .mainCategory(mainCategory)
-                .intro(intro)
-                .description(description)
-                .descImgKey(descImgKey)
-                .address(address)
-                .valuationCap(valuationCap)
-                .goalInvestment(goalInvestment)
-                .maxIssuedShare(maxIssuedShare)
-                .deadline(deadline)
-                .longPitchURL(longPitchURL)
-                .build();
-    }
 }

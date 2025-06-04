@@ -87,8 +87,19 @@ public class BmService {
 
         bmSubcategoryService.update(bm.getId(), bmUpdateReq.subCategories());
 
-        Bm updateBm = bmUpdateReq.createBm(descImgKey);
-        bm.update(updateBm);
+        bm.update(
+                bmUpdateReq.name(),
+                bmUpdateReq.mainCategory(),
+                bmUpdateReq.intro(),
+                bmUpdateReq.description(),
+                descImgKey,
+                bmUpdateReq.address(),
+                bmUpdateReq.valuationCap(),
+                bmUpdateReq.goalInvestment(),
+                bmUpdateReq.maxIssuedShare(),
+                bmUpdateReq.deadline(),
+                bmUpdateReq.longPitchURL()
+        );
     }
 
     public void updatePtImgs(MemberDetails memberDetails, Long bmId, List<String> uploadPtImgKeys) {

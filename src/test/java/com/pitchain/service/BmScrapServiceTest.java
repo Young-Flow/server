@@ -84,7 +84,7 @@ class BmScrapServiceTest {
     }
 
     private Bm saveBm(Company company) {
-        Bm bm = new Bm(
+        Bm bm = Bm.create(
                 company, "bmName", MainCategory.FOOD,
                 "bmIntro", "bmDescription", "bmDescriptionImg", "bmAddress",
                 100000L, 1000L, 1000,

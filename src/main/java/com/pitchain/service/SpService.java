@@ -41,7 +41,7 @@ public class SpService {
         String spKey = createSpM3U8Key(spOriginKey);
         String thumbnailImgKey = s3Service.uploadFile(thumbnailImg, S3UploadTarget.COMPANY_THUMBNAIL);
 
-        Sp sp = new Sp(bm, spKey, thumbnailImgKey, spCreateReq.name());
+        Sp sp = Sp.of(bm, spKey, thumbnailImgKey, spCreateReq.name());
         spRepository.save(sp);
     }
 
@@ -124,7 +124,7 @@ public class SpService {
         String spKey = s3Service.uploadFile(spVid, S3UploadTarget.COMPANY_VIDEO);
         String thumbnailImgKey = s3Service.uploadFile(thumbnailImg, S3UploadTarget.COMPANY_THUMBNAIL);
 
-        Sp updateSp = new Sp(sp.getBm(), spKey, thumbnailImgKey, name);
+        Sp updateSp = Sp.of(sp.getBm(), spKey, thumbnailImgKey, name);
         sp.update(updateSp);
     }
 

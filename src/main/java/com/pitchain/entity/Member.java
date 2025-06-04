@@ -1,16 +1,14 @@
 package com.pitchain.entity;
 
 import com.pitchain.common.constant.MemberRole;
-import com.pitchain.common.constant.SubCategory;
 import jakarta.persistence.*;
-import lombok.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class Member {
@@ -30,18 +28,20 @@ public class Member {
     private String name;
 
     public static Member createIndividualMember(String email, String name) {
-        return Member.builder()
-                .role(MemberRole.INDIVIDUAL)
-                .email(email)
-                .name(name)
-                .build();
+        Member member = new Member();
+        member.role = MemberRole.INDIVIDUAL;
+        member.email = email;
+        member.name = name;
+
+        return member;
     }
 
     public static Member createCompanyMember(String email) {
-        return Member.builder()
-                .role(MemberRole.COMPANY)
-                .email(email)
-                .build();
+        Member member = new Member();
+        member.role = MemberRole.COMPANY;
+        member.email = email;
+
+        return member;
     }
 
     public boolean hasProfileImg() {

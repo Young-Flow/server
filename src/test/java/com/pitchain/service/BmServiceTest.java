@@ -81,7 +81,7 @@ class BmServiceTest {
     }
 
     private Bm saveBm(Company company) {
-        Bm bm = new Bm(
+        Bm bm = Bm.create(
                 company, NAME, MAIN_CATEGORY,
                 INTRO, DESCRIPTION, DESC_IMG_KEY, ADDRESS,
                 VALUATION_CAP, GOAL_INVESTMENT, MAX_ISSUED_SHARE,

@@ -38,19 +38,7 @@ public record BmCreateReq(
         String longPitchURL
 ) {
     public Bm createBm(Company company, String descImgKey) {
-        return Bm.builder()
-                .company(company)
-                .name(name)
-                .mainCategory(mainCategory)
-                .intro(intro)
-                .description(description)
-                .descImgKey(descImgKey)
-                .address(address)
-                .valuationCap(valuationCap)
-                .goalInvestment(goalInvestment)
-                .maxIssuedShare(maxIssuedShare)
-                .deadline(deadline)
-                .longPitchURL(longPitchURL)
-                .build();
+        return Bm.create(company, name, mainCategory, intro, description, descImgKey,
+                address, valuationCap, goalInvestment, maxIssuedShare, deadline, longPitchURL);
     }
 }

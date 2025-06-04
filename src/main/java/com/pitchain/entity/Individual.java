@@ -7,7 +7,6 @@ import lombok.*;
 
 @Entity
 @Getter
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table
@@ -28,11 +27,11 @@ public class Individual extends BaseEntity {
     private Member member;
 
     public static Individual of(Member member, String socailId, OauthProvider oauthProvider) {
-        return Individual.builder()
-                .member(member)
-                .socialId(builder().socialId)
-                .oauthProvider(oauthProvider)
-                .build();
+        Individual individual = new Individual();
+        individual.member = member;
+        individual.socialId = socailId;
+        individual.oauthProvider = oauthProvider;
+        return individual;
     }
 
 }

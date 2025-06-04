@@ -14,7 +14,6 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString
 public class Bm extends BaseEntity {
 
     @Id
@@ -47,32 +46,38 @@ public class Bm extends BaseEntity {
     @JoinColumn(name = "company_id")
     private Company company;
 
-//    @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<BmSubCategory> subCategories = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY)
-//    private List<Investment> investments = new ArrayList<>();
-//
-//    @OrderBy("id ASC")
-//    @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Sp> sps = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<PtImg> ptImgs = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "bm", fetch = FetchType.LAZY)
-//    private List<Comment> comments = new ArrayList<>();
-
     public double getPricePerShare() {
         return (double) valuationCap / maxIssuedShare;
     }
 
-    @Builder
-    public Bm(Company company, String name, MainCategory mainCategory,
-              String intro, String description, String descImgKey, String address,
-              Long valuationCap, Long goalInvestment, Integer maxIssuedShare,
-              LocalDate deadline, String longPitchURL) {
-        this.company = company;
+    public static Bm create(Company company, String name, MainCategory mainCategory,
+                              String intro, String description, String descImgKey, String address,
+                              Long valuationCap, Long goalInvestment, Integer maxIssuedShare,
+                              LocalDate deadline, String longPitchURL) {
+        Bm bm = new Bm();
+        bm.company = company;
+        bm.name = name;
+        bm.mainCategory = mainCategory;
+        bm.intro = intro;
+        bm.description = description;
+        bm.descImgKey = descImgKey;
+        bm.address = address;
+        bm.valuationCap = valuationCap;
+        bm.goalInvestment = goalInvestment;
+        bm.maxIssuedShare = maxIssuedShare;
+        bm.deadline = deadline;
+        bm.longPitchURL = longPitchURL;
+        return bm;
+    }
+
+    public boolean isOwner(Long companyId) {
+        return this.company.getId().equals(companyId);
+    }
+
+    public void update(String name, MainCategory mainCategory, String intro,
+                       String description, String descImgKey, String address,
+                       Long valuationCap, Long goalInvestment, Integer maxIssuedShare,
+                       LocalDate deadline, String longPitchURL) {
         this.name = name;
         this.mainCategory = mainCategory;
         this.intro = intro;
@@ -84,25 +89,6 @@ public class Bm extends BaseEntity {
         this.maxIssuedShare = maxIssuedShare;
         this.deadline = deadline;
         this.longPitchURL = longPitchURL;
-    }
-
-    public boolean isOwner(Long companyId) {
-        return this.company.getId().equals(companyId);
-    }
-
-
-    public void update(Bm updateBm) {
-        this.name = updateBm.getName();
-        this.mainCategory = updateBm.getMainCategory();
-        this.intro = updateBm.getIntro();
-        this.description = updateBm.getDescription();
-        this.descImgKey = updateBm.getDescImgKey();
-        this.address = updateBm.getAddress();
-        this.valuationCap = updateBm.getValuationCap();
-        this.goalInvestment = updateBm.getGoalInvestment();
-        this.maxIssuedShare = updateBm.getMaxIssuedShare();
-        this.deadline = updateBm.getDeadline();
-        this.longPitchURL = updateBm.getLongPitchURL();
     }
 
 }

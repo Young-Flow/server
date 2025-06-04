@@ -63,12 +63,12 @@ class SpServiceTest {
     }
 
     private Bm saveBm(Company company) {
-        return bmRepository.save(new Bm(company, "bmName", MainCategory.FOOD, "bmIntro", "bmDescription",
+        return bmRepository.save(Bm.create(company, "bmName", MainCategory.FOOD, "bmIntro", "bmDescription",
                 "bmDescriptionImg", "companyAddress", 100000L, 1000L, 1000, LocalDate.now(), "longPitchUrl"));
     }
 
     private Bm saveBmWithMainCategory(Company company, MainCategory mainCategory) {
-        return bmRepository.save(new Bm(company, "bm_name", mainCategory, "bm_intro", "bm_description",
+        return bmRepository.save(Bm.create(company, "bm_name", mainCategory, "bm_intro", "bm_description",
                 "bm_desc_img_key", "bm_address", 100000L, 1000L, 1000, LocalDate.now(), "bm_long_pitch_url"));
     }
 
