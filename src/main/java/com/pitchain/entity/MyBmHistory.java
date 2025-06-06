@@ -23,8 +23,10 @@ public class MyBmHistory {
     @JoinColumn(name = "bm_id")
     private Bm bm;
 
-    public MyBmHistory(Member member, Bm bm) {
-        this.member = member;
-        this.bm = bm;
+    public static MyBmHistory of(Member member, Bm bm) {
+        MyBmHistory myBmHistory = new MyBmHistory();
+        myBmHistory.member = member;
+        myBmHistory.bm = bm;
+        return myBmHistory;
     }
 }

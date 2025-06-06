@@ -16,6 +16,6 @@ public class MyBmHistoryService {
     @Transactional
     public void saveMyBmHistory(Member member, Bm bm) {
         if (!myBmHistoryRepository.existsByMemberAndBm(member, bm))
-            myBmHistoryRepository.save(new MyBmHistory(member, bm));
+            myBmHistoryRepository.save(MyBmHistory.of(member, bm));
     }
 }
