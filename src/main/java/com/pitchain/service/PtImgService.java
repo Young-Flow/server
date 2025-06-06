@@ -34,7 +34,7 @@ public class PtImgService {
 
         deleteAll(OldPtImgs);
 
-        if (isNullOrEmpty(uploadPtImgKeys)) {
+        if (!isNullOrEmpty(uploadPtImgKeys)) {
             saveAll(uploadPtImgKeys, bm);
         }
     }
