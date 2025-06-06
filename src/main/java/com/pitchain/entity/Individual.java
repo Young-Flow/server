@@ -26,10 +26,10 @@ public class Individual extends BaseEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    public static Individual of(Member member, String socailId, OauthProvider oauthProvider) {
+    public static Individual of(Member member, String socialId, OauthProvider oauthProvider) {
         Individual individual = new Individual();
         individual.member = member;
-        individual.socialId = socailId;
+        individual.socialId = socialId;
         individual.oauthProvider = oauthProvider;
         return individual;
     }
