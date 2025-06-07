@@ -29,11 +29,7 @@ public class InvestmentService {
 
         Member member = entityFacade.getMember(memberDetails.id());
         Bm bm = entityFacade.getBm(bmId);
-        Investment investment = Investment.builder()
-                .member(member)
-                .bm(bm)
-                .amount(amount)
-                .build();
+        Investment investment = Investment.of(member, bm, amount);
 
         investmentRepository.save(investment);
     }

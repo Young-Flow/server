@@ -41,26 +41,20 @@ public class CommentService {
         }
     }
 
+    @Transactional
     private void addReplyComment(Member member, Bm bm, String content, Long parentCommentId) {
         Comment parentComment = commentRepository.findById(parentCommentId).orElseThrow(() ->
                 new GeneralException(ErrorStatus.COMMENT_NOT_FOUND));
 
-        Comment comment = Comment.builder()
-                .member(member)
-                .bm(bm)
-                .parentComment(parentComment)
-                .content(content)
-                .build();
+        Comment comment = Comment.of(member, bm, content);
+        comment.setParent(parentComment);
 
         commentRepository.save(comment);
     }
 
+    @Transactional
     private void addComment(Member member, Bm bm, String content) {
-        Comment comment = Comment.builder()
-                .member(member)
-                .bm(bm)
-                .content(content)
-                .build();
+        Comment comment = Comment.of(member, bm, content);
 
         commentRepository.save(comment);
     }
@@ -70,11 +64,11 @@ public class CommentService {
         Member member = entityFacade.getMember(memberDetails.id());
         Bm bm = entityFacade.getBm(bmId);
 
-        List<Comment> comments = commentRepository.findByBm(bm);
+        List<Comment> comments = commentRepository.findAllByBm(bm);
 
         return comments.stream()
                 .map(comment -> {
-                    List<ReplyCommentRes> replyCommentResList = comment.getChildComments().stream()
+                    List<ReplyCommentRes> replyCommentResList = commentRepository.findAllByParentComments(comments).stream()
                             .map(childComment -> ReplyCommentRes.createRes(
                                     childComment, childComment.getMember().getProfileImgKey()
                             ))
@@ -118,7 +112,7 @@ public class CommentService {
     }
 
     private boolean isReplyComment(Comment comment) {
-        List<Comment> childComments = comment.getChildComments();
+        List<Comment> childComments = commentRepository.findByParentComment(comment);
         return childComments.isEmpty();
     }
 

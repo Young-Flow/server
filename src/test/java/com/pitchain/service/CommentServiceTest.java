@@ -74,17 +74,16 @@ class CommentServiceTest {
         commentService.addComment(bm.getId(), individualMemberDetails, addCommentReq);
 
         //then
-        List<Comment> comments = commentRepository.findByBm(bm);
+        List<Comment> comments = commentRepository.findAllByBm(bm);
         Comment comment = comments.get(0);
         assertThat(comment.getMember()).isEqualTo(individual);
         assertThat(comment.getParentComment()).isNull();
-        assertThat(comment.getChildComments().size()).isEqualTo(0);
+        assertThat(commentRepository.findByParentComment(comment).size()).isEqualTo(0);
         assertThat(comment.getContent()).isEqualTo(content);
         assertThat(comment.getBm()).isEqualTo(bm);
     }
 
     @Test
-    @Transactional(propagation = NEVER)
     void 답글_등록_성공() {
         //given
         Member individual = saveIndividual();
@@ -105,10 +104,10 @@ class CommentServiceTest {
         commentService.addComment(bm.getId(), individualMemberDetails, addReplyCommentReq);
 
         //then
-        List<Comment> comments = commentRepository.findByBm(bm);
+        List<Comment> comments = commentRepository.findAllByBm(bm);
         Comment comment = comments.get(0);
 
-        List<Comment> replyComments = comment.getChildComments();
+        List<Comment> replyComments = commentRepository.findByParentComment(parentComment);
         Comment replyComment = replyComments.get(0);
         assertThat(replyComment.getParentComment()).isEqualTo(comment);
         assertThat(replyComment.getContent()).isEqualTo(replyCommentContent);
@@ -153,7 +152,6 @@ class CommentServiceTest {
     }
 
     @Test
-    @Transactional(propagation = NEVER)
     void 답글_포함_댓글_조회_성공() {
         //given
         Member individualA = saveIndividual();
@@ -184,14 +182,13 @@ class CommentServiceTest {
     }
 
     @Test
-    @Transactional(propagation = NEVER)
     @DisplayName("답글이 있는 댓글은 삭제되어도 조회된다.")
     void 삭제된_댓글_조회_성공() {
         //given
         Member individualA = saveIndividual();
         Company company = saveCompany();
         Bm bm = saveBm(company);
-        Comment parentComment = new Comment(individualA, bm, null, "댓글 내용");
+        Comment parentComment = Comment.of(individualA, bm, "댓글 내용");
         parentComment.deleteParentComment();
         commentRepository.save(parentComment);
 
@@ -288,7 +285,6 @@ class CommentServiceTest {
     }
 
     @Test
-    @Transactional(propagation = NEVER)
     @DisplayName("답글이 있는 댓글은 DB에서 삭제되지 않는다.")
     void 답글_있는_댓글_삭제_성공() {
         //given
@@ -363,10 +359,12 @@ class CommentServiceTest {
     }
 
     private Comment saveComment(Member member, Bm bm) {
-        return commentRepository.save(new Comment(member, bm, null, "댓글 내용"));
+        return commentRepository.save(Comment.of(member, bm, "댓글 내용"));
     }
 
     private Comment saveReplyComment(Member member, Comment parentComment, Bm bm) {
-        return commentRepository.save(new Comment(member, bm, parentComment, "답글 내용"));
+        Comment replyComment = commentRepository.save(Comment.of(member, bm, "답글 내용"));
+        replyComment.setParent(parentComment);
+        return replyComment;
     }
 }
