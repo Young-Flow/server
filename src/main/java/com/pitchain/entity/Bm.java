@@ -1,15 +1,12 @@
 package com.pitchain.entity;
 
 import com.pitchain.common.constant.MainCategory;
-import com.pitchain.common.constant.SubCategory;
 import com.pitchain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter

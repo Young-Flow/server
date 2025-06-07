@@ -9,9 +9,8 @@ import com.pitchain.entity.Bm;
 import com.pitchain.entity.Investment;
 import com.pitchain.entity.Member;
 import com.pitchain.jwt.MemberDetails;
-import com.pitchain.repository.BmRepository;
+import com.pitchain.repository.EntityFacade;
 import com.pitchain.repository.InvestmentRepository;
-import com.pitchain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,17 +21,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class InvestmentService {
 
     private final InvestmentRepository investmentRepository;
-    private final BmRepository bmRepository;
-    private final MemberRepository memberRepository;
+    private final EntityFacade entityFacade;
 
     public void addInvestment(Long bmId, MemberDetails memberDetails, long amount) {
         if (memberDetails.memberRole().equals(MemberRole.COMPANY))
             throw new GeneralException(ErrorStatus.COMPANY_FORBIDDEN);
 
-        Member member = memberRepository.findById(memberDetails.id())
-                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
-
-        Bm bm = bmRepository.findById(bmId).orElseThrow(() -> new GeneralException(ErrorStatus.BM_NOT_FOUND));
+        Member member = entityFacade.getMember(memberDetails.id());
+        Bm bm = entityFacade.getBm(bmId);
         Investment investment = Investment.builder()
                 .member(member)
                 .bm(bm)
@@ -44,8 +40,7 @@ public class InvestmentService {
 
     @Transactional(readOnly = true)
     public InvestmentStatusRes getInvestmentStatus(Long bmId) {
-        Bm bm = bmRepository.findById(bmId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.BM_NOT_FOUND));
+        Bm bm = entityFacade.getBm(bmId);
 
         InvestmentStatusDto investmentStatusDto = investmentRepository.findInvestmentStatusByBm(bm);
         int achievementRate = getAchievementRate(bm.getGoalInvestment(), investmentStatusDto.getRaisedAmount());
