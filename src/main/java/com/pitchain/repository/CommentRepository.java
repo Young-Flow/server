@@ -16,11 +16,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             "AND c.bm = :bm")
     List<Comment> findAllByBm(@Param("bm") Bm bm);
 
-    @Query("SELECT c From Comment c " +
-            "LEFT JOIN FETCH c.member " +
-            "WHERE c.parentComment IN :parentComments")
-    List<Comment> findAllByParentComments(@Param("parentComments") List<Comment> parentComments);
-
     List<Comment> findByParentComment(@Param("parentComment") Comment parentComment);
 
 }

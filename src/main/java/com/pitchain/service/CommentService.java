@@ -68,7 +68,7 @@ public class CommentService {
 
         return comments.stream()
                 .map(comment -> {
-                    List<ReplyCommentRes> replyCommentResList = commentRepository.findAllByParentComments(comments).stream()
+                    List<ReplyCommentRes> replyCommentResList = commentRepository.findByParentComment(comment).stream()
                             .map(childComment -> ReplyCommentRes.createRes(
                                     childComment, childComment.getMember().getProfileImgKey()
                             ))
