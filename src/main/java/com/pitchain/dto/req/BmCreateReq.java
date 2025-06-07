@@ -11,7 +11,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 
-public record CreateBmReq(
+public record BmCreateReq(
         @NotNull(message = "회사 ID는 필수입니다.")
         Long companyId,
         @NotBlank(message = "이름은 필수입니다.")
@@ -38,19 +38,7 @@ public record CreateBmReq(
         String longPitchURL
 ) {
     public Bm createBm(Company company, String descImgKey) {
-        return Bm.builder()
-                .company(company)
-                .name(name)
-                .mainCategory(mainCategory)
-                .intro(intro)
-                .description(description)
-                .descImgKey(descImgKey)
-                .address(address)
-                .valuationCap(valuationCap)
-                .goalInvestment(goalInvestment)
-                .maxIssuedShare(maxIssuedShare)
-                .deadline(deadline)
-                .longPitchURL(longPitchURL)
-                .build();
+        return Bm.create(company, name, mainCategory, intro, description, descImgKey,
+                address, valuationCap, goalInvestment, maxIssuedShare, deadline, longPitchURL);
     }
 }

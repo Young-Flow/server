@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class AddInvestmentReq {
+public class InvestmentAddReq {
     @Positive(message = "투자 금액은 양수여야 합니다.")
     private long amount;
 }

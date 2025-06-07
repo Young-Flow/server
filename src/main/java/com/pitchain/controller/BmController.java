@@ -1,7 +1,7 @@
 package com.pitchain.controller;
 
-import com.pitchain.dto.req.CreateBmReq;
-import com.pitchain.dto.req.UpdateBmReq;
+import com.pitchain.dto.req.BmCreateReq;
+import com.pitchain.dto.req.BmUpdateReq;
 import com.pitchain.dto.res.BmDetailRes;
 import com.pitchain.jwt.MemberDetails;
 import com.pitchain.service.BmService;
@@ -24,9 +24,9 @@ public class BmController {
     @Operation(summary = "BM 생성")
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public void createBm(@AuthenticationPrincipal MemberDetails memberDetails,
-                         @Valid @RequestPart CreateBmReq createBmReq,
+                         @Valid @RequestPart BmCreateReq bmCreateReq,
                          @RequestPart(required = false) MultipartFile descImg) {
-        bmService.createBm(memberDetails, createBmReq, descImg);
+        bmService.createBm(memberDetails, bmCreateReq, descImg);
     }
 
     @Operation(summary = "BM 상세 조회")
@@ -40,9 +40,9 @@ public class BmController {
     @PutMapping(value = "{bmId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public void updateBm(@AuthenticationPrincipal MemberDetails memberDetails,
                          @PathVariable("bmId") Long bmId,
-                         @Valid @RequestPart UpdateBmReq updateBmReq,
+                         @Valid @RequestPart BmUpdateReq bmUpdateReq,
                          @RequestPart(required = false) MultipartFile descImg) {
-        bmService.updateBm(memberDetails, bmId, updateBmReq, descImg);
+        bmService.updateBm(memberDetails, bmId, bmUpdateReq, descImg);
     }
 
     @Operation(summary = "BM PT 이미지 수정")

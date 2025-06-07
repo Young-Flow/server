@@ -1,12 +1,11 @@
 package com.pitchain.service;
 
-import com.pitchain.common.apiPayload.ErrorStatus;
-import com.pitchain.common.exception.GeneralException;
 import com.pitchain.entity.Member;
 import com.pitchain.entity.Sp;
 import com.pitchain.entity.SpLike;
 import com.pitchain.jwt.MemberDetails;
-import com.pitchain.repository.*;
+import com.pitchain.repository.EntityFacade;
+import com.pitchain.repository.SpLikeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,16 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class SpLikeService {
 
+    private final EntityFacade entityFacade;
     private final SpLikeRepository spLikeRepository;
-    private final MemberRepository memberRepository;
-    private final SpRepository spRepository;
 
     @Transactional
     public void toggleLikeSp(Long spId, MemberDetails memberDetails) {
-        Member member = memberRepository.findById(memberDetails.id())
-                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
-        Sp sp = spRepository.findById(spId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.SP_NOT_FOUND));
+        Member member = entityFacade.getMember(memberDetails.id());
+        Sp sp = entityFacade.getSp(spId);
 
         if (isLiked(member, sp)) {
             cancelLike(member, sp);
@@ -46,4 +42,9 @@ public class SpLikeService {
         spLikeRepository.deleteByMemberAndSp(member, sp);
     }
 
+    @Transactional(readOnly = true)
+    public Long countBySpId(Long spId) {
+        Sp sp = entityFacade.getSp(spId);
+        return spLikeRepository.countBySp(sp);
+    }
 }

@@ -1,14 +1,11 @@
 package com.pitchain.service;
 
-import com.pitchain.common.apiPayload.ErrorStatus;
-import com.pitchain.common.exception.GeneralException;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.BmScrap;
 import com.pitchain.entity.Member;
 import com.pitchain.jwt.MemberDetails;
-import com.pitchain.repository.BmRepository;
-import com.pitchain.repository.MemberRepository;
 import com.pitchain.repository.BmScrapRepository;
+import com.pitchain.repository.EntityFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,16 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class BmScrapService {
 
+    private final EntityFacade entityFacade;
     private final BmScrapRepository bmScrapRepository;
-    private final MemberRepository memberRepository;
-    private final BmRepository bmRepository;
 
     @Transactional
     public void toggleScrapBm(Long bmId, MemberDetails memberDetails) {
-        Member member = memberRepository.findById(memberDetails.id())
-                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
-        Bm bm = bmRepository.findById(bmId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.BM_NOT_FOUND));
+        Member member = entityFacade.getMember(memberDetails.id());
+        Bm bm = entityFacade.getBm(bmId);
 
         if (isScraped(member, bm)) {
             cancelScrap(member, bm);
@@ -49,4 +43,8 @@ public class BmScrapService {
     }
 
 
+    public long countByBm(Long bmId) {
+        Bm bm = entityFacade.getBm(bmId);
+        return bmScrapRepository.countByBm(bm);
+    }
 }

@@ -10,7 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 
-public record UpdateBmReq(
+public record BmUpdateReq(
         @NotBlank(message = "이름은 필수입니다.")
         String name,
         @NotNull(message = "메인 카테고리는 필수입니다.")
@@ -33,19 +33,4 @@ public record UpdateBmReq(
         LocalDate deadline,
         String longPitchURL
 ) {
-    public Bm createBm(String descImgKey) {
-        return Bm.builder()
-                .name(name)
-                .mainCategory(mainCategory)
-                .intro(intro)
-                .description(description)
-                .descImgKey(descImgKey)
-                .address(address)
-                .valuationCap(valuationCap)
-                .goalInvestment(goalInvestment)
-                .maxIssuedShare(maxIssuedShare)
-                .deadline(deadline)
-                .longPitchURL(longPitchURL)
-                .build();
-    }
 }

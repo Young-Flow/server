@@ -1,12 +1,19 @@
 package com.pitchain.service;
 
-import com.pitchain.common.constant.*;
+import com.pitchain.common.constant.MainCategory;
+import com.pitchain.common.constant.MemberRole;
+import com.pitchain.common.constant.S3UploadTarget;
+import com.pitchain.common.constant.SubCategory;
 import com.pitchain.common.entity.InfinityScrollRes;
-import com.pitchain.dto.req.CreateSpReq;
+import com.pitchain.dto.req.SpCreateReq;
 import com.pitchain.dto.res.SpDetailRes;
 import com.pitchain.entity.*;
 import com.pitchain.jwt.MemberDetails;
-import com.pitchain.repository.*;
+import com.pitchain.repository.BmRepository;
+import com.pitchain.repository.BmSubCategoryRepository;
+import com.pitchain.repository.SpLikeRepository;
+import com.pitchain.repository.SpRepository;
+import com.pitchain.util.EntitySaver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,60 +42,37 @@ class SpServiceTest {
     @Autowired
     private SpRepository spRepository;
     @Autowired
-    private MemberRepository memberRepository;
-    @Autowired
     private BmRepository bmRepository;
     @Autowired
     private SpLikeRepository spLikeRepository;
     @Autowired
-    private CompanyRepository companyRepository;
-
-    private Member saveIndividual() {
-        return memberRepository.save(Member.createIndividualMember("email", "name"));
-    }
+    private BmSubCategoryRepository bmSubCategoryRepository;
+    @Autowired
+    private EntitySaver entitySaver;
 
     private MemberDetails createIndividualMemberDetails(Member member) {
         return new MemberDetails(member.getId(), MemberRole.INDIVIDUAL);
-    }
-
-    private Company saveCompany() {
-        Member member = memberRepository.save(Member.createCompanyMember("email"));
-        return companyRepository.save(new Company(member, "encodedPassword"));
     }
 
     private MemberDetails createCompanyMemberDetails(Company company) {
         return new MemberDetails(company.getMember().getId(), MemberRole.COMPANY);
     }
 
-    private Bm saveBm(Company company) {
-        return bmRepository.save(new Bm(company, "bmName", MainCategory.FOOD, "bmIntro", "bmDescription",
-                "bmDescriptionImg", "companyAddress", 100000L, 1000L, 1000, LocalDate.now(), "longPitchUrl"));
-    }
-
-    private Bm saveBmWithMainCategory(Company company, MainCategory mainCategory) {
-        return bmRepository.save(new Bm(company, "bm_name", mainCategory, "bm_intro", "bm_description",
-                "bm_desc_img_key", "bm_address", 100000L, 1000L, 1000, LocalDate.now(), "bm_long_pitch_url"));
-    }
-
-    private Sp saveSp(Bm bm) {
-        return spRepository.save(
-                new Sp(bm, SP_KEY, THUMBNAIL_IMG.getOriginalFilename(), SP_NAME));
-    }
-
-    @BeforeEach
-    void setUp() {
-        individual = saveIndividual();
-        individualMemberDetails = createIndividualMemberDetails(individual);
-        company = saveCompany();
-        bm = saveBm(company);
-        companyMemberDetails = createCompanyMemberDetails(company);
-    }
-
-    private Member individual;
+    private Member individualMember;
     private MemberDetails individualMemberDetails;
     private Bm bm;
     private Company company;
     private MemberDetails companyMemberDetails;
+
+    @BeforeEach
+    void setUp() {
+        individualMember = entitySaver.saveIndividualMember();
+        Member companyMember = entitySaver.saveCompanyMember();
+        company = entitySaver.saveCompany(companyMember);
+        bm = entitySaver.saveBm(company);
+        companyMemberDetails = createCompanyMemberDetails(company);
+        individualMemberDetails = createIndividualMemberDetails(individualMember);
+    }
 
     private static final String SP_NAME = "sp_name";
     private static final String SP_KEY = "sp_vid.m3u8";
@@ -101,7 +85,7 @@ class SpServiceTest {
     @Test
     void SP_생성_성공() {
         //given
-        CreateSpReq createSpReq = new CreateSpReq(bm.getId(), SP_NAME);
+        SpCreateReq spCreateReq = new SpCreateReq(bm.getId(), SP_NAME);
 
         when(s3Service.uploadFile(SP_VID, S3UploadTarget.COMPANY_VIDEO))
                 .thenReturn(SP_VID.getOriginalFilename());
@@ -109,7 +93,7 @@ class SpServiceTest {
                 .thenReturn(THUMBNAIL_IMG.getOriginalFilename());
 
         //when
-        spService.createSp(companyMemberDetails, createSpReq, SP_VID, THUMBNAIL_IMG);
+        spService.createSp(companyMemberDetails, spCreateReq, SP_VID, THUMBNAIL_IMG);
 
         //then
         List<Sp> all = spRepository.findAll();
@@ -123,10 +107,12 @@ class SpServiceTest {
     @Test
     void SP_조회_성공_좋아요_없음() {
         //given
-        Sp sp = saveSp(bm);
+        Sp sp = entitySaver.saveSp(bm);
 
-        bm.updateSubCategories(SUB_CATEGORIES);
-        List<String> subCategories = bm.getKoreanSubCategories();
+        for (SubCategory subCategory : SUB_CATEGORIES) {
+            BmSubCategory bmSubCategory = BmSubCategory.create(bm, subCategory);
+            bmSubCategoryRepository.save(bmSubCategory);
+        }
 
         //when
         SpDetailRes spDetail = spService.getSpDetail(individualMemberDetails, sp.getId());
@@ -138,7 +124,7 @@ class SpServiceTest {
         assertThat(spDetail.views()).isEqualTo(sp.getViews());
         assertThat(spDetail.name()).isEqualTo(sp.getName());
         assertThat(spDetail.mainCategory()).isEqualTo(sp.getBm().getMainCategory().getKoreanName());
-        assertThat(spDetail.subCategories()).isEqualTo(subCategories);
+        assertThat(spDetail.subCategories()).isEqualTo(SUB_CATEGORIES.stream().map(SubCategory::getKoreanName).toList());
         assertThat(spDetail.isLiked()).isEqualTo(false);
         assertThat(spDetail.likeCnt()).isEqualTo(0L);
     }
@@ -146,13 +132,16 @@ class SpServiceTest {
     @Test
     void SP_조회_성공_좋아요_존재() {
         //given
-        Member newIndividual = saveIndividual();
-        Sp sp = saveSp(bm);
-        spLikeRepository.save(new SpLike(individual, sp));
+        Member newIndividual = entitySaver.saveIndividualMember();
+        Sp sp = entitySaver.saveSp(bm);
+
+        spLikeRepository.save(new SpLike(individualMember, sp));
         spLikeRepository.save(new SpLike(newIndividual, sp));
 
-        bm.updateSubCategories(SUB_CATEGORIES);
-        List<String> subCategories = bm.getKoreanSubCategories();
+        for (SubCategory subCategory : SUB_CATEGORIES) {
+            BmSubCategory bmSubCategory = BmSubCategory.create(bm, subCategory);
+            bmSubCategoryRepository.save(bmSubCategory);
+        }
 
         //when
         SpDetailRes spDetail = spService.getSpDetail(individualMemberDetails, sp.getId());
@@ -164,7 +153,7 @@ class SpServiceTest {
         assertThat(spDetail.views()).isEqualTo(sp.getViews());
         assertThat(spDetail.name()).isEqualTo(sp.getName());
         assertThat(spDetail.mainCategory()).isEqualTo(sp.getBm().getMainCategory().getKoreanName());
-        assertThat(spDetail.subCategories()).isEqualTo(subCategories);
+        assertThat(spDetail.subCategories()).isEqualTo(SUB_CATEGORIES.stream().map(SubCategory::getKoreanName).toList());
         assertThat(spDetail.isLiked()).isEqualTo(true);
         assertThat(spDetail.likeCnt()).isEqualTo(2L);
     }
@@ -172,11 +161,12 @@ class SpServiceTest {
     @Test
     void SP_전체_조회() {
         //given
-        Sp sp_1 = saveSp(bm);
+        Sp sp_1 = entitySaver.saveSp(bm);
 
-        Company newCompany = saveCompany();
-        Bm newBm = saveBm(newCompany);
-        Sp sp_2 = saveSp(newBm);
+        Member companyMember = entitySaver.saveCompanyMember();
+        Company newCompany = entitySaver.saveCompany(companyMember);
+        Bm newBm = entitySaver.saveBm(newCompany);
+        Sp sp_2 = entitySaver.saveSp(newBm);
 
         //when
         List<SpDetailRes> spDetails = spService.getSpDetails(individualMemberDetails);
@@ -195,32 +185,32 @@ class SpServiceTest {
     @Test
     void SP_카테고리_필터링_조회() {
         //given
-        Member individual1 = saveIndividual();
-        Member individual2 = saveIndividual();
-        Member individual3 = saveIndividual();
+        Member individual_1 = entitySaver.saveIndividualMember();
+        Member individual_2 = entitySaver.saveIndividualMember();
+        Member individual_3 = entitySaver.saveIndividualMember();
 
-        MemberDetails individualMemberDetails1 = createIndividualMemberDetails(individual1);
+        MemberDetails individualMemberDetails_1 = createIndividualMemberDetails(individual_1);
 
-        Company company1 = saveCompany();
-        Company company2 = saveCompany();
-        Company company3 = saveCompany();
+        Company company1 = entitySaver.saveCompany(entitySaver.saveCompanyMember());
+        Company company2 = entitySaver.saveCompany(entitySaver.saveCompanyMember());
+        Company company3 = entitySaver.saveCompany(entitySaver.saveCompanyMember());
 
         Bm bm1 = saveBmWithMainCategory(company1, MainCategory.TECH_DIGITAL);
         Bm bm2 = saveBmWithMainCategory(company2, MainCategory.TECH_DIGITAL);
         Bm bm3 = saveBmWithMainCategory(company3, MainCategory.FOOD);
 
-        Sp sp1 = saveSp(bm1);
-        Sp sp2 = saveSp(bm2);
-        Sp sp3 = saveSp(bm3);
+        Sp sp1 = entitySaver.saveSp(bm1);
+        Sp sp2 = entitySaver.saveSp(bm2);
+        Sp sp3 = entitySaver.saveSp(bm3);
 
-        spLikeRepository.save(new SpLike(individual1, sp1));
-        spLikeRepository.save(new SpLike(individual2, sp1));
+        spLikeRepository.save(new SpLike(individual_1, sp1));
+        spLikeRepository.save(new SpLike(individual_2, sp1));
 
         //when
         InfinityScrollRes<SpDetailRes> spDetailRes_1 = spService.getSpDetailsFilteredCategory(
-                individualMemberDetails1, MainCategory.TECH_DIGITAL.getKoreanName(), null, 1);
+                individualMemberDetails_1, MainCategory.TECH_DIGITAL.getKoreanName(), null, 1);
         InfinityScrollRes<SpDetailRes> spDetailRes_2 = spService.getSpDetailsFilteredCategory(
-                individualMemberDetails1, MainCategory.TECH_DIGITAL.getKoreanName(), spDetailRes_1.getLastElementId(), 1);
+                individualMemberDetails_1, MainCategory.TECH_DIGITAL.getKoreanName(), spDetailRes_1.getLastElementId(), 1);
 
         // then
         List<SpDetailRes> content_1 = spDetailRes_1.getContent();
@@ -246,10 +236,15 @@ class SpServiceTest {
         assertThat(spDetailRes_2.getLastElementId()).isEqualTo(sp1.getId());
     }
 
+    private Bm saveBmWithMainCategory(Company company, MainCategory mainCategory) {
+        return bmRepository.save(Bm.create(company, "bm_name", mainCategory, "bm_intro", "bm_description",
+                "bm_desc_img_key", "bm_address", 100000L, 1000L, 1000, LocalDate.now(), "bm_long_pitch_url"));
+    }
+
     @Test
     void SP_수정_성공() {
         //given
-        Sp sp = saveSp(bm);
+        Sp sp = entitySaver.saveSp(bm);
 
         String newName = "new_name";
         MockMultipartFile newSpVid = new MockMultipartFile(
@@ -277,7 +272,7 @@ class SpServiceTest {
     @Test
     void SP_삭제_성공() {
         //given
-        Sp sp = saveSp(bm);
+        Sp sp = entitySaver.saveSp(bm);
 
         //when
         spService.deleteSp(companyMemberDetails, sp.getId());

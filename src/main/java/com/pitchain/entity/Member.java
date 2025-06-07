@@ -1,16 +1,14 @@
 package com.pitchain.entity;
 
 import com.pitchain.common.constant.MemberRole;
-import com.pitchain.common.constant.SubCategory;
 import jakarta.persistence.*;
-import lombok.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class Member {
@@ -29,39 +27,21 @@ public class Member {
 
     private String name;
 
-    @OneToMany(mappedBy = "member")
-    @Builder.Default
-    private List<Comment> comments = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member")
-    @Builder.Default
-    private List<BmScrap> bmScraps = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member")
-    @Builder.Default
-    private List<SpLike> spLikes = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<CategoryPref> categoryPrefs = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member")
-    @Builder.Default
-    private List<Investment> investments = new ArrayList<>();
-
     public static Member createIndividualMember(String email, String name) {
-        return Member.builder()
-                .role(MemberRole.INDIVIDUAL)
-                .email(email)
-                .name(name)
-                .build();
+        Member member = new Member();
+        member.role = MemberRole.INDIVIDUAL;
+        member.email = email;
+        member.name = name;
+
+        return member;
     }
 
     public static Member createCompanyMember(String email) {
-        return Member.builder()
-                .role(MemberRole.COMPANY)
-                .email(email)
-                .build();
+        Member member = new Member();
+        member.role = MemberRole.COMPANY;
+        member.email = email;
+
+        return member;
     }
 
     public boolean hasProfileImg() {
@@ -78,12 +58,6 @@ public class Member {
 
     public void updateName(String name) {
         this.name = name;
-    }
-
-    public void addCategoryPref(List<SubCategory> subCategories) {
-        for (SubCategory subCategory : subCategories) {
-            this.categoryPrefs.add(new CategoryPref(this, subCategory));
-        }
     }
 
     public Member(String email) {

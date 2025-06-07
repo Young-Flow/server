@@ -4,9 +4,9 @@ import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.MemberRole;
 import com.pitchain.common.exception.GeneralException;
 import com.pitchain.controller.UpdatePasswordReq;
-import com.pitchain.dto.req.CreateCompanyReq;
-import com.pitchain.dto.req.LoginCompanyReq;
-import com.pitchain.dto.req.VerifyCompanyReq;
+import com.pitchain.dto.req.CompanyCreateReq;
+import com.pitchain.dto.req.CompanyLoginReq;
+import com.pitchain.dto.req.CompanyVerifyReq;
 import com.pitchain.dto.res.LoginRes;
 import com.pitchain.entity.Company;
 import com.pitchain.entity.Member;
@@ -59,7 +59,7 @@ public class CompanyServiceTest {
     @Test
     void 회사_가입_성공() {
         //given
-        CreateCompanyReq req = new CreateCompanyReq(COMPANY_EMAIL, COMPANY_PASSWORD, COMPANY_PASSWORD_CONFIRMATION);
+        CompanyCreateReq req = new CompanyCreateReq(COMPANY_EMAIL, COMPANY_PASSWORD, COMPANY_PASSWORD_CONFIRMATION);
 
         //when
         companyService.createCompany(req);
@@ -76,20 +76,20 @@ public class CompanyServiceTest {
     void 회사_가입_실패() {
         //given
         saveCompany();
-        CreateCompanyReq req = new CreateCompanyReq(COMPANY_EMAIL, COMPANY_PASSWORD, COMPANY_PASSWORD_CONFIRMATION);
+        CompanyCreateReq req = new CompanyCreateReq(COMPANY_EMAIL, COMPANY_PASSWORD, COMPANY_PASSWORD_CONFIRMATION);
 
         //when
         GeneralException e = assertThrows(GeneralException.class, () -> companyService.createCompany(req));
 
         //then
-        assertThat(e.getErrorStatus()).isEqualTo(ErrorStatus.COMPANY_EMAIL_CONFLICT);
+        assertThat(e.getErrorStatus()).isEqualTo(ErrorStatus.MEMBER_EMAIL_CONFLICT);
     }
 
     @Test
     void 회사_가입_실패_비밀번호_확인_실패인_경우() {
         //given
         String wrongPasswordConfirmation = "wrongPasswordConfirmation";
-        CreateCompanyReq req = new CreateCompanyReq(COMPANY_EMAIL, COMPANY_PASSWORD, wrongPasswordConfirmation);
+        CompanyCreateReq req = new CompanyCreateReq(COMPANY_EMAIL, COMPANY_PASSWORD, wrongPasswordConfirmation);
 
         //when
         GeneralException e = assertThrows(GeneralException.class, () -> companyService.createCompany(req));
@@ -103,7 +103,7 @@ public class CompanyServiceTest {
     void 회사_로그인_성공() {
         //given
         Company company = saveCompany();
-        LoginCompanyReq req = new LoginCompanyReq(COMPANY_EMAIL, COMPANY_PASSWORD);
+        CompanyLoginReq req = new CompanyLoginReq(COMPANY_EMAIL, COMPANY_PASSWORD);
 
         //when
         LoginRes loginRes = companyService.loginCompany(req);
@@ -125,8 +125,8 @@ public class CompanyServiceTest {
         String invalidPassword = "invalidPassword";
 
         //when
-        GeneralException e_1 = assertThrows(GeneralException.class, () -> companyService.loginCompany(new LoginCompanyReq(invalidEmail, COMPANY_PASSWORD)));
-        GeneralException e_2 = assertThrows(GeneralException.class, () -> companyService.loginCompany(new LoginCompanyReq(COMPANY_EMAIL, invalidPassword)));
+        GeneralException e_1 = assertThrows(GeneralException.class, () -> companyService.loginCompany(new CompanyLoginReq(invalidEmail, COMPANY_PASSWORD)));
+        GeneralException e_2 = assertThrows(GeneralException.class, () -> companyService.loginCompany(new CompanyLoginReq(COMPANY_EMAIL, invalidPassword)));
 
         //then
         assertThat(e_1.getErrorStatus()).isEqualTo(ErrorStatus.MEMBER_NOT_FOUND);
@@ -158,7 +158,7 @@ public class CompanyServiceTest {
 
         MemberDetails companyMemberDetails = createCompanyMemberDetails(company);
         String companyName = "companyName";
-        VerifyCompanyReq req = new VerifyCompanyReq(companyName);
+        CompanyVerifyReq req = new CompanyVerifyReq(companyName);
 
         //when
         companyService.verifyCompany(companyMemberDetails, req);

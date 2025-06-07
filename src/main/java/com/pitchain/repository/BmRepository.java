@@ -38,9 +38,9 @@ public interface BmRepository extends JpaRepository<Bm, Long> {
     List<PtImg> getPtImgsByBmId(Long bmId);
 
     @Query("""
-                SELECT b 
+                SELECT b
                 FROM Bm b
-                LEFT JOIN FETCH b.ptImgs
+                LEFT JOIN FETCH PtImg pi ON pi.bm.id = b.id
                 WHERE b.id = :bmId
             """)
     Optional<Bm> getByIdWithPtImgs(Long bmId);

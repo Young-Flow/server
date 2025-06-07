@@ -1,23 +1,18 @@
 package com.pitchain.service;
 
-import com.pitchain.common.constant.MainCategory;
 import com.pitchain.common.constant.MemberRole;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.BmScrap;
 import com.pitchain.entity.Company;
 import com.pitchain.entity.Member;
 import com.pitchain.jwt.MemberDetails;
-import com.pitchain.repository.BmRepository;
-import com.pitchain.repository.CompanyRepository;
-import com.pitchain.repository.MemberRepository;
 import com.pitchain.repository.BmScrapRepository;
+import com.pitchain.util.EntitySaver;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,69 +24,47 @@ class BmScrapServiceTest {
     @Autowired
     private BmScrapService bmScrapService;
     @Autowired
-    private MemberRepository memberRepository;
-    @Autowired
-    private BmRepository bmRepository;
-    @Autowired
     private BmScrapRepository bmScrapRepository;
     @Autowired
-    private CompanyRepository companyRepository;
+    private EntitySaver entitySaver;
 
     @Test
     void BM_스크랩_등록_성공() {
         //given
-        Company company = saveCompany();
-        Bm bm = saveBm(company);
-        Member member = saveIndividual();
+        Member companyMember = entitySaver.saveCompanyMember();
+        Company company = entitySaver.saveCompany(companyMember);
+        Bm bm = entitySaver.saveBm(company);
+        Member individual = entitySaver.saveIndividualMember();
 
         //when
-        bmScrapService.toggleScrapBm(bm.getId(), createIndividualMemberDetails(member));
+        bmScrapService.toggleScrapBm(bm.getId(), createIndividualMemberDetails(individual));
 
         //then
-        boolean isScraped = bmScrapRepository.existsByMemberAndBm(member, bm);
+        boolean isScraped = bmScrapRepository.existsByMemberAndBm(individual, bm);
         assertThat(isScraped).isTrue();
     }
 
     @Test
     void BM_스크랩_취소_성공() {
         //given
-        Company company = saveCompany();
-        Bm bm = saveBm(company);
-        Member member = saveIndividual();
+        Member companyMember = entitySaver.saveCompanyMember();
+        Company company = entitySaver.saveCompany(companyMember);
+        Bm bm = entitySaver.saveBm(company);
+        Member individual = entitySaver.saveIndividualMember();
 
-        BmScrap bmScrap = new BmScrap(member, bm);
+        BmScrap bmScrap = new BmScrap(individual, bm);
         bmScrapRepository.save(bmScrap);
 
         //when
-        bmScrapService.toggleScrapBm(bm.getId(), createIndividualMemberDetails(member));
+        bmScrapService.toggleScrapBm(bm.getId(), createIndividualMemberDetails(individual));
 
         //then
-        boolean isScraped = bmScrapRepository.existsByMemberAndBm(member, bm);
+        boolean isScraped = bmScrapRepository.existsByMemberAndBm(individual, bm);
         assertThat(isScraped).isFalse();
     }
 
-    private Member saveIndividual() {
-        return memberRepository.save(Member.createIndividualMember("email", "name"));
-    }
 
     private MemberDetails createIndividualMemberDetails(Member member) {
         return new MemberDetails(member.getId(), MemberRole.INDIVIDUAL);
     }
-
-    private Company saveCompany() {
-        Member member = memberRepository.save(Member.createCompanyMember("email"));
-        return companyRepository.save(new Company(member, "encodedPassword"));
-    }
-
-    private Bm saveBm(Company company) {
-        Bm bm = new Bm(
-                company, "bmName", MainCategory.FOOD,
-                "bmIntro", "bmDescription", "bmDescriptionImg", "bmAddress",
-                100000L, 1000L, 1000,
-                LocalDate.now(), "longPitchUrl"
-        );
-
-        return bmRepository.save(bm);
-    }
-
 }

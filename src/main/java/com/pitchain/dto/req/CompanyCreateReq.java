@@ -4,7 +4,7 @@ import com.pitchain.entity.Company;
 import com.pitchain.entity.Member;
 import jakarta.validation.constraints.NotBlank;
 
-public record CreateCompanyReq(
+public record CompanyCreateReq(
         @NotBlank(message = "이메일은 필수입니다.")
         String email,
         @NotBlank(message = "비밀번호는 필수입니다.")

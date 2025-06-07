@@ -1,8 +1,8 @@
 package com.pitchain.controller;
 
-import com.pitchain.dto.req.CreateCompanyReq;
-import com.pitchain.dto.req.LoginCompanyReq;
-import com.pitchain.dto.req.VerifyCompanyReq;
+import com.pitchain.dto.req.CompanyCreateReq;
+import com.pitchain.dto.req.CompanyLoginReq;
+import com.pitchain.dto.req.CompanyVerifyReq;
 import com.pitchain.dto.res.LoginRes;
 import com.pitchain.jwt.MemberDetails;
 import com.pitchain.service.CompanyService;
@@ -20,13 +20,13 @@ public class CompanyController {
 
     @Operation(summary = "회사 회원가입")
     @PostMapping()
-    public void createCompany(@RequestBody CreateCompanyReq req) {
+    public void createCompany(@RequestBody CompanyCreateReq req) {
         companyService.createCompany(req);
     }
 
     @Operation(summary = "회사 로그인")
     @PostMapping("/login")
-    public LoginRes loginCompany(@RequestBody LoginCompanyReq req) {
+    public LoginRes loginCompany(@RequestBody CompanyLoginReq req) {
         LoginRes loginRes = companyService.loginCompany(req);
         return loginRes;
     }
@@ -39,7 +39,7 @@ public class CompanyController {
 
     @Operation(summary = "회사 인증")
     @PostMapping("/verify")
-    public void verifyCompany(@AuthenticationPrincipal MemberDetails memberDetails, @RequestBody VerifyCompanyReq req) {
+    public void verifyCompany(@AuthenticationPrincipal MemberDetails memberDetails, @RequestBody CompanyVerifyReq req) {
         companyService.verifyCompany(memberDetails, req);
     }
 }

@@ -4,9 +4,9 @@ import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.MemberRole;
 import com.pitchain.common.exception.GeneralException;
 import com.pitchain.controller.UpdatePasswordReq;
-import com.pitchain.dto.req.CreateCompanyReq;
-import com.pitchain.dto.req.LoginCompanyReq;
-import com.pitchain.dto.req.VerifyCompanyReq;
+import com.pitchain.dto.req.CompanyCreateReq;
+import com.pitchain.dto.req.CompanyLoginReq;
+import com.pitchain.dto.req.CompanyVerifyReq;
 import com.pitchain.dto.res.LoginRes;
 import com.pitchain.entity.Company;
 import com.pitchain.entity.Member;
@@ -14,7 +14,6 @@ import com.pitchain.jwt.MemberDetails;
 import com.pitchain.jwt.TokenUtil;
 import com.pitchain.repository.CompanyRepository;
 import com.pitchain.repository.EntityFacade;
-import com.pitchain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,28 +25,26 @@ import java.util.Optional;
 @Transactional
 @Service
 public class CompanyService {
-    private final EntityFacade entityFacade;
-    private final MemberRepository memberRepository;
     private final CompanyRepository companyRepository;
+    private final EntityFacade entityFacade;
+    private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
     private final TokenUtil tokenUtil;
 
-    public void createCompany(CreateCompanyReq req) {
-        Optional<Member> optionalCompany = memberRepository.findByEmail(req.email());
-        verifyEmailConflict(optionalCompany);
+    public void createCompany(CompanyCreateReq req) {
         confirmPassword(req.password(), req.passwordConfirmation());
 
-        Member member = Member.createCompanyMember(req.email());
-        memberRepository.save(member);
+        memberService.validateEmailConflict(req.email());
+
+        Member member = memberService.saveCompanyMember(req.email());
 
         String encodedPassword = passwordEncoder.encode(req.password());
         Company company = req.createUnverifiedCompany(member, encodedPassword);
         companyRepository.save(company);
     }
 
-    public LoginRes loginCompany(LoginCompanyReq req) {
-        Member member = memberRepository.findByEmail(req.email())
-                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+    public LoginRes loginCompany(CompanyLoginReq req) {
+        Member member = memberService.findByEmail(req.email());
 
         Company company = companyRepository.findByMemberId(member.getId())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.COMPANY_NOT_FOUND));
@@ -65,20 +62,15 @@ public class CompanyService {
 
         verifyPassword(req.originPassword(), company.getPassword());
 
-        String encodedNewPassword = passwordEncoder.encode(req.newPassword());
-        company.updatePassword(encodedNewPassword);
+        String newEncodedPassword = passwordEncoder.encode(req.newPassword());
+        company.updatePassword(newEncodedPassword);
     }
 
-    public void verifyCompany(MemberDetails memberDetails, VerifyCompanyReq req) {
+    public void verifyCompany(MemberDetails memberDetails, CompanyVerifyReq req) {
         Company company = entityFacade.getCompany(memberDetails);
 
         company.getMember().updateName(req.companyName());
         company.verifyCompany();
-    }
-
-    private static void verifyEmailConflict(Optional<Member> optionalMember) {
-        if (optionalMember.isPresent())
-            throw new GeneralException(ErrorStatus.COMPANY_EMAIL_CONFLICT);
     }
 
     private void confirmPassword(String password, String passwordConfirmation) {

@@ -7,7 +7,7 @@ import com.pitchain.common.entity.InfinityScrollRes;
 import com.pitchain.common.exception.GeneralException;
 import com.pitchain.common.util.InfinityScrollUtil;
 import com.pitchain.dto.SpWithLikeDto;
-import com.pitchain.dto.req.CreateSpReq;
+import com.pitchain.dto.req.SpCreateReq;
 import com.pitchain.dto.res.SpDetailRes;
 import com.pitchain.entity.*;
 import com.pitchain.jwt.MemberDetails;
@@ -27,19 +27,21 @@ public class SpService {
     private final EntityFacade entityFacade;
     private final SpRepository spRepository;
     private final SpRepositoryCustom spRepositoryCustom;
-    private final SpLikeRepository spLikeRepository;
+//    private final SpLikeRepository spLikeRepository;
+    private final BmSubcategoryService bmSubcategoryService;
+    private final SpLikeService spLikeService;
     private final S3Service s3Service;
 
-    public void createSp(MemberDetails memberDetails, CreateSpReq createSpReq, MultipartFile spVid, MultipartFile thumbnailImg) {
+    public void createSp(MemberDetails memberDetails, SpCreateReq spCreateReq, MultipartFile spVid, MultipartFile thumbnailImg) {
         Company company = entityFacade.getCompany(memberDetails);
-        Bm bm = entityFacade.getBm(createSpReq.bmId());
+        Bm bm = entityFacade.getBm(spCreateReq.bmId());
 
         String spOriginKey = s3Service.uploadFile(spVid, S3UploadTarget.COMPANY_VIDEO);
 
         String spKey = createSpM3U8Key(spOriginKey);
         String thumbnailImgKey = s3Service.uploadFile(thumbnailImg, S3UploadTarget.COMPANY_THUMBNAIL);
 
-        Sp sp = new Sp(bm, spKey, thumbnailImgKey, createSpReq.name());
+        Sp sp = Sp.of(bm, spKey, thumbnailImgKey, spCreateReq.name());
         spRepository.save(sp);
     }
 
@@ -52,12 +54,20 @@ public class SpService {
                     Sp sp = spWithLikeDto.getSp();
                     Bm bm = sp.getBm();
 
-                    Long likeCnt = spLikeRepository.countBySp(sp);
-                    List<String> subCategories = bm.getKoreanSubCategories();
+                    Long likeCnt = spLikeService.countBySpId(sp.getId());
+                    List<BmSubCategory> bmSubCategories = bmSubcategoryService.getBmSubCategoryByBmId(bm.getId());
+                    List<String> subCategories = convertToKoreanName(bmSubCategories);
 
                     return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories);
                 })
                 .toList();
+    }
+
+    private static List<String> convertToKoreanName(List<BmSubCategory> bmSubCategories) {
+        List<String> subcategoriesInKorean = bmSubCategories.stream()
+                .map(bmSubCategory -> bmSubCategory.getSubCategory().getKoreanName())
+                .toList();
+        return subcategoriesInKorean;
     }
 
     @Transactional(readOnly = true)
@@ -77,8 +87,9 @@ public class SpService {
                     Sp sp = spWithLikeDto.getSp();
                     Bm bm = sp.getBm();
 
-                    Long likeCnt = spLikeRepository.countBySp(sp);
-                    List<String> subCategories = bm.getKoreanSubCategories();
+                    Long likeCnt = spLikeService.countBySpId(sp.getId());
+                    List<BmSubCategory> bmSubCategories = bmSubcategoryService.getBmSubCategoryByBmId(bm.getId());
+                    List<String> subCategories = convertToKoreanName(bmSubCategories);
 
                     return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories);
                 })
@@ -94,8 +105,9 @@ public class SpService {
         Sp sp = spWithLikeDto.getSp();
         Bm bm = sp.getBm();
 
-        Long likeCnt = spLikeRepository.countBySp(sp);
-        List<String> subCategories = bm.getKoreanSubCategories();
+        Long likeCnt = spLikeService.countBySpId(sp.getId());
+        List<BmSubCategory> bmSubCategories = bmSubcategoryService.getBmSubCategoryByBmId(bm.getId());
+        List<String> subCategories = convertToKoreanName(bmSubCategories);
 
         return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories);
     }
@@ -112,7 +124,7 @@ public class SpService {
         String spKey = s3Service.uploadFile(spVid, S3UploadTarget.COMPANY_VIDEO);
         String thumbnailImgKey = s3Service.uploadFile(thumbnailImg, S3UploadTarget.COMPANY_THUMBNAIL);
 
-        Sp updateSp = new Sp(sp.getBm(), spKey, thumbnailImgKey, name);
+        Sp updateSp = Sp.of(sp.getBm(), spKey, thumbnailImgKey, name);
         sp.update(updateSp);
     }
 
@@ -138,5 +150,11 @@ public class SpService {
 
     public String removeFileExtension(String originalFileName) {
         return originalFileName.split("\\.")[0];
+    }
+
+    @Transactional(readOnly = true)
+    public List<Sp> getSpsByBmId(Long bmId) {
+        Bm bm = entityFacade.getBm(bmId);
+        return spRepository.findAllByBmId(bm.getId());
     }
 }
