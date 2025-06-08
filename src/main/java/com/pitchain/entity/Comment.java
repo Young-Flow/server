@@ -3,12 +3,8 @@ package com.pitchain.entity;
 import com.pitchain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -32,21 +28,22 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "parent_comment_id")
     private Comment parentComment;
 
-    @OneToMany(mappedBy = "parentComment")
-    private List<Comment> childComments = new ArrayList<>();
-
     @Column(nullable = false)
     private String content;
 
     @Column(name = "del_yn")
     private boolean delYN;
 
-    @Builder
-    public Comment(Member member, Bm bm, Comment parentComment, String content) {
-        this.member = member;
-        this.bm = bm;
+    public static Comment of(Member member, Bm bm, String content) {
+        Comment comment = new Comment();
+        comment.member = member;
+        comment.bm = bm;
+        comment.content = content;
+        return comment;
+    }
+
+    public void setParent(Comment parentComment) {
         this.parentComment = parentComment;
-        this.content = content;
     }
 
     public void deleteParentComment() {

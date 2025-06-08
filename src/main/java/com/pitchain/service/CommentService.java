@@ -11,9 +11,8 @@ import com.pitchain.entity.Bm;
 import com.pitchain.entity.Comment;
 import com.pitchain.entity.Member;
 import com.pitchain.jwt.MemberDetails;
-import com.pitchain.repository.BmRepository;
 import com.pitchain.repository.CommentRepository;
-import com.pitchain.repository.MemberRepository;
+import com.pitchain.repository.EntityFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,15 +24,12 @@ import java.util.List;
 public class CommentService {
 
     private final CommentRepository commentRepository;
-    private final BmRepository bmRepository;
-    private final MemberRepository memberRepository;
+    private final EntityFacade entityFacade;
 
     @Transactional
     public void addComment(Long bmId, MemberDetails memberDetails, CommentReq.AddCommentReq req) {
-        Member member = memberRepository.findById(memberDetails.id()).orElseThrow(() ->
-                new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
-        Bm bm = bmRepository.findById(bmId).orElseThrow(() ->
-                new GeneralException(ErrorStatus.BM_NOT_FOUND));
+        Member member = entityFacade.getMember(memberDetails.id());
+        Bm bm = entityFacade.getBm(bmId);
 
         String content = req.getContent();
         Long parentCommentId = req.getParentCommentId();
@@ -45,42 +41,34 @@ public class CommentService {
         }
     }
 
+    @Transactional
     private void addReplyComment(Member member, Bm bm, String content, Long parentCommentId) {
         Comment parentComment = commentRepository.findById(parentCommentId).orElseThrow(() ->
                 new GeneralException(ErrorStatus.COMMENT_NOT_FOUND));
 
-        Comment comment = Comment.builder()
-                .member(member)
-                .bm(bm)
-                .parentComment(parentComment)
-                .content(content)
-                .build();
+        Comment comment = Comment.of(member, bm, content);
+        comment.setParent(parentComment);
 
         commentRepository.save(comment);
     }
 
+    @Transactional
     private void addComment(Member member, Bm bm, String content) {
-        Comment comment = Comment.builder()
-                .member(member)
-                .bm(bm)
-                .content(content)
-                .build();
+        Comment comment = Comment.of(member, bm, content);
 
         commentRepository.save(comment);
     }
 
     @Transactional(readOnly = true)
     public List<? extends BaseCommentRes> getComments(Long bmId, MemberDetails memberDetails) {
-        Member member = memberRepository.findById(memberDetails.id()).orElseThrow(() ->
-                new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
-        Bm bm = bmRepository.findById(bmId).orElseThrow(() ->
-                new GeneralException(ErrorStatus.BM_NOT_FOUND));
+        Member member = entityFacade.getMember(memberDetails.id());
+        Bm bm = entityFacade.getBm(bmId);
 
-        List<Comment> comments = commentRepository.findByBm(bm);
+        List<Comment> comments = commentRepository.findAllByBm(bm);
 
         return comments.stream()
                 .map(comment -> {
-                    List<ReplyCommentRes> replyCommentResList = comment.getChildComments().stream()
+                    List<ReplyCommentRes> replyCommentResList = commentRepository.findByParentComment(comment).stream()
                             .map(childComment -> ReplyCommentRes.createRes(
                                     childComment, childComment.getMember().getProfileImgKey()
                             ))
@@ -96,8 +84,7 @@ public class CommentService {
 
     @Transactional
     public void modifyComment(Long commentId, MemberDetails memberDetails, CommentReq.ModifyCommentReq req) {
-        Member member = memberRepository.findById(memberDetails.id()).orElseThrow(() ->
-                new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+        Member member = entityFacade.getMember(memberDetails.id());
         Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
                 new GeneralException(ErrorStatus.COMMENT_NOT_FOUND));
 
@@ -110,8 +97,7 @@ public class CommentService {
 
     @Transactional
     public void removeComment(Long commentId, MemberDetails memberDetails) {
-        Member member = memberRepository.findById(memberDetails.id()).orElseThrow(() ->
-                new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+        Member member = entityFacade.getMember(memberDetails.id());
         Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
                 new GeneralException(ErrorStatus.COMMENT_NOT_FOUND));
 
@@ -126,7 +112,7 @@ public class CommentService {
     }
 
     private boolean isReplyComment(Comment comment) {
-        List<Comment> childComments = comment.getChildComments();
+        List<Comment> childComments = commentRepository.findByParentComment(comment);
         return childComments.isEmpty();
     }
 
