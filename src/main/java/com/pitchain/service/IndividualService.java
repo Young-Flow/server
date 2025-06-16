@@ -23,9 +23,9 @@ public class IndividualService {
     }
 
     @Transactional
-    public void saveIndividual(Long memberId, String socialId, OauthProvider oauthProvider) {
+    public Individual saveIndividual(Long memberId, String socialId, OauthProvider oauthProvider) {
         Member member = entityFacade.getMember(memberId);
         Individual individual = Individual.of(member, socialId, oauthProvider);
-        individualRepository.save(individual);
+        return individualRepository.save(individual);
     }
 }

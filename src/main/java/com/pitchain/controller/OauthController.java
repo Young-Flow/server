@@ -26,7 +26,7 @@ public class OauthController {
     )
     @PostMapping("/login")
     public LoginRes socialLogin(@Valid @RequestBody OauthLoginReq req) {
-        LoginRes loginRes = oauthService.getMemberByOauthLogin(req);
+        LoginRes loginRes = oauthService.oauthLogin(req);
         return loginRes;
     }
 }
