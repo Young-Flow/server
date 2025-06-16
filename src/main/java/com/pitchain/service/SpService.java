@@ -113,6 +113,7 @@ public class SpService {
         return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories);
     }
 
+    @Transactional
     public void updateSp(MemberDetails memberDetails, Long spId, String name, MultipartFile thumbnailImg) {
         Company company = entityFacade.getCompany(memberDetails);
         Sp sp = entityFacade.getSp(spId);
