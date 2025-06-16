@@ -20,7 +20,7 @@ public class Sp extends BaseEntity {
     @JoinColumn(name = "bm_id", nullable = false)
     private Bm bm;
 
-    @Column(nullable = false)
+    @Column
     private String spKey;
 
     @Column(nullable = false)
@@ -39,10 +39,9 @@ public class Sp extends BaseEntity {
         this.views = 0;
     }
 
-    public static Sp of(Bm bm, String spKey, String thumbnailImgKey, String name) {
+    public static Sp of(Bm bm, String thumbnailImgKey, String name) {
         Sp sp = new Sp();
         sp.bm = bm;
-        sp.spKey = spKey;
         sp.thumbnailImgKey = thumbnailImgKey;
         sp.name = name;
         sp.views = 0;

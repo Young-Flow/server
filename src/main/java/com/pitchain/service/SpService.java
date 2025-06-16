@@ -9,9 +9,14 @@ import com.pitchain.common.util.InfinityScrollUtil;
 import com.pitchain.dto.SpWithLikeDto;
 import com.pitchain.dto.req.SpCreateReq;
 import com.pitchain.dto.res.SpDetailRes;
-import com.pitchain.entity.*;
+import com.pitchain.entity.Bm;
+import com.pitchain.entity.BmSubCategory;
+import com.pitchain.entity.Company;
+import com.pitchain.entity.Sp;
 import com.pitchain.jwt.MemberDetails;
-import com.pitchain.repository.*;
+import com.pitchain.repository.EntityFacade;
+import com.pitchain.repository.SpRepository;
+import com.pitchain.repository.SpRepositoryCustom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,21 +32,17 @@ public class SpService {
     private final EntityFacade entityFacade;
     private final SpRepository spRepository;
     private final SpRepositoryCustom spRepositoryCustom;
-//    private final SpLikeRepository spLikeRepository;
     private final BmSubcategoryService bmSubcategoryService;
     private final SpLikeService spLikeService;
     private final S3Service s3Service;
 
-    public void createSp(MemberDetails memberDetails, SpCreateReq spCreateReq, MultipartFile spVid, MultipartFile thumbnailImg) {
+    public void createSp(MemberDetails memberDetails, SpCreateReq spCreateReq, MultipartFile thumbnailImg) {
         Company company = entityFacade.getCompany(memberDetails);
         Bm bm = entityFacade.getBm(spCreateReq.bmId());
 
-        String spOriginKey = s3Service.uploadFile(spVid, S3UploadTarget.COMPANY_VIDEO);
-
-        String spKey = createSpM3U8Key(spOriginKey);
         String thumbnailImgKey = s3Service.uploadFile(thumbnailImg, S3UploadTarget.COMPANY_THUMBNAIL);
 
-        Sp sp = Sp.of(bm, spKey, thumbnailImgKey, spCreateReq.name());
+        Sp sp = Sp.of(bm, thumbnailImgKey, spCreateReq.name());
         spRepository.save(sp);
     }
 
@@ -112,19 +113,16 @@ public class SpService {
         return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories);
     }
 
-    public void updateSp(MemberDetails memberDetails, Long spId, String name, MultipartFile spVid, MultipartFile thumbnailImg) {
+    public void updateSp(MemberDetails memberDetails, Long spId, String name, MultipartFile thumbnailImg) {
         Company company = entityFacade.getCompany(memberDetails);
         Sp sp = entityFacade.getSp(spId);
 
         validateSpOwner(sp, company);
 
-        s3Service.deleteVid(sp.getSpKey());
         s3Service.deleteImg(sp.getThumbnailImgKey());
-
-        String spKey = s3Service.uploadFile(spVid, S3UploadTarget.COMPANY_VIDEO);
         String thumbnailImgKey = s3Service.uploadFile(thumbnailImg, S3UploadTarget.COMPANY_THUMBNAIL);
 
-        Sp updateSp = Sp.of(sp.getBm(), spKey, thumbnailImgKey, name);
+        Sp updateSp = Sp.of(sp.getBm(), thumbnailImgKey, name);
         sp.update(updateSp);
     }
 
@@ -141,15 +139,6 @@ public class SpService {
         if (!sp.isOwner(company.getId())) {
             throw new GeneralException(ErrorStatus.COMPANY_FORBIDDEN);
         }
-    }
-
-    private String createSpM3U8Key(String spKey) {
-        String removedFileKey = removeFileExtension(spKey);
-        return removedFileKey + ".m3u8";
-    }
-
-    public String removeFileExtension(String originalFileName) {
-        return originalFileName.split("\\.")[0];
     }
 
     @Transactional(readOnly = true)
