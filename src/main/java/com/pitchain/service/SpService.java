@@ -120,11 +120,13 @@ public class SpService {
 
         validateSpOwner(sp, company);
 
-        s3Service.deleteImg(sp.getThumbnailImgKey());
-        String thumbnailImgKey = s3Service.uploadFile(thumbnailImg, S3UploadTarget.COMPANY_THUMBNAIL);
+        if (thumbnailImg != null) {
+            s3Service.deleteImg(sp.getThumbnailImgKey());
+            String thumbnailImgKey = s3Service.uploadFile(thumbnailImg, S3UploadTarget.COMPANY_THUMBNAIL);
+            sp.updateThumbnailImgKey(thumbnailImgKey);
+        }
 
-        Sp updateSp = Sp.of(sp.getBm(), thumbnailImgKey, name);
-        sp.update(updateSp);
+        sp.update(name);
     }
 
     public void deleteSp(MemberDetails memberDetails, Long spId) {

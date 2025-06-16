@@ -52,9 +52,11 @@ public class Sp extends BaseEntity {
         return bm.getCompany().getId().equals(companyId);
     }
 
-    public void update(Sp updateSp) {
-        this.spKey = updateSp.spKey;
-        this.thumbnailImgKey = updateSp.thumbnailImgKey;
-        this.name = updateSp.name;
+    public void update(String name) {
+        this.name = name;
+    }
+
+    public void updateThumbnailImgKey(String thumbnailImgKey) {
+        this.thumbnailImgKey = thumbnailImgKey;
     }
 }
