@@ -1,5 +1,6 @@
 package com.pitchain.entity;
 
+import com.pitchain.common.constant.SpStatus;
 import com.pitchain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -31,6 +32,9 @@ public class Sp extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
+    @Enumerated(EnumType.STRING)
+    private SpStatus spStatus;
+
     public Sp(Bm bm, String spKey, String thumbnailImgKey, String name) {
         this.bm = bm;
         this.spKey = spKey;
@@ -58,5 +62,9 @@ public class Sp extends BaseEntity {
 
     public void updateThumbnailImgKey(String thumbnailImgKey) {
         this.thumbnailImgKey = thumbnailImgKey;
+    }
+
+    public void updateStatus(SpStatus spStatus) {
+        this.spStatus = spStatus;
     }
 }

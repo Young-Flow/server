@@ -3,6 +3,7 @@ package com.pitchain.service;
 import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.MainCategory;
 import com.pitchain.common.constant.S3UploadTarget;
+import com.pitchain.common.constant.SpStatus;
 import com.pitchain.common.entity.InfinityScrollRes;
 import com.pitchain.common.exception.GeneralException;
 import com.pitchain.common.util.InfinityScrollUtil;
@@ -148,5 +149,17 @@ public class SpService {
     public List<Sp> getSpsByBmId(Long bmId) {
         Bm bm = entityFacade.getBm(bmId);
         return spRepository.findAllByBmId(bm.getId());
+    }
+
+    @Transactional
+    public void updateStatus(Long spId, SpStatus spStatus) {
+        Sp sp = entityFacade.getSp(spId);
+        sp.updateStatus(spStatus);
+    }
+
+    @Transactional(readOnly = true)
+    public Sp getSp(Long spId) {
+        return spRepository.findSpWithAll(spId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.SP_NOT_FOUND));
     }
 }

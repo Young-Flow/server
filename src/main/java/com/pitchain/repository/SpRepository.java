@@ -1,6 +1,5 @@
 package com.pitchain.repository;
 
-import com.pitchain.common.constant.SubCategory;
 import com.pitchain.dto.SpWithLikeDto;
 import com.pitchain.entity.Sp;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -47,4 +46,11 @@ public interface SpRepository extends JpaRepository<Sp, Long> {
 
 
     List<Sp> findAllByBmId(Long bmId);
+
+    @Query("SELECT s FROM Sp s " +
+            "JOIN FETCH s.bm b " +
+            "JOIN FETCH b.company c " +
+            "JOIN FETCH c.member m " +
+            "WHERE s.id = :spId")
+    Optional<Sp> findSpWithAll(Long spId);
 }
