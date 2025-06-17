@@ -19,6 +19,7 @@ public class NotificationLog extends BaseEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
+    @Enumerated(EnumType.STRING)
     private NotificationType notificationType;
 
     public static NotificationLog of(Member receiver, NotificationType notificationType) {
