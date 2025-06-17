@@ -16,6 +16,9 @@ public enum ErrorStatus implements ResponseStatus {
     _FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON_403_1", "common.forbidden"),
     _INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON_500_1", "common.internal-server-error"),
 
+    // sse
+    SSE_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "SSE_500_1", "sse.send-failed"),
+
     // jwt
     TOKEN_MISSING(HttpStatus.BAD_REQUEST, "TOKEN_400_1", "token.missing"),
     TOKEN_UNVERIFIED(HttpStatus.UNAUTHORIZED, "TOKEN_401_1", "token.unverified"),
@@ -45,6 +48,7 @@ public enum ErrorStatus implements ResponseStatus {
     SUB_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "SUB_CATEGORY_404_1", "sub-category.not-found"),
 
     // sp
+    SP_STATUS_CONVERSION_FAILED(HttpStatus.BAD_REQUEST, "SP_400_1", "sp.status-conversion-failed"),
     SP_NOT_FOUND(HttpStatus.NOT_FOUND, "SP_404_1", "sp.not-found"),
 
     // comment
@@ -53,15 +57,17 @@ public enum ErrorStatus implements ResponseStatus {
     // categoryPref
     CATEGORY_PREF_NOT_FOUND(HttpStatus.NOT_FOUND, "CATEGORY_PREF_404_1", "category-pref.not-found"),
 
+    // notification
+    NOTIFICATION_TYPE_CONVERSION_FAILED(HttpStatus.BAD_REQUEST, "NOTIFICATION_400_1", "notification.status-conversion-failed"),
+
     // S3
     FAIL_S3_UPLOAD(HttpStatus.BAD_REQUEST, "S3_400_1", "s3.fail-upload"),
     INVALID_BUCKET_URL(HttpStatus.BAD_REQUEST, "S3_400_2", "s3.invalid-bucket-url"),
 
-    // file
+    // file,
     INVALID_MIME_TYPE(HttpStatus.BAD_REQUEST, "FILE_400_1", "file.invalid-mime-type"),
-    FAIL_STREAM_CONVERT(HttpStatus.BAD_REQUEST, "FILE_400_2", "file.fail-stream-convert")
+    FAIL_STREAM_CONVERT(HttpStatus.BAD_REQUEST, "FILE_400_2", "file.fail-stream-convert"), ;
 
-    ;
 
     private final HttpStatus httpStatus;
     @Getter
