@@ -35,19 +35,12 @@ public class Sp extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private SpStatus spStatus;
 
-    public Sp(Bm bm, String spKey, String thumbnailImgKey, String name) {
-        this.bm = bm;
-        this.spKey = spKey;
-        this.thumbnailImgKey = thumbnailImgKey;
-        this.name = name;
-        this.views = 0;
-    }
-
     public static Sp of(Bm bm, String thumbnailImgKey, String name) {
         Sp sp = new Sp();
         sp.bm = bm;
         sp.thumbnailImgKey = thumbnailImgKey;
         sp.name = name;
+        sp.spStatus = SpStatus.TRANSCODING;
         sp.views = 0;
         return sp;
     }
