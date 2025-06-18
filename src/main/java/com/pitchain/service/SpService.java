@@ -3,15 +3,21 @@ package com.pitchain.service;
 import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.MainCategory;
 import com.pitchain.common.constant.S3UploadTarget;
+import com.pitchain.common.constant.SpStatus;
 import com.pitchain.common.entity.InfinityScrollRes;
 import com.pitchain.common.exception.GeneralException;
 import com.pitchain.common.util.InfinityScrollUtil;
 import com.pitchain.dto.SpWithLikeDto;
 import com.pitchain.dto.req.SpCreateReq;
 import com.pitchain.dto.res.SpDetailRes;
-import com.pitchain.entity.*;
+import com.pitchain.entity.Bm;
+import com.pitchain.entity.BmSubCategory;
+import com.pitchain.entity.Company;
+import com.pitchain.entity.Sp;
 import com.pitchain.jwt.MemberDetails;
-import com.pitchain.repository.*;
+import com.pitchain.repository.EntityFacade;
+import com.pitchain.repository.SpRepository;
+import com.pitchain.repository.SpRepositoryCustom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,21 +33,17 @@ public class SpService {
     private final EntityFacade entityFacade;
     private final SpRepository spRepository;
     private final SpRepositoryCustom spRepositoryCustom;
-//    private final SpLikeRepository spLikeRepository;
     private final BmSubcategoryService bmSubcategoryService;
     private final SpLikeService spLikeService;
     private final S3Service s3Service;
 
-    public void createSp(MemberDetails memberDetails, SpCreateReq spCreateReq, MultipartFile spVid, MultipartFile thumbnailImg) {
+    public void createSp(MemberDetails memberDetails, SpCreateReq spCreateReq, MultipartFile thumbnailImg) {
         Company company = entityFacade.getCompany(memberDetails);
         Bm bm = entityFacade.getBm(spCreateReq.bmId());
 
-        String spOriginKey = s3Service.uploadFile(spVid, S3UploadTarget.COMPANY_VIDEO);
-
-        String spKey = createSpM3U8Key(spOriginKey);
         String thumbnailImgKey = s3Service.uploadFile(thumbnailImg, S3UploadTarget.COMPANY_THUMBNAIL);
 
-        Sp sp = Sp.of(bm, spKey, thumbnailImgKey, spCreateReq.name());
+        Sp sp = Sp.of(bm, thumbnailImgKey, spCreateReq.name());
         spRepository.save(sp);
     }
 
@@ -112,20 +114,20 @@ public class SpService {
         return SpDetailRes.createRes(spWithLikeDto, likeCnt, subCategories);
     }
 
-    public void updateSp(MemberDetails memberDetails, Long spId, String name, MultipartFile spVid, MultipartFile thumbnailImg) {
+    @Transactional
+    public void updateSp(MemberDetails memberDetails, Long spId, String name, MultipartFile thumbnailImg) {
         Company company = entityFacade.getCompany(memberDetails);
         Sp sp = entityFacade.getSp(spId);
 
         validateSpOwner(sp, company);
 
-        s3Service.deleteVid(sp.getSpKey());
-        s3Service.deleteImg(sp.getThumbnailImgKey());
+        if (thumbnailImg != null) {
+            s3Service.deleteImg(sp.getThumbnailImgKey());
+            String thumbnailImgKey = s3Service.uploadFile(thumbnailImg, S3UploadTarget.COMPANY_THUMBNAIL);
+            sp.updateThumbnailImgKey(thumbnailImgKey);
+        }
 
-        String spKey = s3Service.uploadFile(spVid, S3UploadTarget.COMPANY_VIDEO);
-        String thumbnailImgKey = s3Service.uploadFile(thumbnailImg, S3UploadTarget.COMPANY_THUMBNAIL);
-
-        Sp updateSp = Sp.of(sp.getBm(), spKey, thumbnailImgKey, name);
-        sp.update(updateSp);
+        sp.update(name);
     }
 
     public void deleteSp(MemberDetails memberDetails, Long spId) {
@@ -143,18 +145,21 @@ public class SpService {
         }
     }
 
-    private String createSpM3U8Key(String spKey) {
-        String removedFileKey = removeFileExtension(spKey);
-        return removedFileKey + ".m3u8";
-    }
-
-    public String removeFileExtension(String originalFileName) {
-        return originalFileName.split("\\.")[0];
-    }
-
     @Transactional(readOnly = true)
     public List<Sp> getSpsByBmId(Long bmId) {
         Bm bm = entityFacade.getBm(bmId);
         return spRepository.findAllByBmId(bm.getId());
+    }
+
+    @Transactional
+    public void updateStatus(Long spId, SpStatus spStatus) {
+        Sp sp = entityFacade.getSp(spId);
+        sp.updateStatus(spStatus);
+    }
+
+    @Transactional(readOnly = true)
+    public Sp getSp(Long spId) {
+        return spRepository.findSpWithAll(spId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.SP_NOT_FOUND));
     }
 }

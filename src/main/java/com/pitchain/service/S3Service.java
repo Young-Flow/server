@@ -76,7 +76,6 @@ public class S3Service {
                 file.getInputStream(),
                 ObjectMetadata.builder()
                         .contentType(file.getContentType())
-                        .acl(ObjectCannedACL.PUBLIC_READ)
                         .build()
         );
 

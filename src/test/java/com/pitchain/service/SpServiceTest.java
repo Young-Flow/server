@@ -75,9 +75,6 @@ class SpServiceTest {
     }
 
     private static final String SP_NAME = "sp_name";
-    private static final String SP_KEY = "sp_vid.m3u8";
-    private static final MockMultipartFile SP_VID = new MockMultipartFile(
-            "sp_vid", "sp_vid.mp4", "video/mp4", "test data 1".getBytes());
     private static final MockMultipartFile THUMBNAIL_IMG = new MockMultipartFile(
             "thumbnail_img", "thumbnail_img.png", "image/png", "test data 2".getBytes());
     private static final List<SubCategory> SUB_CATEGORIES = List.of(SubCategory.BEVERAGE_COFFEE, SubCategory.ALCOHOL);
@@ -87,19 +84,16 @@ class SpServiceTest {
         //given
         SpCreateReq spCreateReq = new SpCreateReq(bm.getId(), SP_NAME);
 
-        when(s3Service.uploadFile(SP_VID, S3UploadTarget.COMPANY_VIDEO))
-                .thenReturn(SP_VID.getOriginalFilename());
         when(s3Service.uploadFile(THUMBNAIL_IMG, S3UploadTarget.COMPANY_THUMBNAIL))
                 .thenReturn(THUMBNAIL_IMG.getOriginalFilename());
 
         //when
-        spService.createSp(companyMemberDetails, spCreateReq, SP_VID, THUMBNAIL_IMG);
+        spService.createSp(companyMemberDetails, spCreateReq, THUMBNAIL_IMG);
 
         //then
         List<Sp> all = spRepository.findAll();
         Sp sp = all.get(0);
         assertThat(sp.getBm()).isEqualTo(bm);
-        assertThat(sp.getSpKey()).isEqualTo(SP_KEY);
         assertThat(sp.getThumbnailImgKey()).isEqualTo(THUMBNAIL_IMG.getOriginalFilename());
         assertThat(sp.getName()).isEqualTo(SP_NAME);
     }
@@ -252,19 +246,16 @@ class SpServiceTest {
         MockMultipartFile newThumbnailImg = new MockMultipartFile(
                 "new_thumbnail_img", "new_thumbnail_img.png", "image/png", "test data 4".getBytes());
 
-        when(s3Service.uploadFile(newSpVid, S3UploadTarget.COMPANY_VIDEO))
-                .thenReturn(newSpVid.getOriginalFilename());
         when(s3Service.uploadFile(newThumbnailImg, S3UploadTarget.COMPANY_THUMBNAIL))
                 .thenReturn(newThumbnailImg.getOriginalFilename());
 
         //when
-        spService.updateSp(companyMemberDetails, sp.getId(), newName, newSpVid, newThumbnailImg);
+        spService.updateSp(companyMemberDetails, sp.getId(), newName, newThumbnailImg);
 
         //then
         List<Sp> all = spRepository.findAll();
         Sp updatedSp = all.get(0);
         assertThat(updatedSp.getBm()).isEqualTo(bm);
-        assertThat(updatedSp.getSpKey()).isEqualTo(newSpVid.getOriginalFilename());
         assertThat(updatedSp.getThumbnailImgKey()).isEqualTo(newThumbnailImg.getOriginalFilename());
         assertThat(updatedSp.getName()).isEqualTo(newName);
     }

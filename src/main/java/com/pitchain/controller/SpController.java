@@ -26,9 +26,8 @@ public class SpController {
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public void createSp(@AuthenticationPrincipal MemberDetails memberDetails,
                          @Valid @RequestPart SpCreateReq spCreateReq,
-                         @RequestPart MultipartFile spVideo,
                          @RequestPart MultipartFile thumbnailImg) {
-        spService.createSp(memberDetails, spCreateReq, spVideo, thumbnailImg);
+        spService.createSp(memberDetails, spCreateReq, thumbnailImg);
     }
 
     @Operation(summary = "SP 리스트 조회")
@@ -60,9 +59,8 @@ public class SpController {
     public void updateSp(@AuthenticationPrincipal MemberDetails memberDetails,
                          @PathVariable Long spId,
                          @NotBlank @RequestPart String name,
-                         @RequestPart(required = false) MultipartFile spVideo,
                          @RequestPart(required = false) MultipartFile thumbnailImg) {
-        spService.updateSp(memberDetails, spId, name, spVideo, thumbnailImg);
+        spService.updateSp(memberDetails, spId, name, thumbnailImg);
     }
 
     @Operation(summary = "SP 삭제")

@@ -1,5 +1,6 @@
 package com.pitchain.entity;
 
+import com.pitchain.common.constant.SpStatus;
 import com.pitchain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -20,7 +21,7 @@ public class Sp extends BaseEntity {
     @JoinColumn(name = "bm_id", nullable = false)
     private Bm bm;
 
-    @Column(nullable = false)
+    @Column
     private String spKey;
 
     @Column(nullable = false)
@@ -31,20 +32,15 @@ public class Sp extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
-    public Sp(Bm bm, String spKey, String thumbnailImgKey, String name) {
-        this.bm = bm;
-        this.spKey = spKey;
-        this.thumbnailImgKey = thumbnailImgKey;
-        this.name = name;
-        this.views = 0;
-    }
+    @Enumerated(EnumType.STRING)
+    private SpStatus spStatus;
 
-    public static Sp of(Bm bm, String spKey, String thumbnailImgKey, String name) {
+    public static Sp of(Bm bm, String thumbnailImgKey, String name) {
         Sp sp = new Sp();
         sp.bm = bm;
-        sp.spKey = spKey;
         sp.thumbnailImgKey = thumbnailImgKey;
         sp.name = name;
+        sp.spStatus = SpStatus.TRANSCODING;
         sp.views = 0;
         return sp;
     }
@@ -53,9 +49,15 @@ public class Sp extends BaseEntity {
         return bm.getCompany().getId().equals(companyId);
     }
 
-    public void update(Sp updateSp) {
-        this.spKey = updateSp.spKey;
-        this.thumbnailImgKey = updateSp.thumbnailImgKey;
-        this.name = updateSp.name;
+    public void update(String name) {
+        this.name = name;
+    }
+
+    public void updateThumbnailImgKey(String thumbnailImgKey) {
+        this.thumbnailImgKey = thumbnailImgKey;
+    }
+
+    public void updateStatus(SpStatus spStatus) {
+        this.spStatus = spStatus;
     }
 }

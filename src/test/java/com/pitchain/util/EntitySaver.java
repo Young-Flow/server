@@ -61,6 +61,6 @@ public class EntitySaver {
     }
 
     public Sp saveSp(Bm bm) {
-        return spRepository.save(Sp.of(bm, "spKey", "thumbnailImgKey", "name"));
+        return spRepository.save(Sp.of(bm, "thumbnailImgKey", "name"));
     }
 }
