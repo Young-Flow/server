@@ -1,5 +1,7 @@
 package com.pitchain.controller;
 
+import com.pitchain.common.annotation.RequiredRole;
+import com.pitchain.common.constant.MemberRole;
 import com.pitchain.dto.req.InvestmentAddReq;
 import com.pitchain.dto.res.InvestmentStatusRes;
 import com.pitchain.jwt.MemberDetails;
@@ -16,6 +18,7 @@ public class InvestmentController {
 
     private final InvestmentService investmentService;
 
+    @RequiredRole(MemberRole.INDIVIDUAL)
     @PostMapping("/{bmId}/investments")
     public void addInvestment(@PathVariable("bmId") Long bmId,
                               @AuthenticationPrincipal MemberDetails memberDetails,

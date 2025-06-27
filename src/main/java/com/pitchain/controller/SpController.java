@@ -1,5 +1,7 @@
 package com.pitchain.controller;
 
+import com.pitchain.common.annotation.RequiredRole;
+import com.pitchain.common.constant.MemberRole;
 import com.pitchain.common.entity.InfinityScrollRes;
 import com.pitchain.dto.req.SpCreateReq;
 import com.pitchain.dto.res.SpDetailRes;
@@ -22,6 +24,7 @@ import java.util.List;
 public class SpController {
     private final SpService spService;
 
+    @RequiredRole(MemberRole.COMPANY)
     @Operation(summary = "SP 생성")
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public void createSp(@AuthenticationPrincipal MemberDetails memberDetails,
@@ -54,6 +57,7 @@ public class SpController {
         return spDetailRes;
     }
 
+    @RequiredRole(MemberRole.COMPANY)
     @Operation(summary = "SP 수정")
     @PutMapping(value = "/{spId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public void updateSp(@AuthenticationPrincipal MemberDetails memberDetails,
@@ -63,6 +67,7 @@ public class SpController {
         spService.updateSp(memberDetails, spId, name, thumbnailImg);
     }
 
+    @RequiredRole(MemberRole.COMPANY)
     @Operation(summary = "SP 삭제")
     @DeleteMapping("/{spId}")
     public void deleteSp(@AuthenticationPrincipal MemberDetails memberDetails, @PathVariable Long spId) {

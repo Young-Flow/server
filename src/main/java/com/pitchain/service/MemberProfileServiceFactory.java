@@ -15,6 +15,7 @@ public class MemberProfileServiceFactory {
         return switch (memberDetails.memberRole()) {
             case INDIVIDUAL -> individualProfileService;
             case COMPANY -> companyProfileService;
+            case MEMBER -> null;
         };
     }
 

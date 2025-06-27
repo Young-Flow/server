@@ -1,5 +1,7 @@
 package com.pitchain.controller;
 
+import com.pitchain.common.annotation.RequiredRole;
+import com.pitchain.common.constant.MemberRole;
 import com.pitchain.dto.req.BmCreateReq;
 import com.pitchain.dto.req.BmUpdateReq;
 import com.pitchain.dto.res.BmDetailRes;
@@ -21,6 +23,7 @@ import java.util.List;
 public class BmController {
     private final BmService bmService;
 
+    @RequiredRole(MemberRole.COMPANY)
     @Operation(summary = "BM 생성")
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public void createBm(@AuthenticationPrincipal MemberDetails memberDetails,
@@ -36,6 +39,7 @@ public class BmController {
         return bmDetailRes;
     }
 
+    @RequiredRole(MemberRole.COMPANY)
     @Operation(summary = "BM 수정")
     @PutMapping(value = "{bmId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public void updateBm(@AuthenticationPrincipal MemberDetails memberDetails,
@@ -45,6 +49,7 @@ public class BmController {
         bmService.updateBm(memberDetails, bmId, bmUpdateReq, descImg);
     }
 
+    @RequiredRole(MemberRole.COMPANY)
     @Operation(summary = "BM PT 이미지 수정")
     @PostMapping(value = "{bmId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public void updatePtImgs(@AuthenticationPrincipal MemberDetails memberDetails,
@@ -53,6 +58,7 @@ public class BmController {
         bmService.updatePtImgs(memberDetails, bmId, ptImgKeys);
     }
 
+    @RequiredRole(MemberRole.COMPANY)
     @Operation(summary = "BM 삭제")
     @DeleteMapping("{bmId}")
     public void deleteBm(@AuthenticationPrincipal MemberDetails memberDetails, @PathVariable("bmId") Long bmId) {
