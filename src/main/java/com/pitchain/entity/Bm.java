@@ -67,10 +67,6 @@ public class Bm extends BaseEntity {
         return bm;
     }
 
-    public boolean isOwner(Long companyId) {
-        return this.company.getId().equals(companyId);
-    }
-
     public void update(String name, MainCategory mainCategory, String intro,
                        String description, String descImgKey, String address,
                        Long valuationCap, Long goalInvestment, Integer maxIssuedShare,
