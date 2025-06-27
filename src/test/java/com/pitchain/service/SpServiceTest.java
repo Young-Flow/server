@@ -82,13 +82,13 @@ class SpServiceTest {
     @Test
     void SP_생성_성공() {
         //given
-        SpCreateReq spCreateReq = new SpCreateReq(bm.getId(), SP_NAME);
+        SpCreateReq spCreateReq = new SpCreateReq(SP_NAME);
 
         when(s3Service.uploadFile(THUMBNAIL_IMG, S3UploadTarget.COMPANY_THUMBNAIL))
                 .thenReturn(THUMBNAIL_IMG.getOriginalFilename());
 
         //when
-        spService.createSp(companyMemberDetails, spCreateReq, THUMBNAIL_IMG);
+        spService.createSp(companyMemberDetails, bm.getId(), spCreateReq, THUMBNAIL_IMG);
 
         //then
         List<Sp> all = spRepository.findAll();
@@ -109,7 +109,7 @@ class SpServiceTest {
         }
 
         //when
-        SpDetailRes spDetail = spService.getSpDetail(individualMemberDetails, sp.getId());
+        SpDetailRes spDetail = spService.getSpDetail(individualMemberDetails, bm.getId(), sp.getId());
 
         //then
         assertThat(spDetail.bmId()).isEqualTo(sp.getBm().getId());
@@ -138,7 +138,7 @@ class SpServiceTest {
         }
 
         //when
-        SpDetailRes spDetail = spService.getSpDetail(individualMemberDetails, sp.getId());
+        SpDetailRes spDetail = spService.getSpDetail(individualMemberDetails, bm.getId(), sp.getId());
 
         //then
         assertThat(spDetail.bmId()).isEqualTo(sp.getBm().getId());
@@ -250,7 +250,7 @@ class SpServiceTest {
                 .thenReturn(newThumbnailImg.getOriginalFilename());
 
         //when
-        spService.updateSp(companyMemberDetails, sp.getId(), newName, newThumbnailImg);
+        spService.updateSp(companyMemberDetails, bm.getId(), sp.getId(), newName, newThumbnailImg);
 
         //then
         List<Sp> all = spRepository.findAll();
@@ -266,7 +266,7 @@ class SpServiceTest {
         Sp sp = entitySaver.saveSp(bm);
 
         //when
-        spService.deleteSp(companyMemberDetails, sp.getId());
+        spService.deleteSp(companyMemberDetails, bm.getId(), sp.getId());
 
         //then
         List<Sp> all = spRepository.findAll();

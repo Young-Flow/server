@@ -30,7 +30,7 @@ public class SpController {
                          @PathVariable Long bmId,
                          @Valid @RequestPart SpCreateReq spCreateReq,
                          @RequestPart MultipartFile thumbnailImg) {
-        spService.createSp(memberDetails, spCreateReq, thumbnailImg);
+        spService.createSp(memberDetails, bmId, spCreateReq, thumbnailImg);
     }
 
     @Operation(summary = "SP 리스트 조회")
@@ -55,7 +55,7 @@ public class SpController {
     public SpDetailRes getSpDetail(@AuthenticationPrincipal MemberDetails memberDetails,
                                    @PathVariable Long bmId,
                                    @PathVariable Long spId) {
-        SpDetailRes spDetailRes = spService.getSpDetail(memberDetails, spId);
+        SpDetailRes spDetailRes = spService.getSpDetail(memberDetails, bmId, spId);
         return spDetailRes;
     }
 
@@ -67,7 +67,7 @@ public class SpController {
                          @PathVariable Long bmId,
                          @NotBlank @RequestPart String name,
                          @RequestPart(required = false) MultipartFile thumbnailImg) {
-        spService.updateSp(memberDetails, spId, name, thumbnailImg);
+        spService.updateSp(memberDetails, bmId, spId, name, thumbnailImg);
     }
 
     @RequiredRole(MemberRole.COMPANY)
@@ -76,6 +76,6 @@ public class SpController {
     public void deleteSp(@AuthenticationPrincipal MemberDetails memberDetails,
                          @PathVariable Long bmId,
                          @PathVariable Long spId) {
-        spService.deleteSp(memberDetails, spId);
+        spService.deleteSp(memberDetails, bmId, spId);
     }
 }

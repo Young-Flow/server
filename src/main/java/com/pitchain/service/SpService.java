@@ -37,9 +37,11 @@ public class SpService {
     private final SpLikeService spLikeService;
     private final S3Service s3Service;
 
-    public void createSp(MemberDetails memberDetails, SpCreateReq spCreateReq, MultipartFile thumbnailImg) {
+    public void createSp(MemberDetails memberDetails, Long bmId, SpCreateReq spCreateReq, MultipartFile thumbnailImg) {
         Company company = entityFacade.getCompany(memberDetails);
-        Bm bm = entityFacade.getBm(spCreateReq.bmId());
+        Bm bm = entityFacade.getBm(bmId);
+
+        validateBmOwner(company, bm);
 
         String thumbnailImgKey = s3Service.uploadFile(thumbnailImg, S3UploadTarget.COMPANY_THUMBNAIL);
 
@@ -101,11 +103,13 @@ public class SpService {
     }
 
     @Transactional(readOnly = true)
-    public SpDetailRes getSpDetail(MemberDetails memberDetails, Long spId) {
+    public SpDetailRes getSpDetail(MemberDetails memberDetails, Long bmId, Long spId) {
         SpWithLikeDto spWithLikeDto = spRepository.findSpWithLike(memberDetails.id(), spId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.SP_NOT_FOUND));
         Sp sp = spWithLikeDto.getSp();
-        Bm bm = sp.getBm();
+        Bm bm = entityFacade.getBm(bmId);
+
+        validateRelation(bm, sp);
 
         Long likeCnt = spLikeService.countBySpId(sp.getId());
         List<BmSubCategory> bmSubCategories = bmSubcategoryService.getBmSubCategoryByBmId(bm.getId());
@@ -115,11 +119,13 @@ public class SpService {
     }
 
     @Transactional
-    public void updateSp(MemberDetails memberDetails, Long spId, String name, MultipartFile thumbnailImg) {
+    public void updateSp(MemberDetails memberDetails, Long bmId, Long spId, String name, MultipartFile thumbnailImg) {
         Company company = entityFacade.getCompany(memberDetails);
+        Bm bm = entityFacade.getBm(bmId);
         Sp sp = entityFacade.getSp(spId);
 
-        validateSpOwner(sp, company);
+        validateSpOwner(company, sp);
+        validateRelation(bm, sp);
 
         if (thumbnailImg != null) {
             s3Service.deleteImg(sp.getThumbnailImgKey());
@@ -130,19 +136,15 @@ public class SpService {
         sp.update(name);
     }
 
-    public void deleteSp(MemberDetails memberDetails, Long spId) {
+    public void deleteSp(MemberDetails memberDetails, Long bmId, Long spId) {
         Company company = entityFacade.getCompany(memberDetails);
         Sp sp = entityFacade.getSp(spId);
+        Bm bm = entityFacade.getBm(bmId);
 
-        validateSpOwner(sp, company);
+        validateSpOwner(company, sp);
+        validateRelation(bm, sp);
 
         spRepository.delete(sp);
-    }
-
-    private static void validateSpOwner(Sp sp, Company company) {
-        if (!sp.isOwner(company.getId())) {
-            throw new GeneralException(ErrorStatus.COMPANY_FORBIDDEN);
-        }
     }
 
     @Transactional(readOnly = true)
@@ -161,5 +163,23 @@ public class SpService {
     public Sp getSp(Long spId) {
         return spRepository.findSpWithAll(spId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.SP_NOT_FOUND));
+    }
+
+    private static void validateRelation(Bm bm, Sp sp) {
+        if (!bm.isOwner(sp.getBm().getId())) {
+            throw new GeneralException(ErrorStatus.COMPANY_FORBIDDEN);
+        }
+    }
+
+    private static void validateSpOwner(Company company, Sp sp) {
+        if (!company.isOwner(sp.getBm().getCompany().getId())) {
+            throw new GeneralException(ErrorStatus.COMPANY_FORBIDDEN);
+        }
+    }
+
+    private static void validateBmOwner(Company company, Bm bm) {
+        if (!company.isOwner(bm.getCompany().getId())) {
+            throw new GeneralException(ErrorStatus.COMPANY_FORBIDDEN);
+        }
     }
 }

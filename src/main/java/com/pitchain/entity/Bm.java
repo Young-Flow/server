@@ -84,4 +84,7 @@ public class Bm extends BaseEntity {
         this.longPitchURL = longPitchURL;
     }
 
+    public boolean isOwner(Long bmId) {
+        return this.id.equals(bmId);
+    }
 }
