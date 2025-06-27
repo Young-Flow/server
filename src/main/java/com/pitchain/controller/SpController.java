@@ -34,7 +34,7 @@ public class SpController {
     }
 
     @Operation(summary = "SP 리스트 조회")
-    @GetMapping
+    @GetMapping("/sps/all")
     public List<SpDetailRes> getSpDetails(@AuthenticationPrincipal MemberDetails memberDetails) {
         List<SpDetailRes> spDetailResList = spService.getSpDetails(memberDetails);
         return spDetailResList;
