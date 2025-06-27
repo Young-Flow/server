@@ -2,7 +2,7 @@ package com.pitchain.controller;
 
 import com.pitchain.common.annotation.RequiredRole;
 import com.pitchain.common.apiPayload.ErrorStatus;
-import com.pitchain.common.apiPayload.annotation.ErrorApiResponse;
+import com.pitchain.common.annotation.ErrorApiResponse;
 import com.pitchain.common.constant.MemberRole;
 import com.pitchain.dto.req.BaseMemberUpdateReq;
 import com.pitchain.dto.res.BaseMemberProfileRes;

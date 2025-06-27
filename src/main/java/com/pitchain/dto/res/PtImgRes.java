@@ -1,6 +1,6 @@
 package com.pitchain.dto.res;
 
-import com.pitchain.common.apiPayload.annotation.S3Url;
+import com.pitchain.common.annotation.S3Url;
 import jakarta.validation.constraints.NotEmpty;
 
 public record PtImgRes(

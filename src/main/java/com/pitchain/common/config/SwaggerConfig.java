@@ -2,8 +2,8 @@ package com.pitchain.common.config;
 
 import com.pitchain.common.apiPayload.ErrorResponseDTO;
 import com.pitchain.common.apiPayload.ErrorStatus;
-import com.pitchain.common.apiPayload.annotation.ErrorApiResponse;
-import com.pitchain.common.apiPayload.annotation.ErrorApiResponses;
+import com.pitchain.common.annotation.ErrorApiResponse;
+import com.pitchain.common.annotation.ErrorApiResponses;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
