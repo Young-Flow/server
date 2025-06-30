@@ -52,8 +52,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         Long id = decodedJWT.getClaim("id").asLong();
         String role = decodedJWT.getClaim("role").asString();
 
-        MemberDetails memberDetails = new MemberDetails(id, MemberRole.toEnum(role));
-        Authentication authentication = new UsernamePasswordAuthenticationToken(memberDetails, null);
+        MemberRole memberRole = MemberRole.toEnum(role);
+        MemberDetails memberDetails = new MemberDetails(id, memberRole);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(memberDetails, null, memberRole.getAuthorities());
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         doFilter(request, response, filterChain);

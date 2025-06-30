@@ -1,4 +1,4 @@
-package com.pitchain.common.apiPayload.annotation;
+package com.pitchain.common.annotation;
 
 
 import com.pitchain.common.apiPayload.ErrorStatus;

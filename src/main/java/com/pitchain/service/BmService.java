@@ -123,7 +123,7 @@ public class BmService {
 
 
     private static void validateBmOwner(Bm bm, Company company) {
-        if (!bm.isOwner(company.getId()))
+        if (!company.isOwner(bm.getCompany().getId()))
             throw new GeneralException(ErrorStatus.COMPANY_FORBIDDEN);
     }
 }

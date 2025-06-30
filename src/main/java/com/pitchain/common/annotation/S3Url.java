@@ -1,4 +1,4 @@
-package com.pitchain.common.apiPayload.annotation;
+package com.pitchain.common.annotation;
 
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

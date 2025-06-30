@@ -1,5 +1,6 @@
 package com.pitchain.common.config;
 
+import com.pitchain.common.util.RoleRequestCollector;
 import com.pitchain.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +28,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final RoleRequestCollector roleRequestCollector;
 
     public static final String[] whitelist = {
             "/oauth**",
@@ -48,6 +50,16 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable);
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        http.authorizeHttpRequests(auth -> {
+            auth.requestMatchers(whitelist).permitAll();
+            roleRequestCollector.getRoleUriMap().forEach((role, methodUriMap) -> {
+                methodUriMap.forEach((httpMethod, uriSet) -> {
+                    auth.requestMatchers(httpMethod, uriSet.toArray(new String[0])).hasAnyAuthority(role.getRoles());
+                });
+            });
+            auth.anyRequest().authenticated();
+        });
         return http.build();
     }
 

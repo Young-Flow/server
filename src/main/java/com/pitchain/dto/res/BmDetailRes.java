@@ -1,11 +1,10 @@
 package com.pitchain.dto.res;
 
-import com.pitchain.common.apiPayload.annotation.S3Url;
+import com.pitchain.common.annotation.S3Url;
 import com.pitchain.dto.BmWithScrapDto;
 import com.pitchain.entity.Bm;
 import com.pitchain.entity.Company;
 import com.pitchain.entity.Member;
-import com.pitchain.entity.Sp;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;

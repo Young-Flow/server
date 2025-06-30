@@ -1,7 +1,9 @@
 package com.pitchain.controller;
 
+import com.pitchain.common.annotation.RequiredRole;
 import com.pitchain.common.apiPayload.ErrorStatus;
-import com.pitchain.common.apiPayload.annotation.ErrorApiResponse;
+import com.pitchain.common.annotation.ErrorApiResponse;
+import com.pitchain.common.constant.MemberRole;
 import com.pitchain.dto.req.BaseMemberUpdateReq;
 import com.pitchain.dto.res.BaseMemberProfileRes;
 import com.pitchain.dto.res.LoginRes;
@@ -21,6 +23,7 @@ public class MemberController {
 
     private final MemberService memberService;
 
+    @RequiredRole(MemberRole.MEMBER)
     @Operation(summary = "나의 프로필 조회")
     @ErrorApiResponse(ErrorStatus.MEMBER_NOT_FOUND)
     @GetMapping
@@ -28,6 +31,7 @@ public class MemberController {
         return memberService.getMyProfile(memberDetails);
     }
 
+    @RequiredRole(MemberRole.MEMBER)
     @Operation(summary = "나의 프로필 수정", description = "memberRole 입력 필수")
     @PutMapping
     public void updateMyProfile(@AuthenticationPrincipal MemberDetails memberDetails,

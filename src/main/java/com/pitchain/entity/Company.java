@@ -58,4 +58,8 @@ public class Company {
     public Boolean IsVerified() {
         return isVerified;
     }
+
+    public boolean isOwner(Long companyId) {
+        return this.id.equals(companyId);
+    }
 }

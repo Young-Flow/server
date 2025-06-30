@@ -1,5 +1,7 @@
 package com.pitchain.controller;
 
+import com.pitchain.common.annotation.RequiredRole;
+import com.pitchain.common.constant.MemberRole;
 import com.pitchain.dto.req.CompanyCreateReq;
 import com.pitchain.dto.req.CompanyLoginReq;
 import com.pitchain.dto.req.CompanyVerifyReq;
@@ -31,12 +33,14 @@ public class CompanyController {
         return loginRes;
     }
 
+    @RequiredRole(MemberRole.COMPANY)
     @Operation(summary = "회사 비밀번호 수정")
     @PutMapping("/passwords")
     public void updatePassword(@AuthenticationPrincipal MemberDetails memberDetails, @RequestBody UpdatePasswordReq req) {
         companyService.updatePassword(memberDetails, req);
     }
 
+    @RequiredRole(MemberRole.COMPANY)
     @Operation(summary = "회사 인증")
     @PostMapping("/verify")
     public void verifyCompany(@AuthenticationPrincipal MemberDetails memberDetails, @RequestBody CompanyVerifyReq req) {
