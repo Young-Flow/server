@@ -95,6 +95,9 @@ tasks.named("sentryCollectSourcesJava") {
     dependsOn "compileJava"
     dependsOn "compileTestJava"
 }
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
 
 // pain jar 파일 생성 비활성화
 jar {

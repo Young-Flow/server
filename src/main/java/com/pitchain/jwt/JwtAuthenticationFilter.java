@@ -27,11 +27,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final TokenUtil tokenUtil;
 
     public static final String[] whitelist = {
-            "/oauth**",
+            "/oauth2/**",
             "/resources/**", "/favicon.ico", // resource
             "/swagger-ui/**", "/api-docs/**", "/v3/api-docs**", "/v3/api-docs/**", // swagger
             "/health-check", // health check
-            "/dev**", // 개발용,
+            "/dev/**", // 개발용,
             "/members/tokens", // 공통 유저
             "/companies", "/companies/login", "/companies/emails"// 회사
     };
