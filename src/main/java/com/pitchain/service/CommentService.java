@@ -50,7 +50,7 @@ public class CommentService {
     }
 
     @Transactional
-    private void addReplyComment(Member member, Bm bm, String content, Long parentCommentId) {
+    public void addReplyComment(Member member, Bm bm, String content, Long parentCommentId) {
         Comment parentComment = entityFacade.getComment(parentCommentId);
 
         Comment comment = Comment.of(member, bm, content);
@@ -60,7 +60,7 @@ public class CommentService {
     }
 
     @Transactional
-    private void addComment(Member member, Bm bm, String content) {
+    public void addComment(Member member, Bm bm, String content) {
         Comment comment = Comment.of(member, bm, content);
 
         commentRepository.save(comment);
