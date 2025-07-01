@@ -39,7 +39,7 @@ public class Bm extends BaseEntity {
     @Column(name = "long_pitch_url")
     private String longPitchURL;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
     private Company company;
 

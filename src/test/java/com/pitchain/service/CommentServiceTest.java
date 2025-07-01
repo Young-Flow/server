@@ -18,7 +18,6 @@ import com.pitchain.repository.BmRepository;
 import com.pitchain.repository.CommentRepository;
 import com.pitchain.repository.CompanyRepository;
 import com.pitchain.repository.MemberRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,7 +30,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.transaction.annotation.Propagation.NEVER;
 
 @Transactional
 @SpringBootTest
@@ -48,14 +46,6 @@ class CommentServiceTest {
     private CommentService commentService;
     @Autowired
     private CommentRepository commentRepository;
-
-    @AfterEach
-    void tearDown() {
-        commentRepository.deleteAll();
-        bmRepository.deleteAll();
-        companyRepository.deleteAll();
-        memberRepository.deleteAll();
-    }
 
     @Test
     void 댓글_등록_성공() {
@@ -179,6 +169,31 @@ class CommentServiceTest {
         assertThat(replyCommentRes.content()).isEqualTo(replyComment.getContent());
         assertThat(replyCommentRes.writerId()).isEqualTo(replyComment.getMember().getId());
         assertThat(replyCommentRes.writerProfileImgURL()).isEqualTo(replyComment.getMember().getProfileImgKey());
+    }
+
+    @Test
+    void 다수_답글_포함_다수_댓글_조회_성공() {
+        //given
+        Member individualA = saveIndividual();
+        Company company = saveCompany();
+        Bm bm = saveBm(company);
+
+        Comment parentCommentA = saveComment(individualA, bm);
+        Comment parentCommentB = saveComment(individualA, bm);
+
+        Member individualB = saveIndividual();
+        saveReplyComment(individualB, parentCommentA, bm);
+        saveReplyComment(individualB, parentCommentB, bm);
+        saveReplyComment(individualB, parentCommentB, bm);
+        MemberDetails individualMemberDetails = createIndividualMemberDetails(individualB);
+
+        //when
+        List<? extends BaseCommentRes> comments = commentService.getComments(bm.getId(), individualMemberDetails);
+
+        //then
+        assertThat(comments).hasSize(2);
+        assertThat(comments.get(0).getReplyComments()).hasSize(1);
+        assertThat(comments.get(1).getReplyComments()).hasSize(2);
     }
 
     @Test

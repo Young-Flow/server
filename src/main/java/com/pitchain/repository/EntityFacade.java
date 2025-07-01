@@ -15,6 +15,7 @@ public class EntityFacade {
     private final BmRepository bmRepository;
     private final SpRepository spRepository;
     private final CompanyRepository companyRepository;
+    private final CommentRepository commentRepository;
 
     public Member getMember(Long memberId) {
         return memberRepository.findById(memberId)
@@ -37,5 +38,10 @@ public class EntityFacade {
 
         return companyRepository.findByMemberId(memberDetails.id())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.COMPANY_NOT_FOUND));
+    }
+
+    public Comment getComment(Long commentId) {
+        return commentRepository.findById(commentId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.COMMENT_NOT_FOUND));
     }
 }
