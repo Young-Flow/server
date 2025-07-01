@@ -51,8 +51,7 @@ public class CommentService {
 
     @Transactional
     private void addReplyComment(Member member, Bm bm, String content, Long parentCommentId) {
-        Comment parentComment = commentRepository.findById(parentCommentId).orElseThrow(() ->
-                new GeneralException(ErrorStatus.COMMENT_NOT_FOUND));
+        Comment parentComment = entityFacade.getComment(parentCommentId);
 
         Comment comment = Comment.of(member, bm, content);
         comment.setParent(parentComment);
@@ -105,8 +104,7 @@ public class CommentService {
     @Transactional
     public void modifyComment(Long commentId, MemberDetails memberDetails, CommentReq.ModifyCommentReq req) {
         Member member = entityFacade.getMember(memberDetails.id());
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
-                new GeneralException(ErrorStatus.COMMENT_NOT_FOUND));
+        Comment comment = entityFacade.getComment(commentId);
 
         Member commentWriter = comment.getMember();
         validateWriter(member, commentWriter);
@@ -118,8 +116,7 @@ public class CommentService {
     @Transactional
     public void removeComment(Long commentId, MemberDetails memberDetails) {
         Member member = entityFacade.getMember(memberDetails.id());
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
-                new GeneralException(ErrorStatus.COMMENT_NOT_FOUND));
+        Comment comment = entityFacade.getComment(commentId);
 
         Member commentWriter = comment.getMember();
         validateWriter(member, commentWriter);
