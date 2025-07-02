@@ -86,10 +86,6 @@ public class S3Service {
         deleteFile(imageBucket, fileKey);
     }
 
-    public void deleteVid(String fileKey) {
-        deleteFile(videoBucket, fileKey);
-    }
-
     private void deleteFile(String bucket, String fileKey) {
         try {
             s3Operations.deleteObject(bucket, fileKey);
@@ -101,7 +97,6 @@ public class S3Service {
     private String getTargetBucket(S3UploadTarget target) {
         return switch (target.getMime()) {
             case IMAGE -> imageBucket;
-            case VIDEO -> videoBucket;
         };
     }
 }

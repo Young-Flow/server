@@ -2,7 +2,6 @@ package com.pitchain.common.constant;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.util.Strings;
 
 @Getter
 @RequiredArgsConstructor
@@ -12,7 +11,6 @@ public enum S3UploadTarget {
     COMPANY_DESC(MIME.IMAGE, "company/desc-img/"),
     COMPANY_PT(MIME.IMAGE, "company/pt-img/"),
     COMPANY_THUMBNAIL(MIME.IMAGE, "company/thumbnail-img/"),
-    COMPANY_VIDEO(MIME.VIDEO, Strings.EMPTY),
 
     // MEMBER
     MEMBER_PROFILE(MIME.IMAGE, "member/profile-img/");
@@ -28,8 +26,7 @@ public enum S3UploadTarget {
     @Getter
     @RequiredArgsConstructor
     public enum MIME {
-        IMAGE("image"),
-        VIDEO("video");
+        IMAGE("image");
 
         private final String type;
     }
