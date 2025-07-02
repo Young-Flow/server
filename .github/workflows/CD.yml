@@ -37,31 +37,11 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradle-
 
-    - name: Copy application-prod.yml
-      env:
-        YML: ${{ secrets.APPLICATION_PROD_YML }}
-        YML_DIR: src/main/resources
-        YML_NAME: application-prod.yml
-      run: |
-        mkdir -p $YML_DIR
-        echo -n "$YML" | base64 --decode > $YML_DIR/$YML_NAME
-
-    - name: Copy application-test.yml
-      env:
-        YML: ${{ secrets.APPLICATION_TEST_YML }}
-        YML_DIR: src/test/resources
-        YML_NAME: application-test.yml
-      run: |
-        mkdir -p $YML_DIR
-        echo -n "$YML" | base64 --decode > $YML_DIR/$YML_NAME    
+    - name: Create .env file from secret
+      run: echo "${{ secrets.ENV }}" > .env
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-
-    - name: Build with Gradle, without test
-      env:
-        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      run: ./gradlew clean build -x test
       
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
