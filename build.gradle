@@ -78,14 +78,6 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-// task 의존관계 설정
-tasks.named("generateSentryBundleIdJava") {
-    dependsOn "compileJava"
-}
-tasks.named("sentryCollectSourcesJava") {
-    dependsOn "compileJava"
-    dependsOn "compileTestJava"
-}
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
