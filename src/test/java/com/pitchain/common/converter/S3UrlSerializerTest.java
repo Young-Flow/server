@@ -19,7 +19,7 @@ import java.io.Writer;
 @ActiveProfiles("test")
 class S3UrlSerializerTest {
 
-    @Value("${spring.cloud.aws.s3.cdn}")
+    @Value("${spring.cloud.aws.cdn}")
     private String cdnDomain;
 
     @Autowired
