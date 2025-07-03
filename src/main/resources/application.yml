@@ -53,15 +53,14 @@ jwt:
 
 logging:
   level:
-    level:
-      root: info
-    org:
-      hibernate:
-        SQL: info
-      springframework:
-        web:
-          client:
-            RestTemplate: debug
+    root: info
+  org:
+    hibernate:
+      SQL: info
+    springframework:
+      web:
+        client:
+          RestTemplate: debug
 
 oauth:
   kakao:
