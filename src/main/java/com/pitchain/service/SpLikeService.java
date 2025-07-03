@@ -1,6 +1,5 @@
 package com.pitchain.service;
 
-import com.pitchain.entity.Sp;
 import com.pitchain.jwt.MemberDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
