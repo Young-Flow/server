@@ -14,14 +14,13 @@ import java.util.List;
 @Service
 public class BmService {
     private final BmCommandService bmCommandService;
-    private final BmQueryService bmQueryService;
 
     public void createBm(MemberDetails memberDetails, BmCreateReq bmCreateReq, MultipartFile descImg) {
         bmCommandService.createBm(memberDetails, bmCreateReq, descImg);
     }
 
     public BmDetailRes getBmDetail(MemberDetails memberDetails, Long bmId) {
-        return bmQueryService.getBmDetail(memberDetails, bmId);
+        return bmCommandService.getBmDetail(memberDetails, bmId);
     }
 
     public void updateBm(MemberDetails memberDetails, Long bmId, BmUpdateReq bmUpdateReq, MultipartFile descImg) {
