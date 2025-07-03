@@ -63,6 +63,7 @@ public class SpCommandService {
         validateSpOwner(company, sp);
         validateRelation(bm, sp);
 
+        s3Service.deleteImg(sp.getThumbnailImgKey());
         spRepository.delete(sp);
     }
 
