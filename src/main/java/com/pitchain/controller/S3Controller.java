@@ -28,9 +28,4 @@ public class S3Controller {
         s3Service.deleteImg(fileKey);
     }
 
-    @Operation(summary = "파일(동영상) 삭제 / 개발용")
-    @DeleteMapping("/s3/videos")
-    public void deleteVid(@RequestParam String fileKey) {
-        s3Service.deleteVid(fileKey);
-    }
 }

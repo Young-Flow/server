@@ -1,28 +1,22 @@
 spring:
-  config:
-    import: optional:file:.env[.properties]
   application:
     name: pitchain
     server: http://localhost:8080
-  messages:
-    basename: messages/messages-error
-    fallback-to-system-locale: false
-    encoding: UTF-8
-    cache-duration: 3600
+  config:
+    activate:
+      on-profile: test
   datasource:
-    driver-class-name: ${DATASOURCE_DRIVER_CLASS_NAME}
-    url: ${DATASOURCE_URL}
-    username: ${DATABASE_USERNAME}
-    password: ${DATABASE_PASSWORD}
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:test_db;MODE=MySQL;
+    username:
+    password:
   jpa:
     hibernate:
-      ddl-auto: ${DDL_AUTO}
-      show-sql: true
+      ddl-auto: create
   redis:
-    host: ${REDIS_HOST}
-    port: ${REDIS_PORT}
+    host: localhost
+    port: 6379
     channel: ${REDIS_CHANNEL}
-
   cloud:
     aws:
       s3:
@@ -35,7 +29,6 @@ spring:
       credentials:
         access-key: ${S3_ACCESS_KEY}
         secret-key: ${S3_SECRET_KEY}
-
 jwt:
   secret: ${JWT_SECRET}
   access:
@@ -44,16 +37,6 @@ jwt:
   refresh:
     expiration: ${JWT_REFRESH_EXPIRATION}
     header: ${JWT_REFRESH_HEADER}
-
-logging:
-  level:
-    org:
-      hibernate:
-        SQL: DEBUG
-      springframework:
-        web:
-          client:
-            RestTemplate: debug
 
 oauth:
   kakao:

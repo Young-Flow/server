@@ -13,7 +13,6 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -24,11 +23,9 @@ import java.util.UUID;
 public class S3Service {
     private final S3Operations s3Operations;
 
-    @Value("${spring.cloud.aws.s3.bucket.image}")
+    @Value("${spring.cloud.aws.s3.bucket}")
     private String imageBucket;
-    @Value("${spring.cloud.aws.s3.bucket.video}")
-    private String videoBucket;
-    @Value("${spring.cloud.aws.s3.cdn}")
+    @Value("${spring.cloud.aws.cdn}")
     private String cdnDomain;
 
     public String uploadFile(MultipartFile file, S3UploadTarget target) {
@@ -86,10 +83,6 @@ public class S3Service {
         deleteFile(imageBucket, fileKey);
     }
 
-    public void deleteVid(String fileKey) {
-        deleteFile(videoBucket, fileKey);
-    }
-
     private void deleteFile(String bucket, String fileKey) {
         try {
             s3Operations.deleteObject(bucket, fileKey);
@@ -101,7 +94,6 @@ public class S3Service {
     private String getTargetBucket(S3UploadTarget target) {
         return switch (target.getMime()) {
             case IMAGE -> imageBucket;
-            case VIDEO -> videoBucket;
         };
     }
 }
