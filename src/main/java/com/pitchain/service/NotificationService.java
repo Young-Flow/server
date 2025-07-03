@@ -47,7 +47,7 @@ public class NotificationService {
         return emitter;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public void send(Long spId, NotificationType notificationType) {
         Sp sp = entityFacade.getSp(spId);
         Member receiver = entityFacade.getMember(sp.getBm().getCompany().getMember().getId());
