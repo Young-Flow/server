@@ -9,14 +9,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 
 @SpringBootTest
-@ActiveProfiles("test")
 class S3UrlSerializerTest {
 
     @Value("${spring.cloud.aws.cdn}")

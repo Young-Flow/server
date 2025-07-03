@@ -9,7 +9,10 @@ import com.pitchain.common.exception.GeneralException;
 import com.pitchain.dto.req.BmCreateReq;
 import com.pitchain.dto.req.BmUpdateReq;
 import com.pitchain.dto.res.BmDetailRes;
-import com.pitchain.entity.*;
+import com.pitchain.entity.Bm;
+import com.pitchain.entity.BmScrap;
+import com.pitchain.entity.Company;
+import com.pitchain.entity.Member;
 import com.pitchain.jwt.MemberDetails;
 import com.pitchain.repository.BmRepository;
 import com.pitchain.repository.BmScrapRepository;
@@ -19,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -31,7 +33,6 @@ import static org.mockito.Mockito.when;
 
 @Transactional
 @SpringBootTest
-@ActiveProfiles("test")
 class BmServiceTest {
     @MockBean
     private S3Service s3Service;
