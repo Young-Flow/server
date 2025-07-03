@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @RequiredArgsConstructor
-@Transactional
 @Service
 public class CompanyService {
     private final CompanyRepository companyRepository;
@@ -31,6 +30,7 @@ public class CompanyService {
     private final PasswordEncoder passwordEncoder;
     private final TokenUtil tokenUtil;
 
+    @Transactional
     public void createCompany(CompanyCreateReq req) {
         confirmPassword(req.password(), req.passwordConfirmation());
 
@@ -43,6 +43,7 @@ public class CompanyService {
         companyRepository.save(company);
     }
 
+    @Transactional(readOnly = true)
     public LoginRes loginCompany(CompanyLoginReq req) {
         Member member = memberService.findByEmail(req.email());
 
@@ -57,6 +58,7 @@ public class CompanyService {
         return LoginRes.createRes(accessToken, refreshToken);
     }
 
+    @Transactional
     public void updatePassword(MemberDetails memberDetails, UpdatePasswordReq req) {
         Company company = entityFacade.getCompany(memberDetails);
 
@@ -66,6 +68,7 @@ public class CompanyService {
         company.updatePassword(newEncodedPassword);
     }
 
+    @Transactional
     public void verifyCompany(MemberDetails memberDetails, CompanyVerifyReq req) {
         Company company = entityFacade.getCompany(memberDetails);
 

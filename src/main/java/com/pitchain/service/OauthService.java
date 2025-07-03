@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @RequiredArgsConstructor
-@Transactional
 @Service
 public class OauthService {
     private final TokenUtil tokenUtil;
@@ -22,6 +21,7 @@ public class OauthService {
     private final IndividualService individualService;
     private final RequestOauthInfoService requestOauthInfoService;
 
+    @Transactional
     public LoginRes oauthLogin(OauthLoginReq req) {
         OauthMemberInfo memberInfo = requestOauthInfoService.request(
                 req.getOauthProvider().getOauthParams(req.getCode())

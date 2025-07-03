@@ -9,21 +9,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @RequiredArgsConstructor
 @Service
-public class IndividualService {
-    private final IndividualCommandService individualCommandService;
-    private final IndividualQueryService individualQueryService;
-
-    @Transactional(readOnly = true)
-    public Optional<Individual> findByOauthProviderAndSocialId(OauthProvider oauthProvider, String socialId) {
-        return individualQueryService.findByOauthProviderAndSocialId(oauthProvider, socialId);
-    }
+public class IndividualCommandService {
+    private final IndividualRepository individualRepository;
+    private final EntityFacade entityFacade;
 
     @Transactional
     public Individual saveIndividual(Long memberId, String socialId, OauthProvider oauthProvider) {
-        return individualCommandService.saveIndividual(memberId, socialId, oauthProvider);
+        Member member = entityFacade.getMember(memberId);
+        Individual individual = Individual.of(member, socialId, oauthProvider);
+        return individualRepository.save(individual);
     }
 }
