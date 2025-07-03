@@ -6,6 +6,7 @@ import com.pitchain.dto.res.BmDetailRes;
 import com.pitchain.jwt.MemberDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -15,22 +16,27 @@ import java.util.List;
 public class BmService {
     private final BmCommandService bmCommandService;
 
+    @Transactional
     public void createBm(MemberDetails memberDetails, BmCreateReq bmCreateReq, MultipartFile descImg) {
         bmCommandService.createBm(memberDetails, bmCreateReq, descImg);
     }
 
+    @Transactional
     public BmDetailRes getBmDetail(MemberDetails memberDetails, Long bmId) {
         return bmCommandService.getBmDetail(memberDetails, bmId);
     }
 
+    @Transactional
     public void updateBm(MemberDetails memberDetails, Long bmId, BmUpdateReq bmUpdateReq, MultipartFile descImg) {
         bmCommandService.updateBm(memberDetails, bmId, bmUpdateReq, descImg);
     }
 
+    @Transactional
     public void updatePtImgs(MemberDetails memberDetails, Long bmId, List<String> uploadPtImgKeys) {
         bmCommandService.updatePtImgs(memberDetails, bmId, uploadPtImgKeys);
     }
 
+    @Transactional
     public void deleteBm(MemberDetails memberDetails, Long bmId) {
         bmCommandService.deleteBm(memberDetails, bmId);
     }
