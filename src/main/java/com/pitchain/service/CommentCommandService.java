@@ -43,8 +43,7 @@ public class CommentCommandService {
         commentRepository.save(comment);
     }
 
-    @Transactional
-    public void addReplyComment(Bm bm, Member member, String content, Long parentCommentId) {
+    private void addReplyComment(Bm bm, Member member, String content, Long parentCommentId) {
         Comment parentComment = entityFacade.getComment(parentCommentId);
 
         Comment comment = Comment.of(member, bm, content);
