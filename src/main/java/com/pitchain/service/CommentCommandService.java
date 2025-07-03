@@ -30,7 +30,7 @@ public class CommentCommandService {
         String content = req.getContent();
         Long parentCommentId = req.getParentCommentId();
 
-        if (isOwnedBy(parentCommentId)) {
+        if (hasParentComment(parentCommentId)) {
             addReplyComment(bm, member, content, parentCommentId);
         } else {
             addComment(member, bm, content);
@@ -52,7 +52,7 @@ public class CommentCommandService {
         commentRepository.save(comment);
     }
 
-    private boolean isOwnedBy(Long parentCommentId) {
+    private boolean hasParentComment(Long parentCommentId) {
         return parentCommentId != null;
     }
 
