@@ -14,6 +14,7 @@ import com.pitchain.repository.EntityFacade;
 import com.pitchain.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
@@ -46,6 +47,7 @@ public class NotificationService {
         return emitter;
     }
 
+    @Transactional
     public void send(Long spId, NotificationType notificationType) {
         Sp sp = entityFacade.getSp(spId);
         Member receiver = entityFacade.getMember(sp.getBm().getCompany().getMember().getId());

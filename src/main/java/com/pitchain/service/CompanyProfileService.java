@@ -1,16 +1,9 @@
 package com.pitchain.service;
 
-import com.pitchain.common.apiPayload.ErrorStatus;
-import com.pitchain.common.constant.MemberRole;
-import com.pitchain.common.exception.GeneralException;
 import com.pitchain.dto.req.BaseMemberUpdateReq;
 import com.pitchain.dto.req.CompanyUpdateReq;
 import com.pitchain.dto.res.BaseMemberProfileRes;
-import com.pitchain.dto.res.CompanyProfileRes;
-import com.pitchain.entity.Company;
-import com.pitchain.entity.Member;
 import com.pitchain.jwt.MemberDetails;
-import com.pitchain.repository.CompanyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,29 +11,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class CompanyProfileService implements MemberProfileService {
-
-    private final CompanyRepository companyRepository;
+    private final CompanyProfileCommandService companyProfileCommandService;
+    private final CompanyProfileQueryService companyProfileQueryService;
 
     @Override
     public BaseMemberProfileRes getMyProfile(MemberDetails memberDetails) {
-        Company company = getCompany(memberDetails);
-        Member member = company.getMember();
-        return CompanyProfileRes.createRes(member, company);
+        return companyProfileQueryService.getMyProfile(memberDetails);
     }
 
     @Override
     @Transactional
     public void updateMyProfile(MemberDetails memberDetails, BaseMemberUpdateReq req) {
-        Company company = getCompany(memberDetails);
-        company.updateAddress(((CompanyUpdateReq) req).getAddress());
-    }
-
-    private Company getCompany(MemberDetails memberDetails) {
-        if (memberDetails.memberRole().equals(MemberRole.INDIVIDUAL)) {
-            throw new GeneralException(ErrorStatus.MEMBER_FORBIDDEN);
-        }
-
-        return companyRepository.findByMemberId(memberDetails.id())
-                .orElseThrow(() -> new GeneralException(ErrorStatus.COMPANY_NOT_FOUND));
+        companyProfileCommandService.updateMyProfile(memberDetails, (CompanyUpdateReq) req);
     }
 }

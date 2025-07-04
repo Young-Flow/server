@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
-@Transactional
 @Service
 public class MemberService {
 
@@ -26,16 +25,19 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final MemberProfileServiceFactory memberProfileServiceFactory;
 
+    @Transactional(readOnly = true)
     public BaseMemberProfileRes getMyProfile(MemberDetails memberDetails) {
         MemberProfileService memberProfileService = memberProfileServiceFactory.getMemberProfileService(memberDetails);
         return memberProfileService.getMyProfile(memberDetails);
     }
 
+    @Transactional
     public void updateMyProfile(MemberDetails memberDetails, BaseMemberUpdateReq req) {
         MemberProfileService memberProfileService = memberProfileServiceFactory.getMemberProfileService(memberDetails);
         memberProfileService.updateMyProfile(memberDetails, req);
     }
 
+    @Transactional
     public void updateProfileImg(MemberDetails memberDetails, MultipartFile profileImg) {
         Member member = memberRepository.findById(memberDetails.id())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));

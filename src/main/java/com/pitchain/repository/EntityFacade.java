@@ -16,6 +16,7 @@ public class EntityFacade {
     private final SpRepository spRepository;
     private final CompanyRepository companyRepository;
     private final CommentRepository commentRepository;
+    private final IndividualRepository individualRepository;
 
     public Member getMember(Long memberId) {
         return memberRepository.findById(memberId)
@@ -38,6 +39,14 @@ public class EntityFacade {
 
         return companyRepository.findByMemberId(memberDetails.id())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.COMPANY_NOT_FOUND));
+    }
+
+    public Individual getIndividual(MemberDetails memberDetails) {
+        if (memberDetails.memberRole().equals(MemberRole.COMPANY))
+            throw new GeneralException(ErrorStatus.MEMBER_FORBIDDEN);
+
+        return individualRepository.findByMemberId(memberDetails.id())
+                .orElseThrow(() -> new GeneralException(ErrorStatus.INDIVIDUAL_NOT_FOUND));
     }
 
     public Comment getComment(Long commentId) {

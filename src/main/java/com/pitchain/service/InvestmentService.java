@@ -17,12 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class InvestmentService {
 
     private final InvestmentRepository investmentRepository;
     private final EntityFacade entityFacade;
 
+    @Transactional
     public void addInvestment(Long bmId, MemberDetails memberDetails, long amount) {
         if (memberDetails.memberRole().equals(MemberRole.COMPANY))
             throw new GeneralException(ErrorStatus.COMPANY_FORBIDDEN);

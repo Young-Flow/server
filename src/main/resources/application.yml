@@ -10,10 +10,16 @@ spring:
     encoding: UTF-8
     cache-duration: 3600
   datasource:
-    driver-class-name: ${DATASOURCE_DRIVER_CLASS_NAME}
-    url: ${DATASOURCE_URL}
-    username: ${DATABASE_USERNAME}
-    password: ${DATABASE_PASSWORD}
+    master:
+      driver-class-name: ${MASTER_DATASOURCE_DRIVER_CLASS_NAME}
+      jdbc-url: ${MASTER_DATASOURCE_URL}
+      username: ${MASTER_DATABASE_USERNAME}
+      password: ${MASTER_DATABASE_PASSWORD}
+    replica:
+      driver-class-name: ${REPLICA_DATASOURCE_DRIVER_CLASS_NAME}
+      jdbc-url: ${REPLICA_DATASOURCE_URL}
+      username: ${REPLICA_DATABASE_USERNAME}
+      password: ${REPLICA_DATABASE_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: ${DDL_AUTO}
@@ -47,13 +53,14 @@ jwt:
 
 logging:
   level:
-    org:
-      hibernate:
-        SQL: DEBUG
-      springframework:
-        web:
-          client:
-            RestTemplate: debug
+    root: info
+  org:
+    hibernate:
+      SQL: info
+    springframework:
+      web:
+        client:
+          RestTemplate: debug
 
 oauth:
   kakao:

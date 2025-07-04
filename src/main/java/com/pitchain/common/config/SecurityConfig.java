@@ -35,6 +35,9 @@ public class SecurityConfig {
             "/swagger-ui/**", "/api-docs/**", "/v3/api-docs**", "/v3/api-docs/**", // swagger
             "/dev/**", // 개발용,
             "/health-check", // health check
+
+            "/members/tokens", // 공통 유저
+            "/companies", "/companies/login", "/companies/emails"// 회사
     };
 
     @Bean
