@@ -1,0 +1,45 @@
+package com.pitchain.comment.application.res;
+
+import com.pitchain.common.annotation.S3Url;
+import com.pitchain.comment.domain.Comment;
+import com.pitchain.member.domain.Member;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
+import lombok.Builder;
+
+import java.time.LocalDateTime;
+
+@Builder
+public record ReplyCommentRes(
+        @NotNull
+        Long commentId,
+        @NotNull
+        Long writerId,
+        @NotEmpty
+        String writerName,
+        @NotEmpty
+        @S3Url
+        String writerProfileImgURL,
+        @NotEmpty
+        String content,
+        boolean delYN,
+        @Past @NotNull
+        LocalDateTime createdAt,
+        @Past @NotNull
+        LocalDateTime updatedAt
+) {
+    public static ReplyCommentRes createRes(Comment comment, String writerProfileImgKey) {
+        Member member = comment.getMember();
+        return ReplyCommentRes.builder()
+                .commentId(comment.getId())
+                .writerId(member.getId())
+                .writerProfileImgURL(writerProfileImgKey)  //추후에 JSON 직렬화 처리됨
+                .writerName(member.getName())
+                .content(comment.getContent())
+                .delYN(comment.isDelYN())
+                .createdAt(comment.getCreatedAt())
+                .updatedAt(comment.getUpdatedAt())
+                .build();
+    }
+}

@@ -3,7 +3,7 @@ package com.pitchain.common.converter;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.pitchain.service.S3Service;
+import com.pitchain.upload.application.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

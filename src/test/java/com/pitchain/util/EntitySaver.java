@@ -1,9 +1,24 @@
 package com.pitchain.util;
 
+import com.pitchain.bm.domain.Bm;
+import com.pitchain.bm.infrastucture.BmRepository;
+import com.pitchain.bmscrap.infrastucture.BmScrapRepository;
+import com.pitchain.bmsubcategory.infrastructure.BmSubCategoryRepository;
 import com.pitchain.common.constant.MainCategory;
 import com.pitchain.common.constant.OauthProvider;
-import com.pitchain.entity.*;
-import com.pitchain.repository.*;
+import com.pitchain.investment.infrastucture.InvestmentRepository;
+import com.pitchain.company.domain.Company;
+import com.pitchain.individual.domain.Individual;
+import com.pitchain.member.domain.Member;
+import com.pitchain.company.application.CompanyRepository;
+import com.pitchain.individual.application.IndividualRepository;
+import com.pitchain.member.infrastucture.MemberRepository;
+import com.pitchain.mybmhistory.infrastructure.MyBmHistoryRepository;
+import com.pitchain.mysphistory.infrastucture.MySpHistoryRepository;
+import com.pitchain.ptimg.infrastructure.PtImgRepository;
+import com.pitchain.sp.domain.Sp;
+import com.pitchain.sp.infrastucture.SpRepository;
+import com.pitchain.splike.infrastucture.SpLikeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

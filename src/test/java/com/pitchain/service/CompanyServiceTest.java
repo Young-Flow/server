@@ -3,17 +3,18 @@ package com.pitchain.service;
 import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.MemberRole;
 import com.pitchain.common.exception.GeneralException;
-import com.pitchain.controller.UpdatePasswordReq;
-import com.pitchain.dto.req.CompanyCreateReq;
-import com.pitchain.dto.req.CompanyLoginReq;
-import com.pitchain.dto.req.CompanyVerifyReq;
-import com.pitchain.dto.res.LoginRes;
-import com.pitchain.entity.Company;
-import com.pitchain.entity.Member;
-import com.pitchain.jwt.MemberDetails;
-import com.pitchain.jwt.TokenUtil;
-import com.pitchain.repository.CompanyRepository;
-import com.pitchain.repository.MemberRepository;
+import com.pitchain.company.presentation.req.UpdatePasswordReq;
+import com.pitchain.company.presentation.req.CompanyCreateReq;
+import com.pitchain.company.presentation.req.CompanyLoginReq;
+import com.pitchain.company.presentation.req.CompanyVerifyReq;
+import com.pitchain.oauth.application.res.LoginRes;
+import com.pitchain.company.domain.Company;
+import com.pitchain.member.domain.Member;
+import com.pitchain.common.security.MemberDetails;
+import com.pitchain.common.redis.RedisTokenUtil;
+import com.pitchain.company.application.CompanyService;
+import com.pitchain.company.application.CompanyRepository;
+import com.pitchain.member.infrastucture.MemberRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,7 +35,7 @@ public class CompanyServiceTest {
     @Autowired
     private CompanyRepository companyRepository;
     @Autowired
-    private TokenUtil tokenUtil;
+    private RedisTokenUtil redisTokenUtil;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
@@ -107,8 +108,8 @@ public class CompanyServiceTest {
         LoginRes loginRes = companyService.loginCompany(req);
 
         //then
-        Long id_1 = tokenUtil.decodedJWT(loginRes.getAccessToken()).getClaim("id").asLong();
-        Long id_2 = tokenUtil.decodedJWT(loginRes.getRefreshToken()).getClaim("id").asLong();
+        Long id_1 = redisTokenUtil.decodedJWT(loginRes.getAccessToken()).getClaim("id").asLong();
+        Long id_2 = redisTokenUtil.decodedJWT(loginRes.getRefreshToken()).getClaim("id").asLong();
 
         assertThat(id_1).isEqualTo(company.getId());
         assertThat(id_2).isEqualTo(company.getId());

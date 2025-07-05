@@ -1,6 +1,6 @@
 package com.pitchain.common.config;
 
-import com.pitchain.redis.RedisSubscriber;
+import com.pitchain.common.redis.RedisSubscriber;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,12 +1,13 @@
 package com.pitchain.service;
 
 import com.pitchain.common.constant.MemberRole;
-import com.pitchain.entity.Bm;
-import com.pitchain.entity.Company;
-import com.pitchain.entity.Member;
-import com.pitchain.entity.MySpHistory;
-import com.pitchain.jwt.MemberDetails;
-import com.pitchain.repository.MySpHistoryRepository;
+import com.pitchain.bm.domain.Bm;
+import com.pitchain.company.domain.Company;
+import com.pitchain.member.domain.Member;
+import com.pitchain.mysphistory.domain.MySpHistory;
+import com.pitchain.common.security.MemberDetails;
+import com.pitchain.mysphistory.application.MySpHistoryService;
+import com.pitchain.mysphistory.infrastucture.MySpHistoryRepository;
 import com.pitchain.util.EntitySaver;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;

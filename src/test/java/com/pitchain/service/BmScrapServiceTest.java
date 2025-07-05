@@ -1,12 +1,13 @@
 package com.pitchain.service;
 
+import com.pitchain.bmscrap.application.BmScrapService;
 import com.pitchain.common.constant.MemberRole;
-import com.pitchain.entity.Bm;
-import com.pitchain.entity.BmScrap;
-import com.pitchain.entity.Company;
-import com.pitchain.entity.Member;
-import com.pitchain.jwt.MemberDetails;
-import com.pitchain.repository.BmScrapRepository;
+import com.pitchain.bm.domain.Bm;
+import com.pitchain.bmscrap.domain.BmScrap;
+import com.pitchain.company.domain.Company;
+import com.pitchain.member.domain.Member;
+import com.pitchain.common.security.MemberDetails;
+import com.pitchain.bmscrap.infrastucture.BmScrapRepository;
 import com.pitchain.util.EntitySaver;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

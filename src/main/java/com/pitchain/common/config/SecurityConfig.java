@@ -1,7 +1,7 @@
 package com.pitchain.common.config;
 
-import com.pitchain.common.util.RoleRequestCollector;
-import com.pitchain.jwt.JwtAuthenticationFilter;
+import com.pitchain.common.collector.RoleRequestCollector;
+import com.pitchain.common.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
