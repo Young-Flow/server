@@ -1,4 +1,4 @@
-package com.pitchain.notification.domain;
+package com.pitchain.notificationhistory.domain;
 
 import com.pitchain.common.constant.NotificationType;
 import com.pitchain.common.entity.BaseEntity;

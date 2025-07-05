@@ -1,4 +1,4 @@
-package com.pitchain.notification.application;
+package com.pitchain.notificationhistory.application;
 
 import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.NotificationType;
@@ -7,11 +7,11 @@ import com.pitchain.common.payload.notification.Notification;
 import com.pitchain.common.payload.notification.NotificationPayload;
 import com.pitchain.common.payload.notification.TranscodingNotificationPayload;
 import com.pitchain.member.domain.Member;
-import com.pitchain.notification.domain.NotificationHistory;
+import com.pitchain.notificationhistory.domain.NotificationHistory;
 import com.pitchain.sp.domain.Sp;
-import com.pitchain.notification.infrastucture.EmitterRepository;
+import com.pitchain.notificationhistory.infrastucture.EmitterRepository;
 import com.pitchain.common.application.EntityFacade;
-import com.pitchain.notification.infrastucture.NotificationHistoryRepository;
+import com.pitchain.notificationhistory.infrastucture.NotificationHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

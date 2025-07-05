@@ -1,4 +1,4 @@
-package com.pitchain.notification.infrastucture;
+package com.pitchain.notificationhistory.infrastucture;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;

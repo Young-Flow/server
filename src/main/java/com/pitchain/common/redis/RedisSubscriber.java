@@ -12,7 +12,7 @@ import com.pitchain.common.exception.GeneralException;
 import com.pitchain.common.payload.event.Event;
 import com.pitchain.common.payload.event.TranscodingEventPayload;
 import com.pitchain.sp.domain.Sp;
-import com.pitchain.notification.application.NotificationHistoryService;
+import com.pitchain.notificationhistory.application.NotificationHistoryService;
 import com.pitchain.sp.application.SpService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;

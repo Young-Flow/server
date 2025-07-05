@@ -1,6 +1,6 @@
 package com.pitchain.common.payload.notification;
 
-import com.pitchain.notification.domain.NotificationHistory;
+import com.pitchain.notificationhistory.domain.NotificationHistory;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
