@@ -1,4 +1,4 @@
-package com.pitchain.oauth.application.client.memberinfo;
+package com.pitchain.oauth.application.memberinfo;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

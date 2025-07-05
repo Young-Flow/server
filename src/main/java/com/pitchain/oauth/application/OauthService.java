@@ -1,6 +1,7 @@
 package com.pitchain.oauth.application;
 
 import com.pitchain.common.constant.MemberRole;
+import com.pitchain.oauth.application.handler.OauthHandlerDispatcher;
 import com.pitchain.oauth.presentation.req.OauthLoginReq;
 import com.pitchain.oauth.application.res.LoginRes;
 import com.pitchain.individual.domain.Individual;
@@ -8,7 +9,7 @@ import com.pitchain.member.domain.Member;
 import com.pitchain.common.redis.RedisTokenUtil;
 import com.pitchain.individual.application.IndividualService;
 import com.pitchain.member.application.MemberService;
-import com.pitchain.oauth.application.client.memberinfo.OauthMemberInfo;
+import com.pitchain.oauth.application.memberinfo.OauthMemberInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,11 +22,11 @@ public class OauthService {
     private final RedisTokenUtil redisTokenUtil;
     private final MemberService memberService;
     private final IndividualService individualService;
-    private final RequestOauthInfoService requestOauthInfoService;
+    private final OauthHandlerDispatcher oauthHandlerDispatcher;
 
     @Transactional
     public LoginRes oauthLogin(OauthLoginReq req) {
-        OauthMemberInfo memberInfo = requestOauthInfoService.request(
+        OauthMemberInfo memberInfo = oauthHandlerDispatcher.handleRequest(
                 req.getOauthProvider().getOauthParams(req.getCode())
         );
 

@@ -1,10 +1,10 @@
-package com.pitchain.oauth.application.client;
+package com.pitchain.oauth.application.handler;
 
 import com.pitchain.common.constant.OauthProvider;
-import com.pitchain.oauth.application.client.memberinfo.OauthMemberInfo;
+import com.pitchain.oauth.application.memberinfo.OauthMemberInfo;
 import com.pitchain.oauth.presentation.param.OauthParams;
 
-public interface OauthClient {
+public interface OauthHandler {
     OauthProvider oauthProvider();
 
     String getOauthLoginToken(OauthParams oauthParams);

@@ -1,10 +1,10 @@
-package com.pitchain.oauth.application.client;
+package com.pitchain.oauth.application.handler;
 
 import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.OauthProvider;
 import com.pitchain.common.exception.GeneralException;
-import com.pitchain.oauth.application.client.memberinfo.NaverMemberInfo;
-import com.pitchain.oauth.application.client.memberinfo.OauthMemberInfo;
+import com.pitchain.oauth.application.memberinfo.NaverMemberInfo;
+import com.pitchain.oauth.application.memberinfo.OauthMemberInfo;
 import com.pitchain.oauth.presentation.param.OauthParams;
 import com.pitchain.oauth.presentation.token.NaverToken;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @Component
-public class NaverClient implements OauthClient {
+public class NaverOauthHandler implements OauthHandler {
     @Value("${oauth.naver.token_url}")
     private String token_url;
     @Value("${oauth.naver.user_url}")

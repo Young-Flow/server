@@ -1,4 +1,4 @@
-package com.pitchain.oauth.application.client.memberinfo;
+package com.pitchain.oauth.application.memberinfo;
 
 import com.pitchain.common.constant.OauthProvider;
 
