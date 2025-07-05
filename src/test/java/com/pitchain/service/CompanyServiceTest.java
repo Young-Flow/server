@@ -13,7 +13,7 @@ import com.pitchain.member.domain.Member;
 import com.pitchain.common.security.MemberDetails;
 import com.pitchain.common.redis.RedisTokenUtil;
 import com.pitchain.company.application.CompanyService;
-import com.pitchain.company.application.CompanyRepository;
+import com.pitchain.company.infrastructure.CompanyRepository;
 import com.pitchain.member.infrastucture.MemberRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

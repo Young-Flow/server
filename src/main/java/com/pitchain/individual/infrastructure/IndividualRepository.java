@@ -1,4 +1,4 @@
-package com.pitchain.individual.application;
+package com.pitchain.individual.infrastructure;
 
 import com.pitchain.common.constant.OauthProvider;
 import com.pitchain.individual.domain.Individual;

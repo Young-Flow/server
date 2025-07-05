@@ -2,6 +2,7 @@ package com.pitchain.individual.application;
 
 import com.pitchain.common.constant.OauthProvider;
 import com.pitchain.individual.domain.Individual;
+import com.pitchain.individual.infrastructure.IndividualRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

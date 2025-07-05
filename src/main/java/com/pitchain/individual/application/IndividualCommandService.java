@@ -2,6 +2,7 @@ package com.pitchain.individual.application;
 
 import com.pitchain.common.constant.OauthProvider;
 import com.pitchain.individual.domain.Individual;
+import com.pitchain.individual.infrastructure.IndividualRepository;
 import com.pitchain.member.domain.Member;
 import com.pitchain.common.application.EntityFacade;
 import lombok.RequiredArgsConstructor;

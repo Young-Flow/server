@@ -1,4 +1,4 @@
-package com.pitchain.company.application;
+package com.pitchain.company.infrastructure;
 
 import com.pitchain.company.domain.Company;
 import org.springframework.data.jpa.repository.JpaRepository;

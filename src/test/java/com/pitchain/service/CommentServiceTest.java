@@ -17,7 +17,7 @@ import com.pitchain.member.domain.Member;
 import com.pitchain.common.security.MemberDetails;
 import com.pitchain.bm.infrastucture.BmRepository;
 import com.pitchain.comment.infrastucture.CommentRepository;
-import com.pitchain.company.application.CompanyRepository;
+import com.pitchain.company.infrastructure.CompanyRepository;
 import com.pitchain.member.infrastucture.MemberRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;

@@ -3,6 +3,7 @@ package com.pitchain.company.application;
 import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.constant.MemberRole;
 import com.pitchain.common.exception.GeneralException;
+import com.pitchain.company.infrastructure.CompanyRepository;
 import com.pitchain.member.application.MemberService;
 import com.pitchain.company.presentation.req.UpdatePasswordReq;
 import com.pitchain.company.presentation.req.CompanyCreateReq;
