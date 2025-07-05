@@ -1,13 +1,10 @@
 package com.pitchain.bm.infrastucture;
 
-import com.pitchain.common.constant.SubCategory;
-import com.pitchain.bm.infrastucture.dto.BmWithScrapDto;
 import com.pitchain.bm.domain.Bm;
-import com.pitchain.ptimg.domain.PtImg;
+import com.pitchain.bm.infrastucture.dto.BmWithScrapDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface BmRepository extends JpaRepository<Bm, Long> {
@@ -22,20 +19,6 @@ public interface BmRepository extends JpaRepository<Bm, Long> {
                 GROUP BY b, bs.member.id
             """)
     Optional<BmWithScrapDto> getBmWithScrapDto(Long memberId, Long bmId);
-
-    @Query("""
-                SELECT bsc.subCategory
-                FROM BmSubCategory bsc
-                WHERE bsc.bm.id = :bmId
-            """)
-    List<SubCategory> getSubCategoriesByBmId(Long bmId);
-
-    @Query("""
-                SELECT pi
-                FROM PtImg pi
-                WHERE pi.bm.id = :bmId
-            """)
-    List<PtImg> getPtImgsByBmId(Long bmId);
 
     @Query("""
                 SELECT b

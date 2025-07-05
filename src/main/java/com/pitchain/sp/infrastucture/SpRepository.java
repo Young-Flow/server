@@ -32,19 +32,6 @@ public interface SpRepository extends JpaRepository<Sp, Long> {
     Optional<SpWithLikeDto> findSpWithLike(@Param("memberId") Long memberId,
                                            @Param("spId") Long spId);
 
-    @Query("""
-                SELECT DISTINCT new com.pitchain.sp.infrastucture.dto.SpWithLikeDto(
-                    s,
-                    CASE WHEN sl.member.id IS NOT NULL THEN true ELSE false END
-                )
-                FROM Sp s
-                LEFT JOIN SpLike sl ON sl.sp.id = s.id AND sl.member.id = :memberId
-                WHERE s.bm.id IN :bmIds
-            """)
-    List<SpWithLikeDto> getSpWithLikeDtoRecommendedFromAi(@Param("memberId") Long memberId,
-                                                          @Param("bmIds") List<Long> bmIds);
-
-
     List<Sp> findAllByBmId(Long bmId);
 
     @Query("SELECT s FROM Sp s " +
