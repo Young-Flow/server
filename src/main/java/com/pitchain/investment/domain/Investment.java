@@ -1,0 +1,39 @@
+package com.pitchain.investment.domain;
+
+import com.pitchain.bm.domain.Bm;
+import com.pitchain.common.entity.BaseEntity;
+import com.pitchain.member.domain.Member;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Investment  extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "investment_id")
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bm_id", nullable = false)
+    private Bm bm;
+
+    @Column(nullable = false)
+    private long amount;
+
+    public static Investment of(Member member, Bm bm, long amount) {
+        Investment investment = new Investment();
+        investment.member = member;
+        investment.bm = bm;
+        investment.amount = amount;
+        return investment;
+    }
+}

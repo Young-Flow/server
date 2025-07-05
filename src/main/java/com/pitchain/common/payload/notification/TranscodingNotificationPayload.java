@@ -1,6 +1,6 @@
 package com.pitchain.common.payload.notification;
 
-import com.pitchain.entity.NotificationLog;
+import com.pitchain.notificationhistory.domain.NotificationHistory;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,10 +10,10 @@ public class TranscodingNotificationPayload implements NotificationPayload {
     private Long spId;
     private Long notificationId;
 
-    public static TranscodingNotificationPayload of(Long spId, NotificationLog notificationLog) {
+    public static TranscodingNotificationPayload of(Long spId, NotificationHistory notificationHistory) {
         TranscodingNotificationPayload payload = new TranscodingNotificationPayload();
         payload.spId = spId;
-        payload.notificationId = notificationLog.getId();
+        payload.notificationId = notificationHistory.getId();
         return payload;
     }
 }

@@ -1,9 +1,14 @@
 package com.pitchain.service;
 
+import com.pitchain.bm.domain.Bm;
 import com.pitchain.common.constant.MemberRole;
-import com.pitchain.entity.*;
-import com.pitchain.jwt.MemberDetails;
-import com.pitchain.repository.SpLikeRepository;
+import com.pitchain.common.security.MemberDetails;
+import com.pitchain.company.domain.Company;
+import com.pitchain.member.domain.Member;
+import com.pitchain.sp.domain.Sp;
+import com.pitchain.splike.domain.SpLike;
+import com.pitchain.splike.infrastucture.SpLikeRepository;
+import com.pitchain.splike.application.SpLikeService;
 import com.pitchain.util.EntitySaver;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
