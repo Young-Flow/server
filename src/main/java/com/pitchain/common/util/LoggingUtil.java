@@ -63,14 +63,14 @@ public class LoggingUtil {
         MDC.put("requestId", requestId);
         MDC.put("userId", userId);
         MDC.put("clientIp", clientIp);
-        MDC.put("uri", requestURI);
-        MDC.put("method", requestMethod);
+        MDC.put("requestURI", requestURI);
+        MDC.put("requestMethod", requestMethod);
 
         log.info("HTTP request started");
     }
 
     public static void logCompleteRequest(int status, long turnaroundTime, Exception ex) {
-        MDC.put("status", String.valueOf(status));
+        MDC.put("httpStatus", String.valueOf(status));
         MDC.put("turnaroundTime(sec)", String.valueOf(turnaroundTime));
 
         if (ex == null) {

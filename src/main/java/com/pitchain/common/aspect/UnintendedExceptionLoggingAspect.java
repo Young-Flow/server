@@ -40,7 +40,7 @@ public class UnintendedExceptionLoggingAspect {
 
         String parameterMessage = getParameterMessage(joinPoint);
 
-        MDC.put("status", "500");
+        MDC.put("httpStatus", "500");
 
         Throwable cause = exception.getCause();
         String stackTrace = getStackTrace(exception);
@@ -53,7 +53,7 @@ public class UnintendedExceptionLoggingAspect {
                 (stackTrace != null && stackTrace.length() > 0) ? getFirstLine(stackTrace) : "No stack trace available"
         );
 
-        MDC.remove("status");
+        MDC.remove("httpStatus");
 
         sendErrorWebhook(parameterMessage, stackTrace);
     }

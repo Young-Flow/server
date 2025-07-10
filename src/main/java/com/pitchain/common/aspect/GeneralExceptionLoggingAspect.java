@@ -33,7 +33,7 @@ public class GeneralExceptionLoggingAspect {
         String parameterMessage = LoggingUtil.getParameterMessage(arguments);
 
         ErrorStatus errorStatus = exception.getErrorStatus();
-        MDC.put("status", String.valueOf(errorStatus.getHttpStatus()));
+        MDC.put("httpStatus", String.valueOf(errorStatus.getHttpStatus()));
 
         log.error("[ERROR] POINT : {} || EXCEPTION : {} || ARGUMENTS : {}",
                 className, errorStatus.getCode(), parameterMessage
@@ -41,6 +41,6 @@ public class GeneralExceptionLoggingAspect {
         log.error("[ERROR] FINAL POINT : {}", exception.getStackTrace()[0]);
         log.error("[ERROR] MESSAGE : {}", exception.getMessage());
 
-        MDC.remove("status");
+        MDC.remove("httpStatus");
     }
 }
