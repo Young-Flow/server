@@ -51,6 +51,10 @@ jwt:
     expiration: ${JWT_REFRESH_EXPIRATION}
     header: ${JWT_REFRESH_HEADER}
 
+discord:
+  webhook:
+    url: ${DISCORD_WEBHOOK_URL}
+
 logging:
   level:
     root: info
