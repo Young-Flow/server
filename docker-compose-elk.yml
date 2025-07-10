@@ -1,0 +1,97 @@
+version: "3.8"
+
+services:
+  setup:
+    profiles: [setup]
+    init: true
+    build:
+      context: elk/setup/
+      args:
+        ELASTIC_VERSION: ${ELASTIC_VERSION}
+    volumes:
+      - ./elk/setup/sh/entrypoint.sh:/entrypoint.sh:ro,Z
+      - ./elk/setup/sh/lib.sh:/lib.sh:ro,Z
+      - ./elk/setup/roles:/roles:ro,Z
+    environment:
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-}
+#      LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD:-}
+      KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
+      LOGSTASH_USERNAME: ${LOGSTASH_USERNAME:-}
+      LOGSTASH_PASSWORD: ${LOGSTASH_PASSWORD:-}
+    networks: [elk]
+    depends_on: [elasticsearch]
+
+  elasticsearch:
+    container_name: pitchain_elasticsearch
+    build:
+      context: ./elk/elasticsearch
+      args:
+        ELASTIC_VERSION: ${ELASTIC_VERSION}
+    volumes:
+      - ./elk/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro,Z
+      - elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-}
+      discovery.type: single-node
+    networks: [elk]
+
+  logstash:
+    container_name: pitchain_logstash
+    build:
+      context: ./elk/logstash/
+      args:
+        ELASTIC_VERSION: ${ELASTIC_VERSION}
+    volumes:
+      - ./elk/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,Z
+      - ./elk/logstash/pipeline:/usr/share/logstash/pipeline:ro,Z
+    ports:
+      - "5044:5044"
+      - "50000:50000/tcp"
+      - "50000:50000/udp"
+      - "9600:9600"
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+#      LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD:-}
+      LOGSTASH_USERNAME: ${LOGSTASH_USERNAME:-}
+      LOGSTASH_PASSWORD: ${LOGSTASH_PASSWORD:-}
+    networks: [elk]
+    depends_on: [elasticsearch]
+
+  kibana:
+    container_name: pitchain_kibana
+    build:
+      context: ./elk/kibana/
+      args:
+        ELASTIC_VERSION: ${ELASTIC_VERSION}
+    volumes:
+      - ./elk/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro,Z
+    ports:
+      - "5601:5601"
+    environment:
+      KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
+    networks: [elk]
+    depends_on: [elasticsearch]
+
+  filebeat:
+    container_name: pitchain_filebeat
+    user: root
+    build:
+      context: ./elk/filebeat/
+      args:
+        ELASTIC_VERSION: ${ELASTIC_VERSION}
+    volumes:
+      - ./logs:/logs
+      - ./elk/filebeat/config/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro,Z
+    networks: [elk]
+    depends_on: [logstash]
+
+networks:
+  elk:
+    driver: bridge
+
+volumes:
+  elasticsearch:
