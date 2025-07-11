@@ -14,7 +14,7 @@ done
 
 if [ $NEED_RESTART -eq 1 ]; then
   echo "하나 이상의 ELK 컨테이너가 다운되어 있으므로 ELK 및 Filebeat를 재시작합니다."
-  docker-compose --profile setup -f docker-compose-elk.yml up --build -d
+  docker-compose --env-file .env --profile setup -f docker-compose-elk.yml up --build -d
 else
   echo "모든 ELK 컨테이너가 정상적으로 실행 중입니다."
 fi
