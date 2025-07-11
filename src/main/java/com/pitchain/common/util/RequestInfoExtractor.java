@@ -38,7 +38,11 @@ public class RequestInfoExtractor {
     }
 
     public static String getFullPath() {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        if (requestAttributes == null) {
+            return "";
+        }
+        HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
         String fullPath = request.getMethod() + " " + request.getRequestURL();
 
         String queryString = request.getQueryString();
