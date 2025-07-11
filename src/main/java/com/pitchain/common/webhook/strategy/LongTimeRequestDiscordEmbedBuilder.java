@@ -23,7 +23,7 @@ public class LongTimeRequestDiscordEmbedBuilder implements DiscordEmbedBuilderSt
                         new WebhookEmbed.EmbedField(false, BOLD_FORMAT.formatted("🔗 요청 URL"), QUOTE_FORMAT.formatted(payload.getUrl()))
                 )
                 .addField(
-                        new WebhookEmbed.EmbedField(false, BOLD_FORMAT.formatted("⏱️ 처리 시간"), QUOTE_FORMAT.formatted(payload.getTurnaroundTimeSec() + "ms"))
+                        new WebhookEmbed.EmbedField(false, BOLD_FORMAT.formatted("⏱️ 처리 시간"), QUOTE_FORMAT.formatted(payload.getTurnaroundTimeSec() + " 초"))
                 )
                 .addField(
                         new WebhookEmbed.EmbedField(false, BOLD_FORMAT.formatted("\uD83D\uDCC3 RequestId"), QUOTE_FORMAT.formatted(payload.getRequestId()))
