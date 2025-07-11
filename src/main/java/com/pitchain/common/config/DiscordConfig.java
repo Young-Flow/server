@@ -33,7 +33,8 @@ public class DiscordConfig {
 
     private static void setDefaultErrorHandler() {
         WebhookClient.setDefaultErrorHandler((client, message, throwable) -> {
-            log.info("[%s] %s%n", client.getId(), message);
+            log.error("Discord Webhook Error");
+            log.error("clientId : {}, message : {}", client.getId(), message);
             if (throwable != null)
                 throwable.printStackTrace();
 
@@ -41,5 +42,6 @@ public class DiscordConfig {
                 client.close();
             }
         });
+
     }
 }
