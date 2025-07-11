@@ -56,6 +56,6 @@ public class RequestInfoExtractor {
         }
 
         HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
-        return (String) request.getAttribute(SessionType.REUQEST_ID);
+        return (String) request.getAttribute(SessionType.REQUEST_ID);
     }
 }

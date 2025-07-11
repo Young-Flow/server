@@ -27,7 +27,7 @@ public class RequestInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) {
         String requestId = UUID.randomUUID().toString();
-        request.setAttribute(SessionType.REUQEST_ID, requestId);
+        request.setAttribute(SessionType.REQUEST_ID, requestId);
         request.setAttribute(SessionType.START_TIME, System.currentTimeMillis());
         LoggingUtil.logPreRequest(requestId, request.getRequestURI(), request.getMethod());
         return true;
