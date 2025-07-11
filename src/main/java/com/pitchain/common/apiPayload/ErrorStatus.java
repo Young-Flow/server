@@ -17,7 +17,7 @@ public enum ErrorStatus implements ResponseStatus {
     _INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON_500_1", "common.internal-server-error"),
 
     // discord
-    DISCORD_NO_WEBHOOK_STRATEGY(HttpStatus.BAD_REQUEST, "NO_WEBHOOK_STRATEGY_500_1", "discord.no-webhook-strategy"),
+    DISCORD_NO_WEBHOOK_STRATEGY(HttpStatus.BAD_REQUEST, "NO_WEBHOOK_STRATEGY_400_1", "discord.no-webhook-strategy"),
 
     // sse
     SSE_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "SSE_500_1", "sse.send-failed"),
