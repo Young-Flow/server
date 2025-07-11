@@ -7,5 +7,5 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SessionType {
     public static final String START_TIME = "startTime";
-    public static final String REUQEST_ID = "requestId";
+    public static final String REQUEST_ID = "requestId";
 }
