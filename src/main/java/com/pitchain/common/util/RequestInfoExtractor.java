@@ -3,6 +3,7 @@ package com.pitchain.common.util;
 import com.pitchain.common.constant.SessionType;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.util.Strings;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -43,14 +44,19 @@ public class RequestInfoExtractor {
             return "";
         }
         HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
-        String fullPath = request.getMethod() + " " + request.getRequestURL();
+        return extractFullPath(request);
+    }
+
+    @NotNull
+    private static String extractFullPath(HttpServletRequest request) {
+        String path = request.getMethod() + " " + request.getRequestURL();
 
         String queryString = request.getQueryString();
         if (queryString != null) {
-            fullPath += "?" + queryString;
+            path += "?" + queryString;
         }
 
-        return fullPath;
+        return path;
     }
 
     public static String getRequestIdInSession() {
