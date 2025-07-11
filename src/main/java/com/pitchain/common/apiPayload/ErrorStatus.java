@@ -16,6 +16,9 @@ public enum ErrorStatus implements ResponseStatus {
     _FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON_403_1", "common.forbidden"),
     _INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON_500_1", "common.internal-server-error"),
 
+    // discord
+    DISCORD_NO_WEBHOOK_STRATEGY(HttpStatus.BAD_REQUEST, "NO_WEBHOOK_STRATEGY_500_1", "discord.no-webhook-strategy"),
+
     // sse
     SSE_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "SSE_500_1", "sse.send-failed"),
 
@@ -68,7 +71,7 @@ public enum ErrorStatus implements ResponseStatus {
     INVALID_MIME_TYPE(HttpStatus.BAD_REQUEST, "FILE_400_1", "file.invalid-mime-type"),
     FAIL_STREAM_CONVERT(HttpStatus.BAD_REQUEST, "FILE_400_2", "file.fail-stream-convert"), ;
 
-
+    @Getter
     private final HttpStatus httpStatus;
     @Getter
     private final String code;
