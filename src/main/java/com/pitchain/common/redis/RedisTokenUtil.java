@@ -11,6 +11,7 @@ import com.pitchain.common.constant.TokenType;
 import com.pitchain.common.exception.GeneralException;
 import com.pitchain.common.security.MemberClaims;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -119,14 +120,21 @@ public class RedisTokenUtil {
         }
     }
 
-    public MemberClaims getClaim(String refreshToken) {
-        try {
-            DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC512(secretKey)).build().verify(refreshToken);
-            Long id = decodedJWT.getClaim("id").asLong();
-            MemberRole memberRole = MemberRole.valueOf(decodedJWT.getClaim("role").asString());
-            return new MemberClaims(id, memberRole);
-        } catch (JWTVerificationException e) {
-            throw new GeneralException(ErrorStatus._UNAUTHORIZED);
-        }
+    public MemberClaims getClaim(String token) {
+        DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC512(secretKey)).build().verify(token);
+        Long id = decodedJWT.getClaim("id").asLong();
+        MemberRole memberRole = MemberRole.toEnum(decodedJWT.getClaim("role").asString());
+        return new MemberClaims(id, memberRole);
+    }
+
+    public void reissueToken(HttpServletResponse response, MemberClaims claims) {
+        Long userId = claims.getId();
+        MemberRole memberRole = claims.getMemberRole();
+
+        String accessToken = issueAccessToken(userId, memberRole);
+        String refreshToken = issueRefreshToken(userId, memberRole);
+
+        response.setHeader(accessHeader, BEARER + accessToken);
+        response.setHeader(refreshHeader, BEARER + refreshToken);
     }
 }
