@@ -50,7 +50,6 @@ public class RedisTokenUtil {
                 .sign(Algorithm.HMAC512(secretKey));
     }
 
-    // todo 프로토타입 시연을 위한 임시 메소드
     public String issueAccessTokenWithoutExpiration(Long memberId, MemberRole memberRole) {
         return JWT.create()
                 .withSubject(ACCESS_TOKEN_SUBJECT)
