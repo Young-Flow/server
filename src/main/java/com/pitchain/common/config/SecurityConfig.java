@@ -1,7 +1,11 @@
 package com.pitchain.common.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pitchain.common.apiPayload.CustomResponse;
+import com.pitchain.common.apiPayload.ErrorStatus;
 import com.pitchain.common.collector.RoleRequestCollector;
 import com.pitchain.common.filter.JwtAuthenticationFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,12 +15,15 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -54,7 +61,10 @@ public class SecurityConfig {
             auth.requestMatchers(PUBLIC_ENDPOINTS).permitAll();
             auth.anyRequest().authenticated();
         });
-
+        http.exceptionHandling(exception -> {
+            exception.authenticationEntryPoint(customAuthenticationEntryPoint());
+            exception.accessDeniedHandler(customAccessDeniedHandler());
+        });
         return http.build();
     }
 
@@ -90,5 +100,31 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
+    }
+
+    @Bean
+    public AuthenticationEntryPoint customAuthenticationEntryPoint() {
+        return (request, response, authException) -> {
+            final String message = "유효한 인증 정보가 없거나, 존재하지 않는 API를 요청하셨습니다.";
+            writeErrorResponse(response, message);
+        };
+    }
+
+    @Bean
+    public AccessDeniedHandler customAccessDeniedHandler() {
+        return (request, response, accessDeniedException) -> {
+            final String message = "요청하신 API에 대한 접근 권한이 없습니다.";
+            writeErrorResponse(response, message);
+        };
+    }
+
+    private static void writeErrorResponse(HttpServletResponse response, String message) throws IOException {
+        ErrorStatus errorStatus = ErrorStatus._FORBIDDEN;
+        CustomResponse customResponse = CustomResponse.onFailure(errorStatus.getCode(), message);
+
+        response.setStatus(errorStatus.getHttpStatus().value());
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(new ObjectMapper().writeValueAsString(customResponse));
     }
 }
