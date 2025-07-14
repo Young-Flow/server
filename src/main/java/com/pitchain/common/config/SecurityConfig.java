@@ -29,17 +29,6 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final RoleRequestCollector roleRequestCollector;
 
-    public static final String[] whitelist = {
-            "/oauth**",
-            "/resources/**", "/favicon.ico", // resource
-            "/swagger-ui/**", "/api-docs/**", "/v3/api-docs**", "/v3/api-docs/**", // swagger
-            "/dev/**", // 개발용,
-            "/health-check", // health check
-
-            "/members/tokens", // 공통 유저
-            "/companies", "/companies/login", "/companies/emails"// 회사
-    };
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -55,16 +44,39 @@ public class SecurityConfig {
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         http.authorizeHttpRequests(auth -> {
-            auth.requestMatchers(whitelist).permitAll();
             roleRequestCollector.getRoleUriMap().forEach((role, methodUriMap) -> {
                 methodUriMap.forEach((httpMethod, uriSet) -> {
                     auth.requestMatchers(httpMethod, uriSet.toArray(new String[0])).hasAnyAuthority(role.getRoles());
                 });
             });
+            auth.requestMatchers(SWAGGER_PATTERNS).permitAll();
+            auth.requestMatchers(STATIC_RESOURCES_PATTERNS).permitAll();
+            auth.requestMatchers(PUBLIC_ENDPOINTS).permitAll();
             auth.anyRequest().authenticated();
         });
+
         return http.build();
     }
+
+    private static final String[] SWAGGER_PATTERNS = {
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+    };
+
+    private static final String[] STATIC_RESOURCES_PATTERNS = {
+            "/img/**",
+            "/css/**",
+            "/js/**",
+            "/favicon.ico",
+    };
+
+    private static final String[] PUBLIC_ENDPOINTS = {
+            "/health-check", // health check
+            "/oauth**",
+            "/members/tokens", "/members/emails", // 공통 유저
+            "/companies", "/companies/login", // 회사
+            "/dev/**", // 개발용
+    };
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
