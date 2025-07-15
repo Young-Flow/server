@@ -1,12 +1,11 @@
 package com.pitchain.common.filter;
 
-import com.auth0.jwt.interfaces.DecodedJWT;
-import com.pitchain.common.apiPayload.ErrorStatus;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.pitchain.common.constant.MemberRole;
 import com.pitchain.common.constant.TokenType;
-import com.pitchain.common.exception.GeneralException;
-import com.pitchain.common.security.MemberDetails;
 import com.pitchain.common.redis.RedisTokenUtil;
+import com.pitchain.common.security.MemberClaims;
+import com.pitchain.common.security.MemberDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,7 +16,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.PatternMatchUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -28,37 +26,42 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final RedisTokenUtil redisTokenUtil;
 
-    public static final String[] whitelist = {
-            "/oauth2/**",
-            "/resources/**", "/favicon.ico", // resource
-            "/swagger-ui/**", "/api-docs/**", "/v3/api-docs**", "/v3/api-docs/**", // swagger
-            "/health-check", // health check
-            "/dev/**", // 개발용,
-            "/members/tokens", // 공통 유저
-            "/companies", "/companies/login", "/companies/emails"// 회사
-    };
-
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        return PatternMatchUtils.simpleMatch(whitelist, request.getRequestURI());
-    }
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String token = redisTokenUtil.extractToken(request, TokenType.ACCESS_TOKEN);
+        try {
+            verifyAccessToken(request);
+        } catch (JWTVerificationException e1) {
+            try {
+                verifyRefreshToken(request, response);
+            } catch (JWTVerificationException e2) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+        }
 
-        if (token == null)
-            throw new GeneralException(ErrorStatus.TOKEN_MISSING);
+        filterChain.doFilter(request, response);
+    }
 
-        DecodedJWT decodedJWT = redisTokenUtil.decodedJWT(token);
-        Long id = decodedJWT.getClaim("id").asLong();
-        String role = decodedJWT.getClaim("role").asString();
+    private void verifyAccessToken(HttpServletRequest request) {
+        String accessToken = redisTokenUtil.extractToken(request, TokenType.ACCESS_TOKEN);
+        MemberClaims claim = redisTokenUtil.getClaim(accessToken);
+        setAuthentication(claim);
+    }
 
-        MemberRole memberRole = MemberRole.toEnum(role);
+    private void verifyRefreshToken(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = redisTokenUtil.extractToken(request, TokenType.REFRESH_TOKEN);
+        MemberClaims claims = redisTokenUtil.getClaim(refreshToken);
+        redisTokenUtil.reissueToken(response, claims);
+        setAuthentication(claims);
+    }
+
+    private void setAuthentication(MemberClaims claims) {
+        Long id = claims.getId();
+        MemberRole memberRole = claims.getMemberRole();
+
         MemberDetails memberDetails = new MemberDetails(id, memberRole);
         Authentication authentication = new UsernamePasswordAuthenticationToken(memberDetails, null, memberRole.getAuthorities());
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        doFilter(request, response, filterChain);
     }
 }

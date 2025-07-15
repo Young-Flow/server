@@ -8,17 +8,17 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.EnumSet;
 
 @Getter
 @RequiredArgsConstructor
 public enum MemberRole {
-    MEMBER(new String[]{"ROLE_INDIVIDUAL", "ROLE_COMPANY"}),
-    INDIVIDUAL(new String[]{"ROLE_INDIVIDUAL"}),
-    COMPANY(new String[]{"ROLE_COMPANY"}),
+    MEMBER(EnumSet.of(RoleType.INDIVIDUAL, RoleType.COMPANY)),
+    INDIVIDUAL(EnumSet.of(RoleType.INDIVIDUAL)),
+    COMPANY(EnumSet.of(RoleType.COMPANY)),
     ;
 
-    private final String[] roles;
+    private final EnumSet<RoleType> roleTypes;
 
     public static MemberRole toEnum(String role) {
         try {
@@ -29,8 +29,23 @@ public enum MemberRole {
     }
 
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(roles).stream()
-                .map(SimpleGrantedAuthority::new)
+        return roleTypes.stream()
+                .map(roleType -> new SimpleGrantedAuthority(roleType.getRoleName()))
                 .toList();
     }
+
+    public String[] getRoles() {
+        return roleTypes.stream().map(RoleType::getRoleName).toArray(String[]::new);
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public enum RoleType {
+        INDIVIDUAL("ROLE_INDIVIDUAL"),
+        COMPANY("ROLE_COMPANY"),
+        ;
+
+        private final String roleName;
+    }
+
 }
