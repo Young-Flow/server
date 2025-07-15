@@ -22,35 +22,50 @@ public class SpViewsService {
 
     private static final String SP_VIEW_REDIS_KEY = "spView";
 
+    /**
+     * Redis에 Sp 조회수 증가
+     * @param spId
+     */
     public void updateSpView(Long spId) {
         redisHashRepository.increment(SP_VIEW_REDIS_KEY, String.valueOf(spId), 1L);
     }
 
-    @Scheduled(cron = "0 */1 * * * *")
-    public void runUpdateSpViews() {
-        updateSpViews();
-    }
-
+    /**
+     * Redis에서 DB로 Sp 조회수 업데이트
+     */
     @Transactional
     public void updateSpViews() {
-        List<String> list = redisHashRepository.getAndDeleteAll(SP_VIEW_REDIS_KEY);
-        List<SpViewsDto> spViewsDtoList = parseResult(list);
+        List<String> spViewsResult = redisHashRepository.getAndDeleteAll(SP_VIEW_REDIS_KEY);
+        List<SpViewsDto> spViewsDtoList = parseResult(spViewsResult);
 
         for (SpViewsDto spViewsDto : spViewsDtoList) {
             spRepositoryCustom.updateSpView(spViewsDto.spId(), spViewsDto.views());
         }
     }
 
-    private List<SpViewsDto> parseResult(List<String> list) {
-        if (list.size() % 2 != 0){
-            log.error("조회수 개수가 올바르지 않습니다.");
-            throw new IllegalArgumentException("list 개수가 올바르지 않습니다.");
+    /**
+     * 1분마다 Redis에서 DB로 Sp 조회수 업데이트하는 작업 수행
+     */
+    @Scheduled(cron = "0 */1 * * * *")
+    public void runUpdateSpViews() {
+        updateSpViews();
+    }
+
+    /**
+     * Redis에서 가져온 Sp 조회수 String 리스트를 Dto 리스트로 파싱
+     * @param List<String>
+     * @return List<SpViewsDto>
+     */
+    private List<SpViewsDto> parseResult(List<String> spViewsResult) {
+        if (spViewsResult.size() % 2 != 0){
+            log.error("spViewsResult 개수가 올바르지 않습니다.");
+            throw new IllegalArgumentException("spViewsResult 개수가 올바르지 않습니다.");
         }
 
         List<SpViewsDto> spViewsDtoList = new ArrayList<>();
-        for (int i = 0; i < list.size(); i += 2) {
-            Long spId = Long.parseLong(list.get(i));
-            Long views = Long.parseLong(list.get(i + 1));
+        for (int i = 0; i < spViewsResult.size(); i += 2) {
+            Long spId = Long.parseLong(spViewsResult.get(i));
+            Long views = Long.parseLong(spViewsResult.get(i + 1));
 
             SpViewsDto spViewsDto = new SpViewsDto(spId, views);
             spViewsDtoList.add(spViewsDto);
