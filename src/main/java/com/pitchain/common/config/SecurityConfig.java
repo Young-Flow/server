@@ -40,10 +40,25 @@ public class SecurityConfig {
     @Value("#{'${spring.cors.allowed-origins}'.replaceAll(' ', '').split(',')}")
     private List<String> allowedOrigins;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    private static final String[] SWAGGER_PATTERNS = {
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+    };
+
+    private static final String[] STATIC_RESOURCES_PATTERNS = {
+            "/img/**",
+            "/css/**",
+            "/js/**",
+            "/favicon.ico",
+    };
+
+    private static final String[] PUBLIC_ENDPOINTS = {
+            "/health-check", // health check
+            "/oauth**",
+            "/members/tokens", "/members/emails", // 공통 유저
+            "/companies", "/companies/login", // 회사
+            "/dev/**", // 개발용
+    };
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -71,26 +86,6 @@ public class SecurityConfig {
         });
         return http.build();
     }
-
-    private static final String[] SWAGGER_PATTERNS = {
-            "/swagger-ui/**",
-            "/v3/api-docs/**",
-    };
-
-    private static final String[] STATIC_RESOURCES_PATTERNS = {
-            "/img/**",
-            "/css/**",
-            "/js/**",
-            "/favicon.ico",
-    };
-
-    private static final String[] PUBLIC_ENDPOINTS = {
-            "/health-check", // health check
-            "/oauth**",
-            "/members/tokens", "/members/emails", // 공통 유저
-            "/companies", "/companies/login", // 회사
-            "/dev/**", // 개발용
-    };
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -130,5 +125,10 @@ public class SecurityConfig {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(new ObjectMapper().writeValueAsString(customResponse));
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
