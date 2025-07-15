@@ -58,8 +58,8 @@ public class SpViewsService {
      */
     private List<SpViewsDto> parseResult(List<String> spViewsStringList) {
         if (spViewsStringList.size() % 2 != 0){
-            log.error("spViewsResult 개수가 올바르지 않습니다.");
-            throw new IllegalArgumentException("spViewsResult 개수가 올바르지 않습니다.");
+            log.error("spViewsStringList 개수가 올바르지 않습니다.");
+            throw new IllegalArgumentException("spViewsStringList 개수가 올바르지 않습니다.");
         }
 
         List<SpViewsDto> spViewsDtoList = new ArrayList<>();
