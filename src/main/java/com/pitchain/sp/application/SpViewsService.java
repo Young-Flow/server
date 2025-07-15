@@ -56,16 +56,16 @@ public class SpViewsService {
      * @param List<String>
      * @return List<SpViewsDto>
      */
-    private List<SpViewsDto> parseResult(List<String> spViewsResult) {
-        if (spViewsResult.size() % 2 != 0){
+    private List<SpViewsDto> parseResult(List<String> spViewsStringList) {
+        if (spViewsStringList.size() % 2 != 0){
             log.error("spViewsResult 개수가 올바르지 않습니다.");
             throw new IllegalArgumentException("spViewsResult 개수가 올바르지 않습니다.");
         }
 
         List<SpViewsDto> spViewsDtoList = new ArrayList<>();
-        for (int i = 0; i < spViewsResult.size(); i += 2) {
-            Long spId = Long.parseLong(spViewsResult.get(i));
-            Long views = Long.parseLong(spViewsResult.get(i + 1));
+        for (int i = 0; i < spViewsStringList.size(); i += 2) {
+            Long spId = Long.parseLong(spViewsStringList.get(i));
+            Long views = Long.parseLong(spViewsStringList.get(i + 1));
 
             SpViewsDto spViewsDto = new SpViewsDto(spId, views);
             spViewsDtoList.add(spViewsDto);
