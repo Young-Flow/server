@@ -36,7 +36,6 @@ import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.verify;
 
 @SpringBootTest
-@ActiveProfiles("local")
 class SpViewsServiceTest {
 
     @Autowired
