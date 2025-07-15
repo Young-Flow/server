@@ -78,6 +78,7 @@ public class SecurityConfig {
             auth.requestMatchers(SWAGGER_PATTERNS).permitAll();
             auth.requestMatchers(STATIC_RESOURCES_PATTERNS).permitAll();
             auth.requestMatchers(PUBLIC_ENDPOINTS).permitAll();
+            auth.anyRequest().permitAll();
         });
         http.exceptionHandling(exception -> {
             exception.authenticationEntryPoint(customAuthenticationEntryPoint());
