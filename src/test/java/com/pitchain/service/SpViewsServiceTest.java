@@ -20,6 +20,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +32,8 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @ActiveProfiles("local")
@@ -41,11 +44,11 @@ class SpViewsServiceTest {
     @Autowired
     private RedisHashRepository redisHashRepository;
     @Autowired
-    private SpViewsService spViewsService;
-    @Autowired
     private SpRepository spRepository;
     @Autowired
     private SpService spService;
+    @SpyBean
+    private SpViewsService spViewsService;
 
     private static final String SP_VIEW_REDIS_KEY = "spView";
 
@@ -178,13 +181,12 @@ class SpViewsServiceTest {
         Long spId = sp.getId();
         redisHashRepository.increment(SP_VIEW_REDIS_KEY, String.valueOf(spId), 1L);
 
+        //then
         Awaitility.await()
                 .atMost(Durations.ONE_MINUTE)
                 .untilAsserted(() -> {
-                    //when
-                    spViewsService.runUpdateSpViews();
+                    verify(spViewsService, atLeast(1)).runUpdateSpViews();
 
-                    //then
                     Sp foundSp = spRepository.findById(spId).orElseThrow();
                     Assertions.assertThat(foundSp.getViews()).isEqualTo(1L);
                 });

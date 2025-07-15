@@ -48,7 +48,11 @@ public class SpViewsService {
      */
     @Scheduled(cron = "0 */1 * * * *")
     public void runUpdateSpViews() {
-        updateSpViews();
+        try {
+            updateSpViews();
+        } catch (Exception e) {
+            log.error("Scheduling task [runUpdateSpViews] failed", e);
+        }
     }
 
     /**
