@@ -25,7 +25,7 @@ import java.util.List;
 @Aspect
 @RequiredArgsConstructor
 @Component
-public class UnintendedExceptionLoggingAspect {
+public class UndefinedExceptionLoggingAspect {
 
     private final DiscordWebhookSender discordWebhookSender;
 
