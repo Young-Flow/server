@@ -27,7 +27,7 @@ public class InvestmentController {
         investmentService.addInvestment(bmId, memberDetails, amount);
     }
 
-    @GetMapping("/{bmId}/investment")
+    @GetMapping("/{bmId}/investments")
     public InvestmentStatusRes getInvestmentStatus(@PathVariable("bmId") Long bmId) {
         InvestmentStatusRes investmentStatusRes = investmentService.getInvestmentStatus(bmId);
         return investmentStatusRes;

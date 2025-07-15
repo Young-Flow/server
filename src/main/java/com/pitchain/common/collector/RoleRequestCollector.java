@@ -3,7 +3,6 @@ package com.pitchain.common.collector;
 import com.pitchain.common.annotation.RequiredRole;
 import com.pitchain.common.constant.MemberRole;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -37,8 +36,7 @@ public class RoleRequestCollector {
 
     private void collectRoleUris(Map.Entry<RequestMappingInfo, HandlerMethod> entry, Map<MemberRole, Map<HttpMethod, Set<String>>> roleUriMap) {
         HandlerMethod handlerMethod = entry.getValue();
-        RequiredRole requiredRole = AnnotatedElementUtils.findMergedAnnotation(handlerMethod.getMethod(), RequiredRole.class);
-
+        RequiredRole requiredRole = handlerMethod.getMethod().getAnnotation(RequiredRole.class);
         if (requiredRole != null) {
             MemberRole memberRole = requiredRole.value();
             Map<HttpMethod, Set<String>> uriMap = roleUriMap.get(memberRole);
