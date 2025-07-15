@@ -7,6 +7,7 @@ import com.pitchain.common.collector.RoleRequestCollector;
 import com.pitchain.common.filter.JwtAuthenticationFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -36,10 +37,28 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final RoleRequestCollector roleRequestCollector;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    @Value("#{'${spring.cors.allowed-origins}'.replaceAll(' ', '').split(',')}")
+    private List<String> allowedOrigins;
+
+    private static final String[] SWAGGER_PATTERNS = {
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+    };
+
+    private static final String[] STATIC_RESOURCES_PATTERNS = {
+            "/img/**",
+            "/css/**",
+            "/js/**",
+            "/favicon.ico",
+    };
+
+    private static final String[] PUBLIC_ENDPOINTS = {
+            "/health-check", // health check
+            "/oauth**",
+            "/members/tokens", "/members/emails", // 공통 유저
+            "/companies", "/companies/login", // 회사
+            "/dev/**", // 개발용
+    };
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -68,31 +87,11 @@ public class SecurityConfig {
         return http.build();
     }
 
-    private static final String[] SWAGGER_PATTERNS = {
-            "/swagger-ui/**",
-            "/v3/api-docs/**",
-    };
-
-    private static final String[] STATIC_RESOURCES_PATTERNS = {
-            "/img/**",
-            "/css/**",
-            "/js/**",
-            "/favicon.ico",
-    };
-
-    private static final String[] PUBLIC_ENDPOINTS = {
-            "/health-check", // health check
-            "/oauth**",
-            "/members/tokens", "/members/emails", // 공통 유저
-            "/companies", "/companies/login", // 회사
-            "/dev/**", // 개발용
-    };
-
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
+        config.setAllowedOrigins(allowedOrigins);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(Arrays.asList("Authorization", "Authorization-Refresh"));
@@ -126,5 +125,10 @@ public class SecurityConfig {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(new ObjectMapper().writeValueAsString(customResponse));
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
