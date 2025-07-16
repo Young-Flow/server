@@ -59,15 +59,9 @@ discord:
 logging:
   level:
     root: info
-  org:
-    hibernate:
-      SQL: info
-    springframework:
-      web:
-        cors:
-          DefaultCorsProcessor: trace
-        client:
-          RestTemplate: debug
+    org.hibernate.SQL: info
+    org.springframework.web.cors.DefaultCorsProcessor: trace
+    org.springframework.web.client.RestTemplate: debug
 
 oauth:
   kakao:
