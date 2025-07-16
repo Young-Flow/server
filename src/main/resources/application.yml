@@ -64,6 +64,8 @@ logging:
       SQL: info
     springframework:
       web:
+        cors:
+          DefaultCorsProcessor: trace
         client:
           RestTemplate: debug
 
