@@ -35,7 +35,7 @@ public class GeneralExceptionLoggingAspect {
         ErrorStatus errorStatus = exception.getErrorStatus();
         MDC.put("httpStatus", String.valueOf(errorStatus.getHttpStatus()));
 
-        log.error("[ERROR] POINT : {} || EXCEPTION : {} || ARGUMENTS : {}",
+        log.error("[ERROR] POINT : {} || ERROR CODE : {} || ARGUMENTS : {}",
                 className, errorStatus.getCode(), parameterMessage
         );
         log.error("[ERROR] FINAL POINT : {}", exception.getStackTrace()[0]);

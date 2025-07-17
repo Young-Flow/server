@@ -7,6 +7,7 @@ import com.pitchain.common.collector.RoleRequestCollector;
 import com.pitchain.common.filter.JwtAuthenticationFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -36,37 +37,8 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final RoleRequestCollector roleRequestCollector;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.httpBasic(AbstractHttpConfigurer::disable)
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(withDefaults())
-                .formLogin(AbstractHttpConfigurer::disable);
-        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
-        http.authorizeHttpRequests(auth -> {
-            roleRequestCollector.getRoleUriMap().forEach((role, methodUriMap) -> {
-                methodUriMap.forEach((httpMethod, uriSet) -> {
-                    auth.requestMatchers(httpMethod, uriSet.toArray(new String[0])).hasAnyAuthority(role.getRoles());
-                });
-            });
-            auth.requestMatchers(SWAGGER_PATTERNS).permitAll();
-            auth.requestMatchers(STATIC_RESOURCES_PATTERNS).permitAll();
-            auth.requestMatchers(PUBLIC_ENDPOINTS).permitAll();
-            auth.anyRequest().authenticated();
-        });
-        http.exceptionHandling(exception -> {
-            exception.authenticationEntryPoint(customAuthenticationEntryPoint());
-            exception.accessDeniedHandler(customAccessDeniedHandler());
-        });
-        return http.build();
-    }
+    @Value("#{'${spring.cors.allowed-origins}'.replaceAll(' ', '').split(',')}")
+    private List<String> allowedOrigins;
 
     private static final String[] SWAGGER_PATTERNS = {
             "/swagger-ui/**",
@@ -89,10 +61,37 @@ public class SecurityConfig {
     };
 
     @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.httpBasic(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(withDefaults())
+                .formLogin(AbstractHttpConfigurer::disable);
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        http.authorizeHttpRequests(auth -> {
+            roleRequestCollector.getRoleUriMap().forEach((role, methodUriMap) -> {
+                methodUriMap.forEach((httpMethod, uriSet) -> {
+                    auth.requestMatchers(httpMethod, uriSet.toArray(new String[0])).hasAnyAuthority(role.getRoles());
+                });
+            });
+            auth.requestMatchers(SWAGGER_PATTERNS).permitAll();
+            auth.requestMatchers(STATIC_RESOURCES_PATTERNS).permitAll();
+            auth.requestMatchers(PUBLIC_ENDPOINTS).permitAll();
+            auth.anyRequest().permitAll();
+        });
+        http.exceptionHandling(exception -> {
+            exception.authenticationEntryPoint(customAuthenticationEntryPoint());
+            exception.accessDeniedHandler(customAccessDeniedHandler());
+        });
+        return http.build();
+    }
+
+    @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
+        config.setAllowedOrigins(allowedOrigins);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(Arrays.asList("Authorization", "Authorization-Refresh"));
@@ -126,5 +125,10 @@ public class SecurityConfig {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(new ObjectMapper().writeValueAsString(customResponse));
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
