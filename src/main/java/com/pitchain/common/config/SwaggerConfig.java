@@ -55,7 +55,7 @@ public class SwaggerConfig {
                 .externalDocs(new ExternalDocumentation()
                         .description("Pitchain Server Github")
                         .url("https://github.com/Young-Flow/server"))
-                .servers(List.of(new Server().url(serverUrl)))
+                .servers(List.of(new Server().url("/"), new Server().url(serverUrl)))
                 .info(apiInfo());
     }
 
