@@ -23,22 +23,11 @@
 - 오픈소스 라이브러리: FFmpeg
 - 로깅 툴: Sentry
 
-## 개발 기간
-- 2024.12 ~ 현재 진행중
+## 프로토타입 개발 기간
+- 2024.12 ~ 2025.02
 
 ## 성과
 - 2025.02.07 미래내일 일경험 프로젝트형 IT 직무 3기 대상 수상
-
-## 주요 기술
-- AWS Lambda와 FFmpeg을 이용한 숏폼 업로드 과정 설계 (https://github.com/Young-Flow/server/issues/65)
-![스트리밍](https://github.com/user-attachments/assets/2cdf5800-c019-421a-bedb-3c6fa5424b85)
-- Redis와 HashMap을 이용한 비영업일 고려한 일환율 업데이트 로직 (https://github.com/Young-Flow/server/issues/42)
-
-## 주요 논의
-- API 분리 (https://github.com/Young-Flow/server/issues/25)
-- 영상 업로드 과정에서의 사용자 기능 (https://github.com/Young-Flow/server/issues/129)
-- 조회수 중복 처리 로직 (https://github.com/Young-Flow/server/issues/125)
-- 계층을 가진 댓글 조회 (https://github.com/Young-Flow/server/issues/55)
 
 ## ERD
 ![ERD](https://github.com/user-attachments/assets/bde9d6f4-7ea9-4111-b7f0-621ab8f12acf)
