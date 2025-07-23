@@ -5,6 +5,7 @@ import com.pitchain.sp.infrastucture.SpRepositoryCustom;
 import com.pitchain.sp.infrastucture.dto.SpViewsDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,7 @@ public class SpViewsService {
      * Redis에 Sp 조회수 증가
      * @param spId
      */
+    @Async
     public void updateSpView(Long spId) {
         redisHashRepository.increment(SP_VIEW_REDIS_KEY, String.valueOf(spId), 1L);
     }

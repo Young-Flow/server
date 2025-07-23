@@ -36,8 +36,9 @@ public class SpService {
     }
 
     public SpDetailRes getSpDetail(MemberDetails memberDetails, Long bmId, Long spId) {
+        SpDetailRes spDetailRes = spQueryService.getSpDetail(memberDetails, bmId, spId);
         spViewsService.updateSpView(spId);
-        return spQueryService.getSpDetail(memberDetails, bmId, spId);
+        return spDetailRes;
     }
 
     @Transactional
