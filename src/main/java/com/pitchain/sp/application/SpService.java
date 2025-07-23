@@ -18,6 +18,7 @@ import java.util.List;
 public class SpService {
     private final SpCommandService spCommandService;
     private final SpQueryService spQueryService;
+    private final SpViewsService spViewsService;
 
     @Transactional
     public void createSp(MemberDetails memberDetails, Long bmId, SpCreateReq spCreateReq, MultipartFile thumbnailImg) {
@@ -34,9 +35,10 @@ public class SpService {
         return spQueryService.getSpDetailsFilteredCategory(memberDetails, mainCategoryInKorean, lastSpId, size);
     }
 
-    @Transactional(readOnly = true)
     public SpDetailRes getSpDetail(MemberDetails memberDetails, Long bmId, Long spId) {
-        return spQueryService.getSpDetail(memberDetails, bmId, spId);
+        SpDetailRes spDetailRes = spQueryService.getSpDetail(memberDetails, bmId, spId);
+        spViewsService.updateSpView(spId);
+        return spDetailRes;
     }
 
     @Transactional
