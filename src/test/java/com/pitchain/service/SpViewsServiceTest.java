@@ -32,8 +32,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 class SpViewsServiceTest {
@@ -91,6 +90,8 @@ class SpViewsServiceTest {
             });
         }
         latch.await();
+
+        Thread.sleep(5000);  //비동기 처리 완료 대기
 
         //then
         Map<String, String> spView = redisHashRepository.findAll(SP_VIEW_REDIS_KEY);
